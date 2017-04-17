@@ -1,3 +1,16 @@
+/*
+ * LESSONS LEARNED
+ *  1. Correct i2c-dev.h
+ *    The default `/usr/include/linux/i2c-dev.h` is only meant to be used by the kernel and does not
+ *    contain the `i2c_smbus_...()` functions.
+ *    Fixed by `sudo apt install libi2c-dev`.
+ *  2. Add users to i2c group
+ *    By default, users do not have permission to access the `/dev/i2c-1` file, hence error on
+ *    opening it here.
+ *    Fixed by `usermod -aG i2c <username>`.
+ */
+
+
 #include "mpu6050.h"
 
 using namespace std;
@@ -54,33 +67,68 @@ void Mpu6050::init(unsigned char slave_addr) {
 
 int Mpu6050::get_raw_accl_x()
 {
-  return 0;
+  int x = i2c_smbus_read_word_data(file_i2c, 0x3B);
+  if (x < 0)
+  {
+    printf("MPU6050: Error reading sensor data\n");
+  }
+  else
+    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
 }
 
 int Mpu6050::get_raw_accl_y()
 {
-  return 0;
+  int x = i2c_smbus_read_word_data(file_i2c, 0x3D);
+  if (x < 0)
+  {
+    printf("MPU6050: Error reading sensor data\n");
+  }
+  else
+    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
 }
 
 int Mpu6050::get_raw_accl_z()
 {
-  return 0;
+  int x = i2c_smbus_read_word_data(file_i2c, 0x3F);
+  if (x < 0)
+  {
+    printf("MPU6050: Error reading sensor data\n");
+  }
+  else
+    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
 }
 
 int Mpu6050::get_raw_gyro_x()
 {
   int x = i2c_smbus_read_word_data(file_i2c, 0x43);
-  return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes
+  if (x < 0)
+  {
+    printf("MPU6050: Error reading sensor data\n");
+  }
+  else
+    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
 }
 
 int Mpu6050::get_raw_gyro_y()
 {
-  return 0;
+  int x = i2c_smbus_read_word_data(file_i2c, 0x45);
+  if (x < 0)
+  {
+    printf("MPU6050: Error reading sensor data\n");
+  }
+  else
+    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
 }
 
 int Mpu6050::get_raw_gyro_z()
 {
-  return 0;
+  int x = i2c_smbus_read_word_data(file_i2c, 0x47);
+  if (x < 0)
+  {
+    printf("MPU6050: Error reading sensor data\n");
+  }
+  else
+    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
 }
 
 int main()
@@ -88,14 +136,12 @@ int main()
   Mpu6050 sensor;
   for (int i = 0; i < 10000; i++)
   {
-    printf("\r%8d", sensor.get_raw_gyro_x());
+    printf("AX=%7d, AY=%7d, AZ=%7d, GX=%7d, GY=%7d, GZ=%7d\n",
+        sensor.get_raw_accl_x(),
+        sensor.get_raw_accl_y(),
+        sensor.get_raw_accl_z(),
+        sensor.get_raw_gyro_x(),
+        sensor.get_raw_gyro_y(),
+        sensor.get_raw_gyro_z());
   }
-  printf("\n");
 }
-
-/*
- * LESSONS LEARNED
- *  1. Correct i2c-dev.h
- *
- *  2. Add users to i2c group
- */
