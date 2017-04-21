@@ -11,137 +11,95 @@
  */
 
 
-#include "mpu6050.h"
+#include "mpu6050.hpp"
 
 using namespace std;
 
-class Mpu6050{
-    int file_i2c;
-    void init(unsigned char slave_addr);
-  public:
-    Mpu6050 (unsigned char slave_addr = DEFAULT_SLAVE_ADDR) {init(slave_addr);}
-    ~Mpu6050 () {close(file_i2c);}
-    int get_raw_accl_x();
-    int get_raw_accl_y();
-    int get_raw_accl_z();
-    int get_raw_gyro_x();
-    int get_raw_gyro_y();
-    int get_raw_gyro_z();
-};
-
-
-
-void Mpu6050::init(unsigned char slave_addr) {
-  // Open the I2C bus file
-  // (on Linux filesystem, IO devices are mounted as files in /dev directory)
-  char filename[] = "/dev/i2c-1";   //CAUTION: may be determined dynamically at boot
-  if ((file_i2c = open(filename, O_RDWR)) < 0)
-  {
-    printf("MPU6050: Failed to open the i2c bus\n");
-    exit(1);
-  }
-
-  // Specify which device (sensor) on the I2C bus to communicate with
-  if (ioctl(file_i2c, I2C_SLAVE, slave_addr) < 0)
-  {
-    printf("MPU6050: Failed to acquire bus access and/or talk to slave.\n");
-    exit(1);
-  }
-
-  // POWER MGMT setup
-  if (i2c_smbus_write_byte_data(file_i2c, 0x6B, 0x80) < 0) //reset everything
-  {
-    printf("MPU6050: PWR_MGMT_1 write failed\n");
-  }
-  sleep(1);
-  if (i2c_smbus_write_byte_data(file_i2c, 0x6B, 0x03) < 0) //PWR_MGMT_1 - set gyro z as clock source
-  {
-    printf("MPU6050: PWR_MGMT_1 write failed\n");
-  }
-  if (i2c_smbus_write_byte_data(file_i2c, 0x6B, 0x03) < 0) //PWR_MGMT_2 - set gyro z as clock source
-  {
-    printf("MPU6050: PWR_MGMT_1 write failed\n");
-  }
-  sleep(1);
+Mpu6050::Mpu6050(I2C *bus)
+{
+    this->bus = bus;
+    init();
 }
+
+void Mpu6050::init() {
+    // POWER MGMT setup
+    char buf[2];
+    buf[0] = 0x6B; buf[1] = 0x80;
+    this->bus->write(slave_addr, 2, buf); //PWR_MGMT_1 - reset
+    sleep(1);
+
+    buf[0] = 0x6B; buf[1] = 0x03;
+    this->bus->write(slave_addr, 2, buf); //PWR_MGMT_1 - set gyro z as clock source
+    buf[0] = 0x6C; buf[1] = 0;
+    this->bus->write(slave_addr, 2, buf); //PWR_MGMT_2
+    sleep(1);
+}
+
+void Mpu6050::write8(char reg_addr, char data)
+{
+    char buf[2] = {reg_addr, data};
+    this->bus->write(this->slave_addr, 2, buf);
+}
+
+uint8_t Mpu6050::read8(char reg_addr)
+{
+    char send_buf[1] = {reg_addr};
+    char recv_buf[1];
+    this->bus->write_read(this->slave_addr, 1, send_buf, 1, recv_buf);
+    return (uint8_t) recv_buf[0];
+}
+
+short Mpu6050::read16(char reg_addr)
+{
+    char send_buf[1] = {reg_addr};
+    char recv_buf[2];
+    this->bus->write_read(this->slave_addr, 1, send_buf, 2, recv_buf);
+    return (short) ((recv_buf[0] << 8) | recv_buf[1]); //little-endian
+}
+
+
 
 int Mpu6050::get_raw_accl_x()
 {
-  int x = i2c_smbus_read_word_data(file_i2c, 0x3B);
-  if (x < 0)
-  {
-    printf("MPU6050: Error reading sensor data\n");
-  }
-  else
-    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
+  return this->read16(0x3B);
 }
 
 int Mpu6050::get_raw_accl_y()
 {
-  int x = i2c_smbus_read_word_data(file_i2c, 0x3D);
-  if (x < 0)
-  {
-    printf("MPU6050: Error reading sensor data\n");
-  }
-  else
-    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
+  return this->read16(0x3D);
 }
 
 int Mpu6050::get_raw_accl_z()
 {
-  int x = i2c_smbus_read_word_data(file_i2c, 0x3F);
-  if (x < 0)
-  {
-    printf("MPU6050: Error reading sensor data\n");
-  }
-  else
-    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
+  return this->read16(0x3F);
 }
 
 int Mpu6050::get_raw_gyro_x()
 {
-  int x = i2c_smbus_read_word_data(file_i2c, 0x43);
-  if (x < 0)
-  {
-    printf("MPU6050: Error reading sensor data\n");
-  }
-  else
-    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
+  return this->read16(0x43);
 }
 
 int Mpu6050::get_raw_gyro_y()
 {
-  int x = i2c_smbus_read_word_data(file_i2c, 0x45);
-  if (x < 0)
-  {
-    printf("MPU6050: Error reading sensor data\n");
-  }
-  else
-    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
+  return this->read16(0x45);
 }
 
 int Mpu6050::get_raw_gyro_z()
 {
-  int x = i2c_smbus_read_word_data(file_i2c, 0x47);
-  if (x < 0)
-  {
-    printf("MPU6050: Error reading sensor data\n");
-  }
-  else
-    return (int) (short) (((x & 0xFF) << 8) | ((x & 0xFF00) >> 8)); //correct the order of the bytes and correct sign
+  return this->read16(0x47);
 }
 
 int main()
 {
-  Mpu6050 sensor;
-  for (int i = 0; i < 10000; i++)
-  {
-    printf("AX=%7d, AY=%7d, AZ=%7d, GX=%7d, GY=%7d, GZ=%7d\n",
-        sensor.get_raw_accl_x(),
-        sensor.get_raw_accl_y(),
-        sensor.get_raw_accl_z(),
-        sensor.get_raw_gyro_x(),
-        sensor.get_raw_gyro_y(),
-        sensor.get_raw_gyro_z());
-  }
+    Mpu6050 sensor(new I2C);
+    for (int i = 0; i < 10000; i++)
+    {
+        printf("AX=%7d, AY=%7d, AZ=%7d, GX=%7d, GY=%7d, GZ=%7d\n",
+            sensor.get_raw_accl_x(),
+            sensor.get_raw_accl_y(),
+            sensor.get_raw_accl_z(),
+            sensor.get_raw_gyro_x(),
+            sensor.get_raw_gyro_y(),
+            sensor.get_raw_gyro_z());
+    }
 }
