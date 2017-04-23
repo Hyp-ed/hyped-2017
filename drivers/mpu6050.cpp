@@ -13,7 +13,55 @@
 
 #include "mpu6050.hpp"
 
+#include <array>
+
+// MPU6050's register addresses
+// For more information refer to MPU-6050 Register Map and Descriptions at
+//   https://www.invensense.com/wp-content/uploads/2015/02/MPU-6000-Register-Map1.pdf
+#define SELF_TEST_X  0x0D
+#define SELF_TEST_Y  0x0E
+#define SELF_TEST_Z  0x0F
+#define SELF_TEST_A  0x10
+#define SMPLRT_DIV   0x19
+#define CONFIG       0x1A
+#define GYRO_CONFIG  0x1B
+#define ACCEL_CONFIG 0x1C
+#define FIFO_EN      0x23
+#define INT_PIN_CFG  0x37
+#define INT_ENABLE   0x38
+#define INT_STATUS   0x3A 
+
+#define ACCEL_XOUT_H 0x3B
+#define ACCEL_XOUT_L 0x3C
+#define ACCEL_YOUT_H 0x3D
+#define ACCEL_YOUT_L 0x3E
+#define ACCEL_ZOUT_H 0x3F
+#define ACCEL_ZOUT_L 0x40
+#define TEMP_OUT_H   0x41
+#define TEMP_OUT_L   0x42
+#define GYRO_XOUT_H  0x43
+#define GYRO_XOUT_L  0x44
+#define GYRO_YOUT_H  0x45
+#define GYRO_YOUT_L  0x46
+#define GYRO_ZOUT_H  0x47
+#define GYRO_ZOUT_L  0x48
+
+#define SIGNAL_PATH_RES 0x68
+#define USER_CTRL       0x6A
+#define PWR_MGMT_1      0x6B
+#define PWR_MGMT_2      0x6C
+#define FIFO_COUNTH     0x72
+#define FIFO_COUNTL     0x73
+#define FIFO_R_W        0x74
+#define WHO_AM_I        0x75
+
+#define DEFAULT_ACCL_RANGE ACCL_RANGE_2G
+#define DEFAULT_GYRO_RANGE GYRO_RANGE_250DPS
+
 using namespace std;
+
+const array<double, 4> ACCL_SCALES = {16384.0, 8192.0, 4096.0, 2048.0};
+const array<double, 4> GYRO_SCALES = {131.0, 65.5, 32.8, 16.4};
 
 Mpu6050::Mpu6050(I2C *bus)
 {
@@ -21,18 +69,17 @@ Mpu6050::Mpu6050(I2C *bus)
   init();
 }
 
+
 void Mpu6050::init() {
   // POWER MGMT setup
-  char buf[2];
-  buf[0] = 0x6B; buf[1] = 0x80;
-  this->bus->write(slave_addr, 2, buf); //PWR_MGMT_1 - reset
-  sleep(1);
+  this->write8(PWR_MGMT_1, 0x80); //PWR_MGMT_1 - reset
+  sleep(1); //sleep for 1 second, probably not necessary but just in case...
   
-  buf[0] = 0x6B; buf[1] = 0x03;
-  this->bus->write(slave_addr, 2, buf); //PWR_MGMT_1 - set gyro z as clock source
-  buf[0] = 0x6C; buf[1] = 0;
-  this->bus->write(slave_addr, 2, buf); //PWR_MGMT_2
-  sleep(1);
+  this->write8(PWR_MGMT_1, 0x03); //PWR_MGMT_1 - set gyro z as clock source
+  sleep(1); //sleep for 1 second, probably not necessary but just in case...
+
+  this->set_accl_range(DEFAULT_ACCL_RANGE);
+  this->set_gyro_range(DEFAULT_GYRO_RANGE);
 }
 
 void Mpu6050::write8(char reg_addr, char data)
@@ -57,49 +104,108 @@ short Mpu6050::read16(char reg_addr)
   return (short) ((recv_buf[0] << 8) | recv_buf[1]); //little-endian
 }
 
-uint8_t* Mpu6050::read_bytes(char reg_addr, short length)
+vector<uint8_t> Mpu6050::read_bytes(char reg_addr, short length)
 {
   char send_buf[1] = {reg_addr};
   char recv_buf[length];
   this->bus->write_read(this->slave_addr, 1, send_buf, length, recv_buf);
-  return (uint8_t*) recv_buf;
+  vector<uint8_t> vec (length); // new vector of size `length`
+  for (int i = 0; i < length; i++)
+  {
+    vec[i] = (uint8_t) recv_buf[i];
+  }
+  return vec;
 }
 
 
+void Mpu6050::set_accl_range(int range)
+{
+  if (range < ACCL_RANGE_MIN || range > ACCL_RANGE_MAX)
+    range = DEFAULT_ACCL_RANGE;
+  // TODO: do not reset the self-test bits (ACCEL_CONFIG[7:5])
+  this->write8(ACCEL_CONFIG, (char) (range << 3)); //range selection in ACCEL_CONFIG[4:3] (3 lsb empty)
+  this->accl_scale = ACCL_SCALES[range];
+}
+
+void Mpu6050::set_gyro_range(int range)
+{
+  if (range < GYRO_RANGE_MIN || range > GYRO_RANGE_MAX)
+    range = DEFAULT_GYRO_RANGE;
+  // TODO: do not reset the self-test bits (GYRO_CONFIG[7:5])
+  this->write8(GYRO_CONFIG, (char) (range << 3)); //range selection in GYRO_CONFIG[4:3] (3 lsb empty)
+  this->gyro_scale = GYRO_SCALES[range];
+}
+
+void Mpu6050::calibrate_gyro(int num_samples)
+{
+  this->gyro_offset.x = 0.0;
+  this->gyro_offset.y = 0.0;
+  this->gyro_offset.z = 0.0;
+  for (int i = 0; i < num_samples; i++)
+  {
+    RawGyroData data = this->get_raw_gyro_data();
+    this->gyro_offset.x += data.x;
+    this->gyro_offset.y += data.y;
+    this->gyro_offset.z += data.z;
+  }
+  this->gyro_offset.x /= num_samples;
+  this->gyro_offset.y /= num_samples;
+  this->gyro_offset.z /= num_samples;
+}
 
 short Mpu6050::get_raw_accl_x()
 {
-  return this->read16(0x3B);
+  return this->read16(ACCEL_XOUT_H);
 }
 
 short Mpu6050::get_raw_accl_y()
 {
-  return this->read16(0x3D);
+  return this->read16(ACCEL_YOUT_H);
 }
 
 short Mpu6050::get_raw_accl_z()
 {
-  return this->read16(0x3F);
+  return this->read16(ACCEL_ZOUT_H);
 }
 
 short Mpu6050::get_raw_gyro_x()
 {
-  return this->read16(0x43);
+  return this->read16(GYRO_XOUT_H);
 }
 
 short Mpu6050::get_raw_gyro_y()
 {
-  return this->read16(0x45);
+  return this->read16(GYRO_YOUT_H);
 }
 
 short Mpu6050::get_raw_gyro_z()
 {
-  return this->read16(0x47);
+  return this->read16(GYRO_ZOUT_H);
+}
+
+RawAcclData Mpu6050::get_raw_accl_data()
+{
+  vector<uint8_t> bytes = this->read_bytes(ACCEL_XOUT_H, 6); //read all 6 accl output registers
+  RawAcclData data;
+  data.x = (short) ((bytes[0] << 8) | bytes[1]);
+  data.y = (short) ((bytes[2] << 8) | bytes[3]);
+  data.z = (short) ((bytes[4] << 8) | bytes[5]);
+  return data;
+}
+
+RawGyroData Mpu6050::get_raw_gyro_data()
+{
+  vector<uint8_t> bytes = this->read_bytes(GYRO_XOUT_H, 6); //read all 6 gyro output registers
+  RawGyroData data;
+  data.x = (short) ((bytes[0] << 8) | bytes[1]);
+  data.y = (short) ((bytes[2] << 8) | bytes[3]);
+  data.z = (short) ((bytes[4] << 8) | bytes[5]);
+  return data;
 }
 
 RawSensorData Mpu6050::get_raw_sensor_data()
 {
-  uint8_t *bytes = this->read_bytes(0x3B, 14); //array of length 14
+  vector<uint8_t> bytes = this->read_bytes(ACCEL_XOUT_H, 14); //read all 14 output registers
   RawSensorData data;
   data.accl.x = (short) ((bytes[0] << 8) | bytes[1]);
   data.accl.y = (short) ((bytes[2] << 8) | bytes[3]);
@@ -108,5 +214,57 @@ RawSensorData Mpu6050::get_raw_sensor_data()
   data.gyro.x = (short) ((bytes[8] << 8) | bytes[9]);
   data.gyro.y = (short) ((bytes[10] << 8) | bytes[11]);
   data.gyro.z = (short) ((bytes[12] << 8) | bytes[13]);
+  return data;
+}
+
+Acceleration Mpu6050::get_acceleration()
+{
+  return this->get_acceleration(this->get_raw_accl_data());
+}
+
+Acceleration Mpu6050::get_acceleration(RawAcclData accl_reading)
+{
+  Acceleration a;
+  a.x = accl_reading.x / this->accl_scale;
+  a.y = accl_reading.y / this->accl_scale;
+  a.z = accl_reading.z / this->accl_scale;
+  return a;
+}
+
+Acceleration Mpu6050::get_acceleration(RawSensorData reading)
+{
+  return this->get_acceleration(reading.accl);
+}
+
+AngularVelocity Mpu6050::get_angular_velocity()
+{
+  return this->get_angular_velocity(this->get_raw_gyro_data());
+}
+
+AngularVelocity Mpu6050::get_angular_velocity(RawGyroData gyro_reading)
+{
+  AngularVelocity omega;
+  omega.x = (gyro_reading.x - this->gyro_offset.x) / this->gyro_scale;
+  omega.y = (gyro_reading.y - this->gyro_offset.y) / this->gyro_scale;
+  omega.z = (gyro_reading.z - this->gyro_offset.z) / this->gyro_scale;
+  return omega;
+}
+
+AngularVelocity Mpu6050::get_angular_velocity(RawSensorData reading)
+{
+  return this->get_angular_velocity(reading.gyro);
+}
+
+SensorData Mpu6050::get_sensor_data()
+{
+  return this->get_sensor_data(this->get_raw_sensor_data());
+}
+
+SensorData Mpu6050::get_sensor_data(RawSensorData reading)
+{
+  SensorData data;
+  data.accl = this->get_acceleration(reading);
+  data.temp = reading.temp / 340.0 + 36.53; //calculation from Register Descriptions document p. 30
+  data.angv = this->get_angular_velocity(reading);
   return data;
 }
