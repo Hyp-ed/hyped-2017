@@ -14,6 +14,8 @@
 #include "mpu6050.hpp"
 
 #include <array>
+#include <cstdio>
+#include <cmath>
 
 // MPU6050's register addresses
 // For more information refer to MPU-6050 Register Map and Descriptions at
@@ -117,6 +119,84 @@ vector<uint8_t> Mpu6050::read_bytes(char reg_addr, short length)
   return vec;
 }
 
+SelfTestResult Mpu6050::test_accl()
+{
+  uint8_t rng = this->read8(ACCEL_CONFIG) & 0x18; // save current range setting
+  
+  RawAcclData rad1, rad2;
+  
+  this->write8(ACCEL_CONFIG, 0xE0 | (ACCL_RANGE_8G << 3)); // self-test config
+  sleep(1);
+  rad1 = this->get_raw_accl_data();
+
+  // Get factory trim (FT)
+  vector<uint8_t> test = this->read_bytes(SELF_TEST_X, 4);
+  /*for (int i = 0; i < 3; i++)
+    test[i] = ((test[i] & 0xE0) >> 3) | ((test[4] & (0x3 << (4 - 2*i))) >> (4 - 2*i));//*/
+  test[0] = ((test[0] & 0xE0) >> 3) | ((test[4] & 0x30) >> 4);
+  test[1] = ((test[1] & 0xE0) >> 3) | ((test[4] & 0x0C) >> 2);
+  test[2] = ((test[2] & 0xE0) >> 3) | (test[4] & 0x03);
+  array<double, 3> ft;
+  for (int i = 0; i < 3; i++)
+    if (test[i] != 0)
+      ft[i] = 4096 * 0.34 * pow(0.92 / 0.34, (test[i] - 1) / 30); //magic numbers from register desc.
+    else
+      ft[i] = 0;
+
+  this->write8(ACCEL_CONFIG, ACCL_RANGE_8G << 3); // stop self-test
+  sleep(1);
+  rad2 = this->get_raw_accl_data();
+  this->write8(ACCEL_CONFIG, rng); // restore range setting
+
+  // Calculate percentage deviation from FT
+  SelfTestResult result;
+  result.x_dev = ((rad1.x - rad2.x) - ft[0]) / ft[0] * 100.0;
+  result.y_dev = ((rad1.y - rad2.y) - ft[1]) / ft[1] * 100.0;
+  result.z_dev = ((rad1.z - rad2.z) - ft[2]) / ft[2] * 100.0;
+  result.passed = abs(result.x_dev) <= result.max_dev &&     
+                  abs(result.y_dev) <= result.max_dev &&     
+                  abs(result.z_dev) <= result.max_dev;       
+
+  return result;
+}
+
+SelfTestResult Mpu6050::test_gyro()
+{
+  uint8_t rng = this->read8(GYRO_CONFIG) & 0x18; // save current range setting
+
+  RawGyroData rgd1, rgd2;
+
+  this->write8(GYRO_CONFIG, 0xE0); //all tests, 250dps range
+  sleep(1);
+  rgd1 = this->get_raw_gyro_data();
+
+  // Get factory trim (FT)
+  vector<uint8_t> test = this->read_bytes(SELF_TEST_X, 3);
+  for (int i = 0; i < 3; i++) test[i] = test[i] & 0x1F;
+  array<double, 3> ft;
+  for (int i = 0; i < 3; i++)
+    if (test[i] != 0)
+      ft[i] = 25 * 131 * pow(1.046, test[i] - 1); // magic numbers from register descriptions doc
+    else
+      ft[i] = 0;
+  ft[1] = -ft[1];
+
+  this->write8(GYRO_CONFIG, GYRO_RANGE_250DPS << 3); // stop self-test
+  sleep(1);
+  rgd2 = this->get_raw_gyro_data();
+  this->write8(GYRO_CONFIG, rng); // restore range setting
+
+  // Calculate percentage deviation from FT
+  SelfTestResult result;
+  result.x_dev = ((rgd1.x - rgd2.x) - ft[0]) / ft[0] * 100.0;
+  result.y_dev = ((rgd1.y - rgd2.y) - ft[1]) / ft[1] * 100.0;
+  result.z_dev = ((rgd1.z - rgd2.z) - ft[2]) / ft[2] * 100.0;
+  result.passed = abs(result.x_dev) <= result.max_dev &&
+                  abs(result.y_dev) <= result.max_dev &&
+                  abs(result.z_dev) <= result.max_dev;
+
+  return result;
+}
 
 void Mpu6050::set_accl_range(int range)
 {

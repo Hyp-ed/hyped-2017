@@ -42,6 +42,14 @@ struct SensorData {
   AngularVelocity angv;
 };
 
+struct SelfTestResult {
+  bool passed;
+  double x_dev;
+  double y_dev;
+  double z_dev;
+  const double max_dev = 14.0;
+};
+
 class Mpu6050{
  public:
   Mpu6050 (I2C* bus);
@@ -49,6 +57,8 @@ class Mpu6050{
   void set_accl_range(int range);
   void set_gyro_range(int range);
   void calibrate_gyro(int num_samples);
+  SelfTestResult test_accl();
+  SelfTestResult test_gyro();
   short get_raw_accl_x();
   short get_raw_accl_y();
   short get_raw_accl_z();

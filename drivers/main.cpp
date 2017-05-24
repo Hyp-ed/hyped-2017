@@ -8,7 +8,15 @@ using namespace std;
 
 int main()
 {
-  //using namespace std::chrono;  
+  printf("Initializing MPU6050...\n");
+  Mpu6050 sensor(new I2C);
+  SelfTestResult at = sensor.test_accl();
+  printf("Accelerometer self-test: passed=%d, x_dev=%f%%, y_dev=%f%%, z_dev=%f%%\n",
+      at.passed, at.x_dev, at.y_dev, at.z_dev);
+  SelfTestResult gt = sensor.test_gyro();
+  printf("Gyroscope self-test: passed=%d, x_dev=%f%%, y_dev=%f%%, z_dev=%f%%\n",
+      gt.passed, gt.x_dev, gt.y_dev, gt.z_dev);
+  
   printf("is steady clock: %d\n", chrono::steady_clock::is_steady);
   int n = 10000;
 
@@ -16,9 +24,6 @@ int main()
   //RawSensorData data[n];
   //RawGyroData gdata[n];
   SensorData data[n];
-
-  printf("Initializing MPU6050...\n");
-  Mpu6050 sensor(new I2C);
 
   printf("Calibrating gyro...\n");
   chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
@@ -56,7 +61,7 @@ int main()
     /*file << gdata[i].x << ","
          << gdata[i].y << ","
          << gdata[i].z << endl;//*/
-    file << data[i].accl.x << ","
+   file << data[i].accl.x << ","
          << data[i].accl.y << ","
          << data[i].accl.z << ","
          << data[i].temp << ","
@@ -64,5 +69,12 @@ int main()
          << data[i].angv.y << ","
          << data[i].angv.z << endl;
   }
-  file.close();
+  file.close();//*/
+  
+  SelfTestResult at2 = sensor.test_accl();
+  printf("Accelerometer self-test: passed=%d, x_dev=%f%%, y_dev=%f%%, z_dev=%f%%\n",
+      at2.passed, at2.x_dev, at2.y_dev, at2.z_dev);
+  SelfTestResult gt2 = sensor.test_gyro();
+  printf("Gyroscope self-test: passed=%d, x_dev=%f%%, y_dev=%f%%, z_dev=%f%%\n",
+      gt2.passed, gt2.x_dev, gt2.y_dev, gt2.z_dev);
 }
