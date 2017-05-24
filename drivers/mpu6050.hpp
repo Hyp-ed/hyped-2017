@@ -44,6 +44,8 @@ struct SensorData {
 
 struct SelfTestResult {
   bool passed;
+  // Deviations of self-test response (STR) from factory trim (FT) in %
+  // (STR = difference between outputs with self-test enabled and disabled)
   double x_dev;
   double y_dev;
   double z_dev;
