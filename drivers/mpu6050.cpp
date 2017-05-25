@@ -245,36 +245,6 @@ SelfTestResult Mpu6050::test_gyro()
   return result;
 }
 
-short Mpu6050::get_raw_accl_x()
-{
-  return this->read16(ACCEL_XOUT_H);
-}
-
-short Mpu6050::get_raw_accl_y()
-{
-  return this->read16(ACCEL_YOUT_H);
-}
-
-short Mpu6050::get_raw_accl_z()
-{
-  return this->read16(ACCEL_ZOUT_H);
-}
-
-short Mpu6050::get_raw_gyro_x()
-{
-  return this->read16(GYRO_XOUT_H);
-}
-
-short Mpu6050::get_raw_gyro_y()
-{
-  return this->read16(GYRO_YOUT_H);
-}
-
-short Mpu6050::get_raw_gyro_z()
-{
-  return this->read16(GYRO_ZOUT_H);
-}
-
 RawAcclData Mpu6050::get_raw_accl_data()
 {
   vector<uint8_t> bytes = this->read_bytes(ACCEL_XOUT_H, 6); //read all 6 accl output registers

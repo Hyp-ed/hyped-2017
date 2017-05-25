@@ -61,12 +61,6 @@ class Mpu6050{
   void calibrate_gyro(int num_samples);
   SelfTestResult test_accl();
   SelfTestResult test_gyro();
-  short get_raw_accl_x();
-  short get_raw_accl_y();
-  short get_raw_accl_z();
-  short get_raw_gyro_x();
-  short get_raw_gyro_y();
-  short get_raw_gyro_z();
   RawAcclData get_raw_accl_data();
   RawGyroData get_raw_gyro_data();
   RawSensorData get_raw_sensor_data();
