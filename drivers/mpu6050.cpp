@@ -57,6 +57,17 @@
 #define FIFO_R_W        0x74
 #define WHO_AM_I        0x75
 
+// SETTINGS
+// ACCEL_CONFIG flags (combine with each other and with range settings using `|`)
+#define XA_ST 0x80 // ST = self-test
+#define YA_ST 0x40
+#define ZA_ST 0x20
+
+// GYRO_CONFIG flags (combine with each other and with range settings using `|`)
+#define XG_ST 0x80
+#define YG_ST 0x40
+#define ZG_ST 0x20
+
 #define DEFAULT_ACCL_RANGE ACCL_RANGE_2G
 #define DEFAULT_GYRO_RANGE GYRO_RANGE_250DPS
 
@@ -68,11 +79,10 @@ const array<double, 4> GYRO_SCALES = {131.0, 65.5, 32.8, 16.4};
 Mpu6050::Mpu6050(I2C *bus)
 {
   this->bus = bus;
-  init();
-}
+  this->gyro_offset.x = 0.0;
+  this->gyro_offset.y = 0.0;
+  this->gyro_offset.z = 0.0;
 
-
-void Mpu6050::init() {
   // POWER MGMT setup
   this->write8(PWR_MGMT_1, 0x80); //PWR_MGMT_1 - reset
   sleep(1); //sleep for 1 second, probably not necessary but just in case...
@@ -119,14 +129,51 @@ vector<uint8_t> Mpu6050::read_bytes(char reg_addr, short length)
   return vec;
 }
 
+
+
+void Mpu6050::set_accl_range(char range)
+{
+  if (range < ACCL_RANGE_MIN || range > ACCL_RANGE_MAX)
+    range = DEFAULT_ACCL_RANGE;
+  // TODO: do not reset the self-test bits (ACCEL_CONFIG[7:5])
+  this->write8(ACCEL_CONFIG, range); //range selection in ACCEL_CONFIG[4:3] (3 lsb empty)
+  this->accl_scale = ACCL_SCALES[range >> 3];
+}
+
+void Mpu6050::set_gyro_range(char range)
+{
+  if (range < GYRO_RANGE_MIN || range > GYRO_RANGE_MAX)
+    range = DEFAULT_GYRO_RANGE;
+  // TODO: do not reset the self-test bits (GYRO_CONFIG[7:5])
+  this->write8(GYRO_CONFIG, range); //range selection in GYRO_CONFIG[4:3] (3 lsb empty)
+  this->gyro_scale = GYRO_SCALES[range >> 3];
+}
+
+void Mpu6050::calibrate_gyro(int num_samples)
+{
+  this->gyro_offset.x = 0.0;
+  this->gyro_offset.y = 0.0;
+  this->gyro_offset.z = 0.0;
+  for (int i = 0; i < num_samples; i++)
+  {
+    RawGyroData data = this->get_raw_gyro_data();
+    this->gyro_offset.x += data.x;
+    this->gyro_offset.y += data.y;
+    this->gyro_offset.z += data.z;
+  }
+  this->gyro_offset.x /= num_samples;
+  this->gyro_offset.y /= num_samples;
+  this->gyro_offset.z /= num_samples;
+}
+
 SelfTestResult Mpu6050::test_accl()
 {
   uint8_t rng = this->read8(ACCEL_CONFIG) & 0x18; // save current range setting
   
   RawAcclData rad1, rad2;
   
-  this->write8(ACCEL_CONFIG, 0xE0 | (ACCL_RANGE_8G << 3)); // self-test config
-  sleep(1);
+  this->write8(ACCEL_CONFIG, XA_ST | YA_ST | ZA_ST | ACCL_RANGE_8G); // self-test config
+  sleep(2);
   rad1 = this->get_raw_accl_data();
 
   // Get factory trim (FT)
@@ -143,8 +190,8 @@ SelfTestResult Mpu6050::test_accl()
     else
       ft[i] = 0;
 
-  this->write8(ACCEL_CONFIG, ACCL_RANGE_8G << 3); // stop self-test
-  sleep(1);
+  this->write8(ACCEL_CONFIG, ACCL_RANGE_8G); // stop self-test
+  sleep(2);
   rad2 = this->get_raw_accl_data();
   this->write8(ACCEL_CONFIG, rng); // restore range setting
 
@@ -166,7 +213,7 @@ SelfTestResult Mpu6050::test_gyro()
 
   RawGyroData rgd1, rgd2;
 
-  this->write8(GYRO_CONFIG, 0xE0); //all tests, 250dps range
+  this->write8(GYRO_CONFIG, XG_ST | YG_ST | ZG_ST | GYRO_RANGE_250DPS); //all tests, 250dps range
   sleep(1);
   rgd1 = this->get_raw_gyro_data();
 
@@ -181,7 +228,7 @@ SelfTestResult Mpu6050::test_gyro()
       ft[i] = 0;
   ft[1] = -ft[1];
 
-  this->write8(GYRO_CONFIG, GYRO_RANGE_250DPS << 3); // stop self-test
+  this->write8(GYRO_CONFIG, GYRO_RANGE_250DPS); // stop self-test
   sleep(1);
   rgd2 = this->get_raw_gyro_data();
   this->write8(GYRO_CONFIG, rng); // restore range setting
@@ -196,41 +243,6 @@ SelfTestResult Mpu6050::test_gyro()
                   abs(result.z_dev) <= result.max_dev;
 
   return result;
-}
-
-void Mpu6050::set_accl_range(int range)
-{
-  if (range < ACCL_RANGE_MIN || range > ACCL_RANGE_MAX)
-    range = DEFAULT_ACCL_RANGE;
-  // TODO: do not reset the self-test bits (ACCEL_CONFIG[7:5])
-  this->write8(ACCEL_CONFIG, (char) (range << 3)); //range selection in ACCEL_CONFIG[4:3] (3 lsb empty)
-  this->accl_scale = ACCL_SCALES[range];
-}
-
-void Mpu6050::set_gyro_range(int range)
-{
-  if (range < GYRO_RANGE_MIN || range > GYRO_RANGE_MAX)
-    range = DEFAULT_GYRO_RANGE;
-  // TODO: do not reset the self-test bits (GYRO_CONFIG[7:5])
-  this->write8(GYRO_CONFIG, (char) (range << 3)); //range selection in GYRO_CONFIG[4:3] (3 lsb empty)
-  this->gyro_scale = GYRO_SCALES[range];
-}
-
-void Mpu6050::calibrate_gyro(int num_samples)
-{
-  this->gyro_offset.x = 0.0;
-  this->gyro_offset.y = 0.0;
-  this->gyro_offset.z = 0.0;
-  for (int i = 0; i < num_samples; i++)
-  {
-    RawGyroData data = this->get_raw_gyro_data();
-    this->gyro_offset.x += data.x;
-    this->gyro_offset.y += data.y;
-    this->gyro_offset.z += data.z;
-  }
-  this->gyro_offset.x /= num_samples;
-  this->gyro_offset.y /= num_samples;
-  this->gyro_offset.z /= num_samples;
 }
 
 short Mpu6050::get_raw_accl_x()

@@ -6,16 +6,16 @@
 // Datasheet: https://www.invensense.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf
 // Register Descriptions: https://www.invensense.com/wp-content/uploads/2015/02/MPU-6000-Register-Map1.pdf
 
-#define ACCL_RANGE_2G  0
-#define ACCL_RANGE_6G  1
-#define ACCL_RANGE_8G  2
-#define ACCL_RANGE_16G 3
+#define ACCL_RANGE_2G  0x00
+#define ACCL_RANGE_6G  0x08
+#define ACCL_RANGE_8G  0x10
+#define ACCL_RANGE_16G 0x18
 #define ACCL_RANGE_MIN ACCL_RANGE_2G
 #define ACCL_RANGE_MAX ACCL_RANGE_16G
-#define GYRO_RANGE_250DPS  0
-#define GYRO_RANGE_500DPS  1
-#define GYRO_RANGE_1000DPS 2
-#define GYRO_RANGE_2000DPS 3
+#define GYRO_RANGE_250DPS  0x00
+#define GYRO_RANGE_500DPS  0x08
+#define GYRO_RANGE_1000DPS 0x10
+#define GYRO_RANGE_2000DPS 0x18
 #define GYRO_RANGE_MIN GYRO_RANGE_250DPS
 #define GYRO_RANGE_MAX GYRO_RANGE_2000DPS
 
@@ -56,8 +56,8 @@ class Mpu6050{
  public:
   Mpu6050 (I2C* bus);
 
-  void set_accl_range(int range);
-  void set_gyro_range(int range);
+  void set_accl_range(char range);
+  void set_gyro_range(char range);
   void calibrate_gyro(int num_samples);
   SelfTestResult test_accl();
   SelfTestResult test_gyro();
@@ -80,7 +80,6 @@ class Mpu6050{
   SensorData get_sensor_data(RawSensorData reading); //conversion only, no sensor reading
 
  private:
-  void init();
   void write8(char reg_addr, char data);
   uint8_t read8(char reg_addr);
   short read16(char reg_addr);
