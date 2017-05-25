@@ -76,12 +76,13 @@ using namespace std;
 const array<double, 4> ACCL_SCALES = {16384.0, 8192.0, 4096.0, 2048.0};
 const array<double, 4> GYRO_SCALES = {131.0, 65.5, 32.8, 16.4};
 
-Mpu6050::Mpu6050(I2C *bus)
+Mpu6050::Mpu6050(I2C *bus, uint8_t slave_addr /*= DEFAULT_SLAVE_ADDR*/)
 {
   this->bus = bus;
   this->gyro_offset.x = 0.0;
   this->gyro_offset.y = 0.0;
   this->gyro_offset.z = 0.0;
+  this->slave_addr = slave_addr;
 
   // POWER MGMT setup
   this->write8(PWR_MGMT_1, 0x80); //PWR_MGMT_1 - reset

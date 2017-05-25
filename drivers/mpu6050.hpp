@@ -19,7 +19,8 @@
 #define GYRO_RANGE_MIN GYRO_RANGE_250DPS
 #define GYRO_RANGE_MAX GYRO_RANGE_2000DPS
 
-const uint8_t DEFAULT_SLAVE_ADDR = 0x68;
+#define DEFAULT_SLAVE_ADDR     0x68 // AD0 pin is low (0V)
+#define ALTERNATIVE_SLAVE_ADDR 0x69 // AD0 pin is high (3.3V)
 
 template <typename T> struct Vector3D {
   T x, y, z;
@@ -49,12 +50,12 @@ struct SelfTestResult {
   double x_dev;
   double y_dev;
   double z_dev;
-  const double max_dev = 14.0;
+  double max_dev = 14.0;
 };
 
 class Mpu6050{
  public:
-  Mpu6050 (I2C* bus);
+  Mpu6050 (I2C* bus, uint8_t slave_addr = DEFAULT_SLAVE_ADDR);
 
   void set_accl_range(char range);
   void set_gyro_range(char range);
@@ -80,7 +81,7 @@ class Mpu6050{
   std::vector<uint8_t> read_bytes(char reg_addr, short length);
 
   I2C *bus;
-  uint8_t slave_addr = DEFAULT_SLAVE_ADDR;
+  uint8_t slave_addr;
   double accl_scale;
   double gyro_scale;
   Vector3D<double> gyro_offset;
