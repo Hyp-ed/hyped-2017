@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "i2c.hpp"
+#include "vector3d.hpp"
 
 // Datasheet: https://www.invensense.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf
 // Register Descriptions: https://www.invensense.com/wp-content/uploads/2015/02/MPU-6000-Register-Map1.pdf
@@ -22,14 +23,10 @@
 #define DEFAULT_SLAVE_ADDR     0x68 // AD0 pin is low (0V)
 #define ALTERNATIVE_SLAVE_ADDR 0x69 // AD0 pin is high (3.3V)
 
-template <typename T> struct Vector3D {
-  T x, y, z;
-};
-
-struct RawAcclData : Vector3D<short> {};
-struct RawGyroData : Vector3D<short> {};
-struct Acceleration : Vector3D<double> {};
-struct AngularVelocity : Vector3D<double> {};
+class RawAcclData : public Vector3D<short> {};
+class RawGyroData : public Vector3D<short> {};
+class Acceleration : public Vector3D<double> {};
+class AngularVelocity : public Vector3D<double> {};
 
 struct RawSensorData {
   RawAcclData accl;
