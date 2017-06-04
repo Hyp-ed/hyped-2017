@@ -1,3 +1,7 @@
 # Ignore object and archive files
 *.[oa]
 .DS_Store
+
+# Ignore executables
+main
+integrator
