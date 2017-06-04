@@ -30,6 +30,7 @@ int main()
   printf("Calibrating gyro...\n");
   chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
   sensor.calibrate_gyro(100000);
+  sensor2.calibrate_gyro(100000);
   chrono::steady_clock::time_point t2 = chrono::steady_clock::now();  
   chrono::duration<double> time_span = chrono::duration_cast<chrono::duration<double>>(t2 - t1);  
   printf("time: %fs\n", time_span.count());
@@ -38,14 +39,15 @@ int main()
   int n = 10000;
   //RawSensorData data[n];
   //RawGyroData gdata[n];
-  SensorData data[n];
+  SensorData data[2*n];
   printf("Taking %d readings...\n", n);
   t1 = chrono::steady_clock::now();
   for (int i = 0; i < n; i++)
   {
     //data[i] = sensor.get_raw_sensor_data();
     //gdata[i] = sensor.get_raw_gyro_data();
-    data[i] = sensor.get_sensor_data();
+    data[2*i] = sensor.get_sensor_data();
+    data[2*i + 1] = sensor2.get_sensor_data();
   }
   t2 = chrono::steady_clock::now();  
   time_span = chrono::duration_cast<chrono::duration<double>>(t2 - t1);  
@@ -58,13 +60,20 @@ int main()
     /*file << gdata[i].x << ","
          << gdata[i].y << ","
          << gdata[i].z << endl;//*/
-    file << data[i].accl.x << ","
-         << data[i].accl.y << ","
-         << data[i].accl.z << ","
-         << data[i].temp << ","
-         << data[i].angv.x << ","
-         << data[i].angv.y << ","
-         << data[i].angv.z << endl;
+    file << data[2*i].accl.x << ","
+         << data[2*i].accl.y << ","
+         << data[2*i].accl.z << ","
+         << data[2*i].temp << ","
+         << data[2*i].angv.x << ","
+         << data[2*i].angv.y << ","
+         << data[2*i].angv.z << ",,"
+         << data[2*i + 1].accl.x << ","
+         << data[2*i + 1].accl.y << ","
+         << data[2*i + 1].accl.z << ","
+         << data[2*i + 1].temp << ","
+         << data[2*i + 1].angv.x << ","
+         << data[2*i + 1].angv.y << ","
+         << data[2*i + 1].angv.z << endl;
   }
   file.close();//*/
   
