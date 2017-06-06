@@ -1,3 +1,6 @@
+#ifndef HYPED_DRIVERS_MPU6050_H_
+#define HYPED_DRIVERS_MPU6050_H_
+
 #include <cstdint>
 #include <vector>
 
@@ -83,3 +86,5 @@ class Mpu6050{
   double gyro_scale;
   Vector3D<double> gyro_offset;
 };
+
+#endif // HYPED_DRIVERS_MPU6050_H_

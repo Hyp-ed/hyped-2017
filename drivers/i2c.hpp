@@ -1,3 +1,6 @@
+#ifndef HYPED_DRIVERS_I2C_H_
+#define HYPED_DRIVERS_I2C_H_
+
 extern "C"{
 #include <unistd.h>
 #include <fcntl.h>
@@ -22,3 +25,5 @@ class I2C {
         void write_read(uint16_t device, short send_len, char *send_buf,
                                 short recv_len, char *recv_buf);
 };
+
+#endif // HYPED_DRIVERS_I2C_H_
