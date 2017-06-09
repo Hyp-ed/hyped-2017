@@ -6,6 +6,7 @@
 
 #include "i2c.hpp"
 #include "vector3d.hpp"
+#include "interfaces.hpp"
 
 // Datasheet: https://www.invensense.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf
 // Register Descriptions: https://www.invensense.com/wp-content/uploads/2015/02/MPU-6000-Register-Map1.pdf
@@ -53,26 +54,27 @@ struct SelfTestResult {
   double max_dev = 14.0;
 };
 
-class Mpu6050{
+class Mpu6050 : public Imu{
  public:
   Mpu6050 (I2C* bus, uint8_t slave_addr = DEFAULT_SLAVE_ADDR);
 
   void set_accl_range(char range);
   void set_gyro_range(char range);
-  void calibrate_gyro(int num_samples);
+  virtual void calibrate_gyro(int num_samples);
   SelfTestResult test_accl();
   SelfTestResult test_gyro();
   RawAcclData get_raw_accl_data();
   RawGyroData get_raw_gyro_data();
   RawSensorData get_raw_sensor_data();
-  Acceleration get_acceleration(); //performs accl reading
+  virtual Vector3D<double> get_acceleration(); //performs accl reading
   Acceleration get_acceleration(RawAcclData accl_reading); //conversion only, no sensor reading
   Acceleration get_acceleration(RawSensorData reading); //conversion only, no sensor reading
-  AngularVelocity get_angular_velocity(); //performs gyro reading
+  virtual Vector3D<double> get_angular_velocity(); //performs gyro reading
   AngularVelocity get_angular_velocity(RawGyroData gyro_reading); //conversion only, no sensor reading
   AngularVelocity get_angular_velocity(RawSensorData reading); //conversion only, no sensor reading
   SensorData get_sensor_data(); //performs all data reading
   SensorData get_sensor_data(RawSensorData reading); //conversion only, no sensor reading
+  virtual ImuData get_imu_data(); // calls get_sensor_data()
 
  private:
   void write8(char reg_addr, char data);

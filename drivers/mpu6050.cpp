@@ -280,7 +280,7 @@ RawSensorData Mpu6050::get_raw_sensor_data()
   return data;
 }
 
-Acceleration Mpu6050::get_acceleration()
+Vector3D<double> Mpu6050::get_acceleration()
 {
   return this->get_acceleration(this->get_raw_accl_data());
 }
@@ -299,7 +299,7 @@ Acceleration Mpu6050::get_acceleration(RawSensorData reading)
   return this->get_acceleration(reading.accl);
 }
 
-AngularVelocity Mpu6050::get_angular_velocity()
+Vector3D<double> Mpu6050::get_angular_velocity()
 {
   return this->get_angular_velocity(this->get_raw_gyro_data());
 }
@@ -330,4 +330,10 @@ SensorData Mpu6050::get_sensor_data(RawSensorData reading)
   data.temp = reading.temp / 340.0 + 36.53; //calculation from Register Descriptions document p. 30
   data.angv = this->get_angular_velocity(reading);
   return data;
+}
+
+ImuData Mpu6050::get_imu_data()
+{
+  SensorData data = this->get_sensor_data();
+  return ImuData(data.accl, data.angv);
 }
