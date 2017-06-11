@@ -68,6 +68,7 @@ public class Server
                         frontEnd.setMasterOnline(true);
                 }
                 
+               //receipt(_podSocket); 
                UserThread usr = new UserThread(_podSocket);
                usr.start(); 
            }
@@ -81,6 +82,7 @@ public class Server
         {
             Scanner input = new Scanner(sock.getInputStream());
             String piName = input.nextLine();
+            piName = piName.substring(0, piName.indexOf("|"));
             // CANNOT CLOSE INPUT OBJ. OR POINT TO NULL AS THIS WOULD CLOSE THE SOCKET DATA STREAM.
             return piName;
         } catch(IOException e) 
@@ -89,6 +91,16 @@ public class Server
             return "0"; 
         }
     }
+    
+    public static void receipt(Socket piConnection) throws Exception
+        {
+            Socket temp = piConnection;
+            PrintWriter tempOut = new PrintWriter(temp.getOutputStream());
+            
+            tempOut.println("1"); //message received
+            tempOut.flush(); 
+            
+        }
     
     private static class UserThread extends Thread
     {
@@ -132,6 +144,8 @@ public class Server
             }
         }
         
+        
+        
         public void run()
         {
             try
@@ -151,6 +165,7 @@ public class Server
                         if (!_input.hasNext()) return;
                         
                         message = _input.nextLine();
+                        message = message.substring(0, message.indexOf("|"));
                         frontEnd.printToConsole(_list.getPiName(subSock) + " sent data: " + message);
                   
                        /* for (int i = 1; i <= _userList.getNoOfUsers() + 1; i++)
@@ -176,7 +191,7 @@ public class Server
                         {
                             if (message.contains("CMD1"))
                                 frontEnd.printPodTemperature(Integer.parseInt(message.substring(4)));
-                        }
+                        } // change to switch statement, i.e. switch (message.substring(0, 4)) case "CMD1"...
                     }
                 } finally { subSock.close(); _input.close(); _out.close();  }
             } catch (Exception e) { System.err.println("3 "+e); }
