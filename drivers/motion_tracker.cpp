@@ -26,7 +26,7 @@ void MotionTracker::add_imu(Imu &imu)
 
 bool MotionTracker::start()
 {
-  const int n = 10000;
+  const int n = 100000;
   //Calibrate gyros
   for (Gyroscope &g : this->gyroscopes)
     g.calibrate_gyro(n);
@@ -129,6 +129,12 @@ void MotionTracker::get_imu_data_points(
     DataPoint<Vector3D<double>> &accl_dp,
     DataPoint<Vector3D<double>> &av_dp)
 {
+  accl_dp.value.x = 0.0;
+  accl_dp.value.y = 0.0;
+  accl_dp.value.z = 0.0;
+  av_dp.value.x = 0.0;
+  av_dp.value.y = 0.0;
+  av_dp.value.z = 0.0;
   accl_dp.timestamp = timestamp();
   for (Accelerometer &a : this->accelerometers)
     accl_dp.value += a.get_acceleration();
@@ -151,6 +157,9 @@ void MotionTracker::get_imu_data_points(
 
 void MotionTracker::get_gyro_data_point(DataPoint<Vector3D<double>> &av_dp)
 {
+  av_dp.value.x = 0.0;
+  av_dp.value.y = 0.0;
+  av_dp.value.z = 0.0;
   av_dp.timestamp = timestamp();
   for (Gyroscope &g : this->gyroscopes)
     av_dp.value += g.get_angular_velocity();
