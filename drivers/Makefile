@@ -1,10 +1,10 @@
-OBJS = i2c.o mpu6050.o motion_tracker.o
+OBJS = i2c.o mpu6050.o vl6180.o motion_tracker.o
 CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
 LFLAGS = -Wall -latomic -lpthread $(DEBUG)
 
-all : main integrator test_motion_tracker
+all : main integrator test_motion_tracker demo-vl6180
 
 main : $(OBJS) main.o
 	$(CC) $(OBJS) $(LFLAGS) main.o -o main
@@ -12,8 +12,12 @@ main : $(OBJS) main.o
 integrator : $(OBJS) integrator.o
 	$(CC) $(OBJS) $(LFLAGS) integrator.o -o integrator
 
-test_motion_tracker : test_motion_tracker.o
+test_motion_tracker : $(OBJS) test_motion_tracker.o
 	$(CC) $(OBJS) $(LFLAGS) -lncurses test_motion_tracker.o -o test_motion_tracker
+
+demo-vl6180 : $(OBJS) demo-vl6180.o
+	$(CC) $(OBJS) $(LFLAGS) -lncurses demo-vl6180.o -o demo-vl6180
+
 
 main.o : main.cpp mpu6050.hpp i2c.hpp
 	$(CC) $(CFLAGS) main.cpp
@@ -24,8 +28,15 @@ integrator.o : integrator.cpp mpu6050.hpp i2c.hpp vector3d.hpp
 test_motion_tracker.o : test_motion_tracker.cpp mpu6050.hpp i2c.hpp vector3d.hpp motion_tracker.hpp
 	$(CC) $(CFLAGS) test_motion_tracker.cpp
 
+demo-vl6180.o : demo-vl6180.cpp vl6180.hpp i2c.hpp
+	$(CC) $(CFLAGS) demo-vl6180.cpp
+
+
 motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_point.hpp vector3d.hpp
 	$(CC) $(CFLAGS) motion_tracker.cpp
+
+vl6180.o : vl6180.hpp vl6180.cpp i2c.hpp
+	$(CC) $(CFLAGS) vl6180.cpp
 
 mpu6050.o : mpu6050.hpp mpu6050.cpp i2c.hpp vector3d.hpp
 	$(CC) $(CFLAGS) mpu6050.cpp
