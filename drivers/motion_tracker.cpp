@@ -26,7 +26,7 @@ void MotionTracker::add_imu(Imu &imu)
 
 bool MotionTracker::start()
 {
-  const int n = 100000;
+  const int n = 10000;
   //Calibrate gyros
   for (Gyroscope &g : this->gyroscopes)
     g.calibrate_gyro(n);
@@ -127,45 +127,46 @@ void MotionTracker::track()
 
 void MotionTracker::get_imu_data_points(
     DataPoint<Vector3D<double>> &accl_dp,
-    DataPoint<Vector3D<double>> &av_dp)
+    DataPoint<Vector3D<double>> &angv_dp)
 {
   accl_dp.value.x = 0.0;
   accl_dp.value.y = 0.0;
   accl_dp.value.z = 0.0;
-  av_dp.value.x = 0.0;
-  av_dp.value.y = 0.0;
-  av_dp.value.z = 0.0;
+  angv_dp.value.x = 0.0;
+  angv_dp.value.y = 0.0;
+  angv_dp.value.z = 0.0;
   accl_dp.timestamp = timestamp();
   for (Accelerometer &a : this->accelerometers)
     accl_dp.value += a.get_acceleration();
-  av_dp.timestamp = timestamp();
+  angv_dp.timestamp = timestamp();
   for (Imu &imu : this->imus)
   {
     ImuData data = imu.get_imu_data();
     accl_dp.value += data.acceleration;
-    av_dp.value += data.angular_velocity;
+    angv_dp.value += data.angular_velocity;
   }
   double t = timestamp();
   for (Gyroscope &g : this->gyroscopes)
-    av_dp.value += g.get_angular_velocity();
-  av_dp.timestamp += timestamp();
-  av_dp.timestamp /= 2.0;
+    angv_dp.value += g.get_angular_velocity();
+  angv_dp.timestamp += timestamp();
+  angv_dp.timestamp /= 2.0;
   accl_dp.timestamp = (accl_dp.timestamp + t) / 2.0;
   accl_dp.value /= (double) (this->accelerometers.size() + this->imus.size());
-  av_dp.value /= (double) (this->gyroscopes.size() + this->imus.size());
+  accl_dp.value *= STD_GRAVITY; // convert from g to m/s^2
+  angv_dp.value /= (double) (this->gyroscopes.size() + this->imus.size());
 }
 
-void MotionTracker::get_gyro_data_point(DataPoint<Vector3D<double>> &av_dp)
+void MotionTracker::get_gyro_data_point(DataPoint<Vector3D<double>> &angv_dp)
 {
-  av_dp.value.x = 0.0;
-  av_dp.value.y = 0.0;
-  av_dp.value.z = 0.0;
-  av_dp.timestamp = timestamp();
+  angv_dp.value.x = 0.0;
+  angv_dp.value.y = 0.0;
+  angv_dp.value.z = 0.0;
+  angv_dp.timestamp = timestamp();
   for (Gyroscope &g : this->gyroscopes)
-    av_dp.value += g.get_angular_velocity();
+    angv_dp.value += g.get_angular_velocity();
   for (Imu &imu : this->imus)
-    av_dp.value += imu.get_angular_velocity();
-  av_dp.timestamp += timestamp();
-  av_dp.timestamp /= 2.0;
-  av_dp.value /= (double) (this->gyroscopes.size() + this->imus.size());
+    angv_dp.value += imu.get_angular_velocity();
+  angv_dp.timestamp += timestamp();
+  angv_dp.timestamp /= 2.0;
+  angv_dp.value /= (double) (this->gyroscopes.size() + this->imus.size());
 }

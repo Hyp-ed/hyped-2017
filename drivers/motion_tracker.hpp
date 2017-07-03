@@ -1,14 +1,16 @@
 #ifndef MOTION_TRACKER_H_
 #define MOTION_TRACKER_H_
 
-#include <vector>
 #include <atomic>
+#include <functional>
 #include <thread>
-#include<functional>
+#include <vector>
 
+#include "data_point.hpp"
 #include "interfaces.hpp"
 #include "vector3d.hpp"
-#include "data_point.hpp"
+
+#define STD_GRAVITY 9.80665
 
 class MotionTracker
 {
