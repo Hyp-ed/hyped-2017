@@ -97,4 +97,5 @@ void I2C::read(uint16_t device, short length, char *buf)
     printf("i2c read failed\n");
     exit(EXIT_FAILURE);
   }
+}
 
