@@ -78,3 +78,23 @@ void I2C::write_read(uint16_t device, short send_len, char *send_buf,
         exit(EXIT_FAILURE);
     }
 }
+
+void I2C::read(uint16_t device, short length, char *buf)
+{
+  struct i2c_rdwr_ioctl_data data;
+  struct i2c_msg msgs[1];
+
+  msgs[0].addr = device;
+  msgs[0].flags = I2C_M_RD; //read
+  msgs[0].len = length;
+  msgs[0].buf = buf;
+
+  data.msgs = msgs;
+  data.nmsgs = 1;
+
+  if ( ioctl(bus, I2C_RDWR, &data) < 0 )
+  {
+    printf("i2c read failed\n");
+    exit(EXIT_FAILURE);
+  }
+
