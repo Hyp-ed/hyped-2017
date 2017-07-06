@@ -45,8 +45,8 @@ void Battery::refresh()
     std::array<short, TOTAL_DATA_SIZE> data;
     for (int i = 0; i < SLAVE1_DATA_SIZE / 2; ++i)
       data[i] = (buf1[2*i] << 8) | buf1[2*i + 1];
-    for (int i = SLAVE1_DATA_SIZE / 2; i < TOTAL_DATA_SIZE; ++i)
-      data[i] = (buf2[2*i] << 8) | buf2[2*i + 1];
+    for (int i = SLAVE1_DATA_SIZE / 2, j = 0; i < TOTAL_DATA_SIZE; ++i, j += 2)
+      data[i] = (buf2[j] << 8) | buf2[j + 1];
     // Populate BatteryData
     auto it = data.begin();
     std::copy(it, it += 7, this->data.big1.cell_voltage.begin());
