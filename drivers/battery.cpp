@@ -49,12 +49,14 @@ void Battery::refresh()
       data[i] = (buf2[j] << 8) | buf2[j + 1];
     // Populate BatteryData
     auto it = data.begin();
-    std::copy(it, it += 7, this->data.big1.cell_voltage.begin());
-    this->data.big1.temperature = *it;
+    std::copy(it, it + 7, this->data.big1.cell_voltage.begin());
+    this->data.big1.temperature = *(it += 7);
     this->data.big1.current = *(++it);
-    std::copy(++it, it += 5, this->data.small.cell_voltage.begin());
-    std::copy(it, it += 7, this->data.big2.cell_voltage.begin());
-    this->data.big2.temperature = *it;
+    ++it;
+    std::copy(it, it + 5, this->data.small.cell_voltage.begin());
+    it += 5;
+    std::copy(it, it + 7, this->data.big2.cell_voltage.begin());
+    this->data.big2.temperature = *(it += 7);
     this->data.big2.current = *(++it);
     this->data.small.temperature = *(++it);
   }
