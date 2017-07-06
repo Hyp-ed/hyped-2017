@@ -8,3 +8,5 @@ integrator
 test_motion_tracker
 demo-vl6180
 demo-raspberry_pi
+demo-battery
+

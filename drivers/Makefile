@@ -4,7 +4,7 @@ DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
 LFLAGS = -Wall -latomic -lpthread $(DEBUG)
 
-all : main integrator test_motion_tracker demo-vl6180
+all : main integrator test_motion_tracker demo-vl6180 demo-raspberry_pi demo-battery
 
 main : $(OBJS) main.o
 	$(CC) $(OBJS) $(LFLAGS) main.o -o main
@@ -19,7 +19,10 @@ demo-vl6180 : $(OBJS) demo-vl6180.o
 	$(CC) $(OBJS) $(LFLAGS) -lncurses demo-vl6180.o -o demo-vl6180
 
 demo-raspberry_pi : raspberry_pi.o demo-raspberry_pi.o
-	$(CC) raspberry_pi.o -lncurses demo-raspberry_pi.o -o demo-raspberry_pi
+	$(CC) raspberry_pi.o $(LFLAGS)  -lncurses demo-raspberry_pi.o -o demo-raspberry_pi
+
+demo-battery : demo-battery.o battery.o i2c.o
+	$(CC) $(LFLAGS) i2c.o battery.o demo-battery.o -lncurses -o demo-battery
 
 
 main.o : main.cpp mpu6050.hpp i2c.hpp
@@ -36,6 +39,9 @@ demo-vl6180.o : demo-vl6180.cpp vl6180.hpp i2c.hpp
 
 demo-raspberry_pi.o : demo-raspberry_pi.cpp raspberry_pi.hpp
 	$(CC) $(CFLAGS) demo-raspberry_pi.cpp
+
+demo-battery.o : demo-battery.cpp battery.hpp i2c.hpp
+	$(CC) $(CFLAGS) demo-battery.cpp
 
 
 motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_point.hpp vector3d.hpp
@@ -57,5 +63,5 @@ i2c.o : i2c.hpp i2c.cpp
 	$(CC) $(CFLAGS) i2c.cpp
 
 clean :
-	rm *.o main integrator test_motion_tracker demo-vl6180 demo-raspberry_pi
+	rm *.o main integrator test_motion_tracker demo-vl6180 demo-raspberry_pi demo-battery
 
