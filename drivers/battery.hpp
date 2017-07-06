@@ -39,6 +39,7 @@ class Battery
     std::chrono::milliseconds refresh_period;
     BatteryData data;
 
+    void cond_refresh();
     void refresh();
 };
 
