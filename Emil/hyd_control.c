@@ -82,7 +82,9 @@ pinMode (PUMP, OUTPUT);
         }
     else if(strcmp(argv[1],"test") == 0)
     {
+        printf("\n1\n")
         test();
+        printf("\n1\n")
     }
 	else
 	{
@@ -100,7 +102,7 @@ return 0 ;
 
 void test()
 {
-printf("turns on all solenoids to test which work");
+printf("\nturns on all solenoids to test which work\n");
 
     digitalWrite(SOL_1, LOW);
     digitalWrite(SOL_2, LOW);
