@@ -10,12 +10,12 @@
 // in the terminal
 #define SOL_1 0    //physical pin 17
 #define SOL_2 1	//physical pin 18
-#define SOL_3 3	//pin 22
-#define SOL_4 7		//pin 4
-#define SOL_5 5	//pin 24
-#define SOL_6 2	//pin 27
-#define SOL_7 4	//pin 23
-#define PUMP 6	//pin 25
+#define SOL_3 29	//pin 21
+#define SOL_4 3		//pin 22
+#define SOL_5 4	//pin 23
+#define SOL_6 5	//pin 24
+#define SOL_7 6	//pin 25
+#define PUMP 7	//pin 4
 
 //global functions definitions
 void hold_one();
