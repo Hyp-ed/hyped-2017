@@ -1,0 +1,2 @@
+sudo git pull master origin
+gcc -Wall -o hyd_control hyd_control.c -lwiringPi
