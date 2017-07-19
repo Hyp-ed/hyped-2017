@@ -113,56 +113,56 @@ void test()
 printf("\nturns on all solenoids to test which work\n");
     printf("\n1 HIGH\n");
     digitalWrite(SOL_1, LOW);
-    delay(5000);
+    delay(1000);
     printf("\n1 LOW\n");
     digitalWrite(SOL_1, HIGH);
     delay(1000);
 
     printf("\n2 HIGH\n");
     digitalWrite(SOL_2, LOW);
-    delay(5000);
+    delay(1000);
     printf("\n2 LOW\n");
     digitalWrite(SOL_2, HIGH);
     delay(1000);
 
         printf("\n3 HIGH\n");
     digitalWrite(SOL_3, LOW);
-    delay(5000);
+    delay(1000);
     printf("\n3 LOW\n");
     digitalWrite(SOL_3, HIGH);
     delay(1000);
 
         printf("\n4 HIGH\n");
     digitalWrite(SOL_4, LOW);
-    delay(5000);
+    delay(1000);
     printf("\n4 LOW\n");
     digitalWrite(SOL_4, HIGH);
     delay(1000);
 
         printf("\n5 HIGH\n");
     digitalWrite(SOL_5, LOW);
-    delay(5000);
+    delay(1000);
     printf("\n5 LOW\n");
     digitalWrite(SOL_5, HIGH);
     delay(1000);
 
         printf("\n6 HIGH\n");
     digitalWrite(SOL_6, LOW);
-    delay(5000);
+    delay(1000);
     printf("\n6 LOW\n");
     digitalWrite(SOL_6, HIGH);
     delay(1000);
 
         printf("\n7 HIGH\n");
     digitalWrite(SOL_7, LOW);
-    delay(5000);
+    delay(1000);
     printf("\n7 LOW\n");
     digitalWrite(SOL_7, HIGH);
     delay(1000);
 
         printf("\nPUMP HIGH\n");
     digitalWrite(PUMP, LOW);
-    delay(5000);
+    delay(1000);
     printf("\nPUMP LOW\n");
     digitalWrite(PUMP, HIGH);
     delay(1000);
