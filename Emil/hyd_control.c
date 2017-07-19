@@ -75,11 +75,15 @@ pinMode (PUMP, OUTPUT);
         printf("\nCharging Accumulators\n");
                 chargeAccumulators();
         }
-        else if(strcmp(argv[1],"kill") == 0)
+    else if(strcmp(argv[1],"kill") == 0)
         {
         printf("\nShutting Down\n");
                 shutDown();
         }
+    else if(strcmp(argv[1],"test") == 0)
+    {
+        test();
+    }
 	else
 	{
 		printf("\nnothing to do\n");
@@ -106,13 +110,7 @@ printf("turns on all solenoids to test which work");
     digitalWrite(SOL_6, LOW);
     digitalWrite(SOL_7, LOW);
     digitalWrite(PUMP, LOW);
-
-
-
-
-
-
-
+delay(10000);
 }
 
 void hold_one()
