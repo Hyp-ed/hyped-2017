@@ -141,7 +141,7 @@ void shutDown()
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, HIGH);
     digitalWrite(PUMP, HIGH);
-printf("ERROR, SAFETY MODE ENGAGED")
+printf("ERROR, SAFETY MODE ENGAGED");
 }
 
 void chargeAccumulators()
