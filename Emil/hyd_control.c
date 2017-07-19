@@ -19,8 +19,12 @@
 
 //global functions definitions
 void hold_one();
+void hold_two();
 void retract_one();
+void retract_two();
 void extend_one();
+void extend_two();
+void standby();
 void shutDown();
 void chargeAccumulators();
 //main accepts an argument from the command line
@@ -72,7 +76,7 @@ pinMode (PUMP, OUTPUT);
         }
         else if(strcmp(argv[1],"kill") == 0)
         {
-        printf("\nShutting Down\n SAFE TO DEPRESSURISE ACCUMULATORS\n");
+        printf("\nShutting Down\n");
                 shutDown();
         }
 	else
@@ -84,6 +88,7 @@ pinMode (PUMP, OUTPUT);
 
 delay(500);
 hold_one();
+hold_two();
 return 0 ;
 
 }
@@ -93,6 +98,19 @@ void hold_one()
 {
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, LOW);
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, HIGH);
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_7, HIGH);
+    digitalWrite(PUMP, HIGH);
+
+}
+
+void hold_two()
+{
+    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_3, HIGH);
     digitalWrite(SOL_4, HIGH);
     digitalWrite(SOL_5, HIGH);
@@ -115,20 +133,29 @@ void retract_one()
     digitalWrite(PUMP, LOW);
 }
 
+void retract_two()
+{
+    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, HIGH;
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, LOW);
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_7, LOW);
+    digitalWrite(PUMP, LOW);
+}
 // Complete the function with corresponding
 // solenoids
 
 void extend_one()
 {
-    digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH);
-    digitalWrite(SOL_3, HIGH);
-    digitalWrite(SOL_4, HIGH);
-    digitalWrite(SOL_5, HIGH);
-    digitalWrite(SOL_6, HIGH);
-    digitalWrite(SOL_7, HIGH);
-    digitalWrite(PUMP, HIGH);
 	//Fill in GPIOs as in functions above
+}
+void extend_two()
+{
+    digitalWrite(SOL_6, HIGH);
+    //Fill in GPIOs as in functions above
 }
 
 void shutDown()
@@ -141,9 +168,23 @@ void shutDown()
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, HIGH);
     digitalWrite(PUMP, HIGH);
-printf("\nProgram Complete\n");
+    delay(1000);
+    printf("\nProgram Complete\nSAFE TO DISCHARGE ACCUMULATORS");
 
 
+
+}
+
+void standby()
+{
+    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, LOW);
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, HIGH);
+    digitalWrite(SOL_6, LOW);
+    digitalWrite(SOL_7, HIGH);
+    digitalWrite(PUMP, HIGH);
 
 }
 
