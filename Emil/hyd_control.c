@@ -10,7 +10,7 @@
 // in the terminal
 #define SOL_1 0    //physical pin 17
 #define SOL_2 1	//physical pin 18
-#define SOL_3 29	//pin 21
+#define SOL_3 2	//pin 21
 #define SOL_4 3		//pin 22
 #define SOL_5 4	//pin 23
 #define SOL_6 5	//pin 24
