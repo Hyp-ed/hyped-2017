@@ -143,7 +143,7 @@ void retract_one()
 void retract_two()
 {
     digitalWrite(SOL_1, HIGH);
-    digitalWrite(SOL_2, HIGH;
+    digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_3, HIGH);
     digitalWrite(SOL_4, LOW);
     digitalWrite(SOL_5, LOW);
