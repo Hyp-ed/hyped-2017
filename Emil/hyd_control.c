@@ -17,17 +17,20 @@
 #define SOL_7 6	//pin 25
 #define PUMP 7	//pin 4
 
+
+#define pumpSpinup 200 //Spinup time for the pump when runing off load. This will occur before every operation that uses the pump, plan timing accordingly
+#define accumulatorChargingTime 20000 //Time that the accumulators will charge up SHOULD BE REPLACED BY A FUNCTION ONCE THE PRESSURE SENSOR IS WORKING
 //global functions definitions
-void hold_one();
-void hold_two();
-void retract_one();
-void retract_two();
-void extend_one();
-void extend_two();
-void standby();
-void shutDown();
-void chargeAccumulators();
-void test();
+void hold_one(); //Holds brake 1 in place without affecting the operations of brake 2
+void hold_two(); //Holds brake 2 in place without affecting the operations of brake 1
+void retract_one(); //Retracts brake 1 without affecting the operations of brake 2
+void retract_two(); //Retracts brake 2 without affecting the operations of brake 1
+void extend_one(); //Extends brake 1 without affecting the operations of brake 2
+void extend_two(); //Extends brake 2 without affecting the operations of brake 1
+void standby(); //Shuts down the pump and holds both cylinders in place
+void shutDown(); //Shuts down the pump and releases both cylinders
+void chargeAccumulators(); //Charges the accumulators 
+void test(); // Turns on values one by one to check that all solenoids click and are correctly mapped. (Battery can be connected for this operation but doesn't have to)
 //main accepts an argument from the command line
 
 int main ( int argc, char *argv[] )
@@ -49,7 +52,7 @@ pinMode (PUMP, OUTPUT);
     {
         /* We print argv[0] assuming it is the program name */
         printf( "missing argument");
-     //   shutDown();
+        shutDown();
     }
     else
     {
@@ -88,13 +91,13 @@ pinMode (PUMP, OUTPUT);
     }
 	else
 	{
-		printf("\nnothing to do\n");
+		printf("\nInvalid input\n");
 	}
     }
 
 
 delay(500);
-shutDown();
+standby();
 return 0 ;
 
 }
@@ -110,7 +113,12 @@ void test()
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, HIGH);
     digitalWrite(PUMP, HIGH);
-printf("\nturns on all solenoids to test which work\n");
+    printf("\nPUMP HIGH\n");
+    digitalWrite(PUMP, LOW);
+    delay(1000);
+    digitalWrite(PUMP, LOW);
+    delay(1000);
+    printf("\nturns on all solenoids to test which work\n");
     printf("\n1 HIGH\n");
     digitalWrite(SOL_1, LOW);
     delay(1000);
@@ -125,58 +133,43 @@ printf("\nturns on all solenoids to test which work\n");
     digitalWrite(SOL_2, HIGH);
     delay(1000);
 
-        printf("\n3 HIGH\n");
+    printf("\n3 HIGH\n");
     digitalWrite(SOL_3, LOW);
     delay(1000);
     printf("\n3 LOW\n");
     digitalWrite(SOL_3, HIGH);
     delay(1000);
 
-        printf("\n4 HIGH\n");
+    printf("\n4 HIGH\n");
     digitalWrite(SOL_4, LOW);
     delay(1000);
     printf("\n4 LOW\n");
     digitalWrite(SOL_4, HIGH);
     delay(1000);
 
-        printf("\n5 HIGH\n");
+    printf("\n5 HIGH\n");
     digitalWrite(SOL_5, LOW);
     delay(1000);
     printf("\n5 LOW\n");
     digitalWrite(SOL_5, HIGH);
     delay(1000);
 
-        printf("\n6 HIGH\n");
+    printf("\n6 HIGH\n");
     digitalWrite(SOL_6, LOW);
     delay(1000);
     printf("\n6 LOW\n");
     digitalWrite(SOL_6, HIGH);
     delay(1000);
 
-        printf("\n7 HIGH\n");
+    printf("\n7 HIGH\n");
     digitalWrite(SOL_7, LOW);
     delay(1000);
     printf("\n7 LOW\n");
     digitalWrite(SOL_7, HIGH);
     delay(1000);
 
-    printf("\nPUMP HIGH\n");
+  
 
-
-    
-    digitalWrite(PUMP, LOW);
-delay(2000);
-    digitalWrite(SOL_1, HIGH);
-    digitalWrite(SOL_2, HIGH);
-    digitalWrite(SOL_3, HIGH);
-    digitalWrite(SOL_4, HIGH);
-    digitalWrite(SOL_5, HIGH);
-    digitalWrite(SOL_6, HIGH);
-    digitalWrite(SOL_7, HIGH);
-    digitalWrite(PUMP, HIGH);
-    printf("\nPUMP LOW\n");
-    digitalWrite(PUMP, HIGH);
-    delay(1000);
 
 
 
@@ -199,6 +192,8 @@ void hold_two()
 
 void retract_one()
 {
+    digitalWrite(PUMP, LOW);
+    delay(pumpSpinup);
     digitalWrite(SOL_1, LOW);
     digitalWrite(SOL_2, LOW);
     digitalWrite(SOL_3, HIGH);
@@ -206,11 +201,13 @@ void retract_one()
     digitalWrite(SOL_5, LOW);
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, LOW);
-    digitalWrite(PUMP, LOW);
+
 }
 
 void retract_two()
 {
+    digitalWrite(PUMP, LOW);
+    delay(pumpSpinup);
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_3, HIGH);
@@ -218,22 +215,18 @@ void retract_two()
     digitalWrite(SOL_5, LOW);
     digitalWrite(SOL_6, LOW);
     digitalWrite(SOL_7, LOW);
-    digitalWrite(PUMP, LOW);
+    
 }
-// Complete the function with corresponding
-// solenoids
 
 void extend_one()
 {
     digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_1, HIGH);
-	//Fill in GPIOs as in functions above
 }
 void extend_two()
 {
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_4, HIGH);
-    //Fill in GPIOs as in functions above
 }
 
 void shutDown()
@@ -268,6 +261,8 @@ void standby()
 
 void chargeAccumulators()
 {
+    digitalWrite(PUMP, LOW);
+    delay(pumpSpinup);
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_3, LOW);
@@ -275,8 +270,8 @@ void chargeAccumulators()
     digitalWrite(SOL_5, HIGH);
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, LOW);
-    digitalWrite(PUMP, LOW);
-delay(2000);
+    
+delay(accumulatorChargingTime);
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_3, HIGH);
