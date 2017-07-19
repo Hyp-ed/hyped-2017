@@ -133,14 +133,14 @@ void extend_one()
 
 void shutDown()
 {
-	digitalWrite(SOL_1, GPIO.HIGH);
-    digitalWrite(SOL_2, GPIO.HIGH);
-    digitalWrite(SOL_3, GPIO.HIGH);
-    digitalWrite(SOL_4, GPIO.HIGH);
-    digitalWrite(SOL_5, GPIO.HIGH);
-    digitalWrite(SOL_6, GPIO.HIGH);
-    digitalWrite(SOL_7, GPIO.HIGH);
-    digitalWrite(PUMP, GPIO.HIGH);
+	digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, HIGH);
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, HIGH);
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_7, HIGH);
+    digitalWrite(PUMP, HIGH);
 printf("ERROR, SAFETY MODE ENGAGED")
 }
 
