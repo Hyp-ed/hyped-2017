@@ -82,9 +82,9 @@ pinMode (PUMP, OUTPUT);
         }
     else if(strcmp(argv[1],"test") == 0)
     {
-        printf("\n1\n")
+        printf("\n1\n");
         test();
-        printf("\n1\n")
+        printf("\n1\n");
     }
 	else
 	{
