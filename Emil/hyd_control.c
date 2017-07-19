@@ -101,7 +101,7 @@ return 0 ;
 
 void test()
 {
-    printf("\nTurning all solenoids off\n")
+    printf("\nTurning all solenoids off\n");
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_3, HIGH);
