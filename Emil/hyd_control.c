@@ -27,6 +27,7 @@ void extend_two();
 void standby();
 void shutDown();
 void chargeAccumulators();
+void test();
 //main accepts an argument from the command line
 
 int main ( int argc, char *argv[] )
@@ -93,31 +94,37 @@ return 0 ;
 
 }
 
+void test()
+{
+printf("turns on all solenoids to test which work");
+
+    digitalWrite(SOL_1, LOW);
+    digitalWrite(SOL_2, LOW);
+    digitalWrite(SOL_3, LOW);
+    digitalWrite(SOL_4, LOW);
+    digitalWrite(SOL_5, LOW);
+    digitalWrite(SOL_6, LOW);
+    digitalWrite(SOL_7, LOW);
+    digitalWrite(PUMP, LOW);
+
+
+
+
+
+
+
+}
 
 void hold_one()
 {
-    digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, LOW);
-    digitalWrite(SOL_3, HIGH);
-    digitalWrite(SOL_4, HIGH);
-    digitalWrite(SOL_5, HIGH);
-    digitalWrite(SOL_6, HIGH);
-    digitalWrite(SOL_7, HIGH);
-    digitalWrite(PUMP, HIGH);
-
+    digitalWrite(SOL_1, HIGH);
 }
 
 void hold_two()
 {
-    digitalWrite(SOL_1, HIGH);
-    digitalWrite(SOL_2, HIGH);
-    digitalWrite(SOL_3, HIGH);
-    digitalWrite(SOL_4, HIGH);
-    digitalWrite(SOL_5, HIGH);
     digitalWrite(SOL_6, LOW);
-    digitalWrite(SOL_7, HIGH);
-    digitalWrite(PUMP, HIGH);
-
+    digitalWrite(SOL_4, HIGH);
 }
 
 
@@ -138,9 +145,9 @@ void retract_two()
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH;
     digitalWrite(SOL_3, HIGH);
-    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_4, LOW);
     digitalWrite(SOL_5, LOW);
-    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_6, LOW);
     digitalWrite(SOL_7, LOW);
     digitalWrite(PUMP, LOW);
 }
@@ -150,11 +157,13 @@ void retract_two()
 void extend_one()
 {
     digitalWrite(SOL_2, HIGH);
+    digitalWrite(SOL_1, HIGH);
 	//Fill in GPIOs as in functions above
 }
 void extend_two()
 {
     digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_4, HIGH);
     //Fill in GPIOs as in functions above
 }
 
