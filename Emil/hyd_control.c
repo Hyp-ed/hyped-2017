@@ -161,8 +161,16 @@ printf("\nturns on all solenoids to test which work\n");
     delay(1000);
 
     printf("\nPUMP HIGH\n");
-    digitalWrite(PUMP, LOW);
-    delay(1000);
+      digitalWrite(PUMP, LOW);
+delay(2000);
+    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, HIGH);
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, HIGH);
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_7, HIGH);
+    digitalWrite(PUMP, HIGH);
     printf("\nPUMP LOW\n");
     digitalWrite(PUMP, HIGH);
     delay(1000);
