@@ -34,7 +34,7 @@
 int main ()
 {
   int fd ;
-  int count ;
+ // int count ;
   //unsigned int nextTime ;
 
   if ((fd = serialOpen ("/dev/ttyACM0", 115200)) < 0)
