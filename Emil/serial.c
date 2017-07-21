@@ -8,7 +8,7 @@
 	//----- SETUP USART 0 -----
 	//-------------------------
 	//At bootup, pins 8 and 10 are already set to UART0_TXD, UART0_RXD (ie the alt0 function) respectively
-	int uart0_filestream = -1;
+	FILE *uart0_filestream = -1;
 	
 	//OPEN THE UART
 	//The flags (defined in fcntl.h):
