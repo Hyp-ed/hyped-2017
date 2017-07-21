@@ -106,7 +106,7 @@ return 0 ;
 }
 void testCase()
 {
-    printf("\nRUNNING TEST CASE 1\n")
+    printf("\nRUNNING TEST CASE 1\n");
     chargeAccumulators();
     delay (2000);
     retract_one();
