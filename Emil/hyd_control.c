@@ -115,7 +115,7 @@ void testCase()
     standby();
     extend_one();
     extend_two();
-    delay(500)
+    delay(500);
     standby();
 }
 
