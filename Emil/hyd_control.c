@@ -111,7 +111,7 @@ void motorTest()
     digitalWrite(PUMP, LOW);
     delay(1000);
     digitalWrite(PUMP, HIGH);
-    Shutdown();
+    shutDown();
 }
 void testCase()
 {
