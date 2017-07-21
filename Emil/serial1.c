@@ -121,14 +121,15 @@ else
 
 int i=0;
 char tmp[1024];
-while(1)
+i=0;
+while(i<10)
 {
     fscanf(tty,"%d",&i);
 
 printf("%d\n", i);
 
 //delay(1000);
-
+i++;
 }
 
   fclose(tty);
