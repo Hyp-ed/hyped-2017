@@ -35,7 +35,7 @@ int main ()
 {
   int fd ;
   int count ;
-  unsigned int nextTime ;
+  //unsigned int nextTime ;
 
   if ((fd = serialOpen ("/dev/ttyACM0", 115200)) < 0)
   {
@@ -69,7 +69,7 @@ int main ()
       printf (" -> %3d", serialGetchar (fd)) ;
       fflush (stdout) ;
     }
-  }
+
 
   printf ("\n") ;
   return 0 ;
