@@ -81,11 +81,11 @@ char tmp[1024];
 
 while(1)
 {
-    fgets(tmp,4, tty);
+    fgets(tty,10, tmp);
 
 printf("%s", tmp);
 
-delay(1000);
+//delay(1000);
 
 }
 
