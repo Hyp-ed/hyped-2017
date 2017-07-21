@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
- 
+#include <string.h> 
 #include <wiringPi.h>
 #include <wiringSerial.h>
 
@@ -76,10 +76,10 @@ int main ()
 
 //FILE *tty = fopen("/dev/ttyACM0","r");
 char serial[20];
-int serialnum = 0;
+//int serialnum = 0;
 FILE *tty;
 if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
-  serial="/dev/ttyACM0";
+  strcpy(serial,"/dev/ttyACM0");
 //tty = fopen("/dev/ttyACM0","r");
 printf("\nACM0");
 } 
