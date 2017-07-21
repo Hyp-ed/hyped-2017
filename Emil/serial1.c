@@ -77,12 +77,12 @@ int main ()
   FILE *tty = fopen("/dev/ttyACM0","r");
 
 
-char a[10];
+char a[100];
   while(1)
   {
     fscanf(tty,"%s",a);
 
-    printf("%s\n", a);
+    printf("%s\n", a[0]);
     delay(1000);
 
 
