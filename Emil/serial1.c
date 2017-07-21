@@ -76,21 +76,23 @@ int main ()
 
 //FILE *tty = fopen("/dev/ttyACM0","r");
 
+FILE *tty;
+
 if(fopen("/dev/ttyACM0","r")==NULL)
 {
-  FILE *tty = fopen("/dev/ttyACM1","r");
+  tty = fopen("/dev/ttyACM1","r");
   printf("AMC1");
 }
 else if  (fopen("/dev/ttyACM1","r") == NULL)
 {
-  FILE *tty = fopen("/dev/ttyACM0","r");
+  tty = fopen("/dev/ttyACM0","r");
   printf("ACM0");
 }
 
 else
   {
 printf("error no serial connection detected");
-return 0
+return 0;
 
   }
 
