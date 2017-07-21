@@ -96,12 +96,13 @@ return 0;
 
   }
 
+int i=0;
 char tmp[1024];
 while(1)
 {
-    fgets(tmp,10, tty);
+    fscanf(tty,"%d",&i);
 
-printf("%s", tmp);
+printf("%d", i);
 
 //delay(1000);
 
