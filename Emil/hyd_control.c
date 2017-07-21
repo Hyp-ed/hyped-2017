@@ -102,9 +102,6 @@ pinMode (PUMP, OUTPUT);
 	}
     }
 
-
-delay(500);
-standby();
 return 0 ;
 
 }
