@@ -75,7 +75,11 @@ pinMode (PUMP, OUTPUT);
         printf("\nretracting the cylinder\n");
 		retract_one();
 	}
-
+    else if(strcmp(argv[1],"pump") == 0)
+    {
+        printf("\ntesting the motor\n");
+        motorTest();
+    }
   	else if(strcmp(argv[1],"charge") == 0)
         {
         printf("\nCharging Accumulators\n");
@@ -245,7 +249,7 @@ void test()
     printf("\nPUMP HIGH\n");
     digitalWrite(PUMP, LOW);
     delay(1000);
-    digitalWrite(PUMP, LOW);
+    digitalWrite(PUMP, HIGH);
     delay(1000);
     printf("\nturns on all solenoids to test which work\n");
     printf("\n1 HIGH\n");
