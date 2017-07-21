@@ -75,7 +75,7 @@ int main ()
 
 
 FILE *tty = fopen("/dev/ttyACM0","r");
-if(tty==EOF){tty = fopen("/dev/ttyACM1","r");}
+if(tty==NULL){tty = fopen("/dev/ttyACM1","r");}
 
 char tmp[1024];
   
