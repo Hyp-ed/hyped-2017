@@ -48,7 +48,7 @@
 	tcflush(uart0_filestream, TCIFLUSH);
 	tcsetattr(uart0_filestream, TCSANOW, &options);
 
-	
+
 	//----- CHECK FOR ANY RX BYTES -----
 	if (uart0_filestream != -1)
 	{
@@ -69,4 +69,17 @@
 			rx_buffer[rx_length] = '\0';
 			printf("%i bytes read : %s\n", rx_length, rx_buffer);
 		}
+	}
+
+
+
+
+
+	int main()
+	{
+
+
+
+
+		return 1;
 	}
