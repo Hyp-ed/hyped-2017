@@ -128,11 +128,11 @@ int i,j=0;
 j=0;
 while(j<10)
 {
-tty = open(serial,"r");
-    scanf(tty,"%d",&i);
+tty = fopen(serial,"r");
+    fscanf(tty,"%d",&i);
 
 printf("%d\n", i);
- close(tty);
+ fclose(tty);
 //delay(1000);
 
 j++;
