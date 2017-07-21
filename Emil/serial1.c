@@ -134,7 +134,7 @@ tty = fopen(serial,"r");
 printf("%d\n", i);
  fclose(tty);
 //delay(1000);
- p
+
 j++;
 }
 
