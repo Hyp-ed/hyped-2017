@@ -77,7 +77,7 @@ int main ()
   FILE *tty = fopen("/dev/ttyACM0","r");
 
 
-char a[]=10;
+char a[10];
   while(1)
   {
     fscanf(tty,"%s",a);
