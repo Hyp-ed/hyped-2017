@@ -80,7 +80,7 @@ int main ()
 char a[]=10;
   while(1)
   {
-    fscanf(tty,"%s",&a);
+    fscanf(tty,"%s",a);
 
     printf("%s\n", a);
     delay(1000);
