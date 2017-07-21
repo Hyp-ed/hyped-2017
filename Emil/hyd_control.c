@@ -54,6 +54,7 @@ pinMode (PUMP, OUTPUT);
 
 
 standby();
+digitalWrite(PUMP, LOW);
     if ( argc != 2 ) /* argc should be 2 for correct execution */
     {
         /* We print argv[0] assuming it is the program name */
