@@ -54,7 +54,7 @@ pinMode (PUMP, OUTPUT);
 
 
 standby();
-digitalWrite(PUMP, LOW);
+
     if ( argc != 2 ) /* argc should be 2 for correct execution */
     {
         /* We print argv[0] assuming it is the program name */
@@ -115,7 +115,6 @@ return 0 ;
 void motorTest()
 {
    printf("\nRunning Motor\n");
-   delay(1000);
 
     digitalWrite(PUMP, LOW);
     delay(1000);
