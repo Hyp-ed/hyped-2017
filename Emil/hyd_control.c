@@ -81,9 +81,9 @@ standby();
 	}
     else if(strcmp(argv[1],"pump") == 0)
     {
-        delay(2000);
+    
         printf("\ntesting the motor\n");
-        delay(4000);
+
         motorTest();
     }
   	else if(strcmp(argv[1],"charge") == 0)
