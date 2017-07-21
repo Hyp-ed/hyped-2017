@@ -1,24 +1,4 @@
-Skip to content
-This repository
-Search
-Pull requests
-Issues
-Marketplace
-Gist
- @lymlan
- Sign out
-You don’t have any verified emails. We recommend verifying at least one email.
-Email verification helps our support team verify ownership if you lose account access and allows you to receive all the notifications you ask for.
- Watch 117
-  Star 697
-  Fork 297 WiringPi/WiringPi
- Code  Pull requests 8  Projects 0 Insights 
-Branch: master Find file Copy pathWiringPi/examples/serialTest.c
-3fbc564  on 24 Mar 2013
- Gordon Henderson Synced to git.drogon.net
-0 contributors
-RawBlameHistory     
-76 lines (65 sloc)  1.95 KB
+
 /*
  * serialTest.c:
  *	Very simple program to test the serial port. Expects
