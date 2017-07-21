@@ -83,7 +83,7 @@ int a=0;
     fscanf(tty,"%d",&a);
 
     printf("%d\n", a);
-
+    delay(1000);
 
 
 
