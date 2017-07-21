@@ -102,7 +102,7 @@ while(1)
 {
     fscanf(tty,"%d",&i);
 
-printf("%d", i);
+printf("%d\n", i);
 
 //delay(1000);
 
