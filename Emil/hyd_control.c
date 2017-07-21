@@ -107,7 +107,7 @@ return 0 ;
 
 void motorTest()
 {
-    printf("\nRunning Motor\n")
+    printf("\nRunning Motor\n");
     digitalWrite(PUMP, LOW);
     delay(1000);
     digitalWrite(PUMP, HIGH);
