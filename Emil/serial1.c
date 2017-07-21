@@ -75,20 +75,24 @@ int main ()
 
 
 //FILE *tty = fopen("/dev/ttyACM0","r");
-
+char serial[20];
+int serialnum = 0;
 FILE *tty;
 if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
-tty = fopen("/dev/ttyACM0","r");
+  serial="/dev/ttyACM0";
+//tty = fopen("/dev/ttyACM0","r");
 printf("\nACM0");
 } 
 
 else if( access( "/dev/ttyACM1", F_OK ) != -1 ) {
-tty = fopen("/dev/ttyACM1","r");
+   serial="/dev/ttyACM1";
+//tty = fopen("/dev/ttyACM1","r");
 printf("\nACM1");
 } 
 
 else if( access( "/dev/ttyACM2", F_OK ) != -1 ) {
-tty = fopen("/dev/ttyACM2","r");
+//tty = fopen("/dev/ttyACM2","r");
+ serial="/dev/ttyACM2";
 printf("\nACM2");
 } 
 
@@ -120,18 +124,19 @@ else
 //   }
 
 int i=0;
-char tmp[1024];
+//char tmp[1024];
 i=0;
 while(i<10)
 {
+tty = fopen(serial,"r");
     fscanf(tty,"%d",&i);
 
 printf("%d\n", i);
-
+ fclose(tty);
 //delay(1000);
 i++;
 }
 
-  fclose(tty);
+ 
   return 0 ;
 }
