@@ -78,6 +78,7 @@ pinMode (PUMP, OUTPUT);
     else if(strcmp(argv[1],"pump") == 0)
     {
         printf("\ntesting the motor\n");
+        delay(4000);
         motorTest();
     }
   	else if(strcmp(argv[1],"charge") == 0)
@@ -108,15 +109,12 @@ return 0 ;
 
 void motorTest()
 {
-    printf("\nRunning Motor\n");
-   digitalWrite(SOL_1, LOW);
+   printf("\nRunning Motor\n");
    delay(1000);
 
-
-   // digitalWrite(PUMP, LOW);
+   /digitalWrite(PUMP, LOW);
     delay(1000);
-
-    //digitalWrite(PUMP, HIGH);
+    digitalWrite(PUMP, HIGH);
     shutDown();
 }
 void testCase()
