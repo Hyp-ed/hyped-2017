@@ -76,7 +76,8 @@ int main ()
 
 //FILE *tty = fopen("/dev/ttyACM0","r");
 
-if(fopen("/dev/ttyACM0","r")==NULL){
+if(fopen("/dev/ttyACM0","r")==NULL)
+{
   FILE *tty = fopen("/dev/ttyACM1","r");
   printf("AMC1");
 }
@@ -85,15 +86,15 @@ else if  (fopen("/dev/ttyACM1","r") == NULL)
   FILE *tty = fopen("/dev/ttyACM0","r");
   printf("ACM0");
 }
-char tmp[1024];
-  else
+
+else
   {
-printf("error");
+printf("error no serial connection detected");
 return 0
 
   }
 
-
+char tmp[1024];
 while(1)
 {
     fgets(tmp,10, tty);
