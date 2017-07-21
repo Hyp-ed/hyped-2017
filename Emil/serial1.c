@@ -68,6 +68,8 @@ int main ()
     {
       delay(500);
       printf (" -> %3d", serialGetchar (fd)) ;
+      printf (" -> %3c", serialGetint (fd)) ;
+
       fflush (stdout) ;
     }
   }
