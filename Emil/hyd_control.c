@@ -32,7 +32,7 @@ void shutDown(); //Shuts down the pump and releases both cylinders
 void chargeAccumulators(); //Charges the accumulators 
 void test(); // Turns on values one by one to check that all solenoids click and are correctly mapped. (Battery can be connected for this operation but doesn't have to)
 void testCase(); //Runs through various testing scenarios of the hydraulics, begins by charging the accumulators to the appropriate pressure.
-
+void motorTest(); //Runs the motor idle for 1 second
 //main accepts an argument from the command line
  
 
