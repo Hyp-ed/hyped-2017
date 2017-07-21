@@ -110,7 +110,7 @@ void motorTest()
     printf("\nRunning Motor\n")
     digitalWrite(PUMP, LOW);
     delay(1000);
-    digitalWrite(Pump, HIGH);
+    digitalWrite(PUMP, HIGH);
     Shutdown();
 }
 void testCase()
