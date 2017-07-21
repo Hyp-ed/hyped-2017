@@ -66,9 +66,7 @@ int main ()
 
     while (serialDataAvail (fd))
     {
-      delay(500);
       printf (" -> %3d", serialGetchar (fd)) ;
-
       fflush (stdout) ;
     }
   }
