@@ -104,6 +104,15 @@ standby();
 return 0 ;
 
 }
+
+void motorTest()
+{
+    printf("\nRunning Motor\n")
+    digitalWrite(PUMP, LOW);
+    delay(1000);
+    digitalWrite(Pump, HIGH);
+    Shutdown();
+}
 void testCase()
 {
     printf("\nRUNNING TEST CASE 1\n");
