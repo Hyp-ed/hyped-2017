@@ -123,10 +123,10 @@ else
 
 //   }
 
-int i=0;
+int i,j=0;
 //char tmp[1024];
-i=0;
-while(i<10)
+j=0;
+while(j<10)
 {
 tty = fopen(serial,"r");
     fscanf(tty,"%d",&i);
@@ -134,8 +134,8 @@ tty = fopen(serial,"r");
 printf("%d\n", i);
  fclose(tty);
 //delay(1000);
- printf(i);
-i++;
+ p
+j++;
 }
 
  
