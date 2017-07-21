@@ -81,7 +81,7 @@ char tmp[1024];
 
 while(1)
 {
-    fgets(tty,10, tmp);
+    fgets(tmp,10, tty);
 
 printf("%s", tmp);
 
