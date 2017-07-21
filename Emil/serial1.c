@@ -82,7 +82,7 @@ tty = fopen("/dev/ttyACM0","r");
 printf("\nACM0");
 } 
 
-else if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
+else if( access( "/dev/ttyACM1", F_OK ) != -1 ) {
 tty = fopen("/dev/ttyACM1","r");
 printf("\nACM1");
 } 
