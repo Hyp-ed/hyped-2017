@@ -79,7 +79,7 @@ int main ()
 char tmp[1024];
   
 
-while(!feof(tty))
+while(1)
 {
     fgets(tmp,4, tty);
 
