@@ -51,6 +51,9 @@ pinMode (SOL_6, OUTPUT);
 pinMode (SOL_7, OUTPUT);
 pinMode (PUMP, OUTPUT);
 
+
+
+standby();
     if ( argc != 2 ) /* argc should be 2 for correct execution */
     {
         /* We print argv[0] assuming it is the program name */
