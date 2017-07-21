@@ -220,7 +220,7 @@ delay(accumulatorChargingTime);
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, HIGH);
     digitalWrite(PUMP, HIGH);
-    printf("\nACCUMULATORS CHARGED!\n")
+    printf("\nACCUMULATORS CHARGED!\n");
 }
 void test()
 {
