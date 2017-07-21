@@ -77,24 +77,44 @@ int main ()
 //FILE *tty = fopen("/dev/ttyACM0","r");
 
 FILE *tty;
+if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
+tty = fopen("/dev/ttyACM0","r");
+} 
 
-if(fopen("/dev/ttyACM0","r")==NULL)
-{
-  tty = fopen("/dev/ttyACM1","r");
-  printf("AMC1");
-}
-else if  (fopen("/dev/ttyACM1","r") == NULL)
-{
-  tty = fopen("/dev/ttyACM0","r");
-  printf("ACM0");
-}
+else if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
+tty = fopen("/dev/ttyACM1","r");
+} 
+
+else if( access( "/dev/ttyACM2", F_OK ) != -1 ) {
+tty = fopen("/dev/ttyACM2","r");
+} 
 
 else
   {
-printf("error no serial connection detected");
-return 0;
+ printf("error no serial connection detected");
+ return 0;
 
   }
+
+
+
+// if(fopen("/dev/ttyACM0","r")==NULL) //Rewrite to be more safe
+// {
+//   tty = fopen("/dev/ttyACM1","r");
+//   printf("AMC1");
+// }
+// else if  (fopen("/dev/ttyACM1","r") == NULL)
+// {
+//   tty = fopen("/dev/ttyACM0","r");
+//   printf("ACM0");
+// }
+
+// else
+//   {
+// printf("error no serial connection detected");
+// return 0;
+
+//   }
 
 int i=0;
 char tmp[1024];
