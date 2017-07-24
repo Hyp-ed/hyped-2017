@@ -66,7 +66,7 @@ else
 
 
 
-  int fd = 10;
+  int fd;
 
 
   if ((fd = serialOpen (serial, 115200)) < 0)
@@ -82,11 +82,11 @@ else
   }
 
   // printf ("\n") ;
-
-
+while (;;)
+{
     putchar (serialGetchar (fd)) ;
     fflush (stdout) ;
-  
+  }
 //}
 
   return 0 ;
