@@ -28,8 +28,8 @@
 
 int main ( int argc, char *argv[] )
 {
-printf("argc=\n");
-printf(argc);
+//printf("argc=\n");
+//;
 printf("\nargv\n");
 printf("argv");
 return 0;
