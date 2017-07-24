@@ -39,8 +39,8 @@ void startUp();// Retracts brakes and charges accumulators
 
 int main ( int argc, char *argv[] )
 {
-//int test = (pumpSpinup + accumulatorChargingTime);
-//printf("%i", test);
+int test = (pumpSpinup + accumulatorChargingTime);
+printf("%i", test);
 if (wiringPiSetup () == -1)
     {exit (1) ;
 }
@@ -66,23 +66,8 @@ standby();
 
 
 	}
-	else if(strcmp(argv[1],"hold") == 0)
-	{
-		printf("\nholding the cylinder...\n");
-		hold_one();
-	}
-	else if(strcmp(argv[1],"extend") == 0)
-	{
-		printf("\nextending the cylinder\n");
-		extend_one();
-	}
-	else if(strcmp(argv[1],"retract") == 0)
-	{
-        printf("\nretracting the cylinder\n");
-		retract_one();
-	}
-  
-  	else if(strcmp(argv[1],"charge") == 0)
+	
+  	else if(strcmp(argv[1],"startup") == 0)
         {
         printf("\nCharging Accumulators\n");
                 chargeAccumulators();
