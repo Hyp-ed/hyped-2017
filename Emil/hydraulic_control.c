@@ -48,6 +48,10 @@ void standby(); //Shuts down the pump and holds both cylinders in place
 void shutDown(); //Shuts down the pump and releases both cylinders
 void chargeAccumulators(); //Charges the accumulators 
 void startUp();// Retracts brakes and charges accumulators
+void pressure_reading_accumulator();
+void pressure_reading_pump();
+void proximity_reading_one();
+void proximity_reading_two();
 //main accepts an argument from the command line
  
 
