@@ -83,9 +83,6 @@ else
 
   // printf ("\n") ;
 for (;;)
- {
-   /* code */
- } (;;)
 {
     putchar (serialGetchar (fd)) ;
     fflush (stdout) ;
