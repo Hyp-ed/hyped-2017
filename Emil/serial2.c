@@ -39,7 +39,6 @@ int main ()
 
 char serial[20]; //Looking for a serial connection 
 //int serialnum = 0;
-FILE *tty;
 if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
   strcpy(serial,"/dev/ttyACM0");
 //tty = fopen("/dev/ttyACM0","r");
