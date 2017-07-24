@@ -162,20 +162,6 @@ void loop() {
   showBattStat();
   #endif
 
-  i=0;
-while(i<5000){
-  
-  Serial.print(1);
-  i++;
-  }
-  
-i=0;
-  while(1){
-Serial.println (i);
-i++;
-  delay(50);  
-  }
-
   
   delay(50);                  
 }
@@ -257,39 +243,40 @@ void getBattStat() {
 }
 
 void showBattStat() {
-  //Serial.println (Current);
-//  Serial.print ("A. ");
-//  Serial.print (Cell1);
-//  Serial.print ("V. " );
-//  Serial.print (Cell2);
-//  Serial.print ("V. ");
-//  Serial.print (Cell3);
-//  Serial.print ("V. ");
-//  Serial.print (Cell4);
-//  Serial.print ("V. ");
-//  Serial.print (Cell5);
-//  Serial.print ("V. " );
-//  Serial.print (Cell6);
-//  Serial.print ("V. ");
-//  Serial.print (Cell7);
-//  Serial.print ("V. Total = " );
-//  Serial.print (Cell1+Cell2+Cell3+Cell4);
-//  
-//  Serial.print ("   Bigtemp. ");
-//  Serial.print (bigtemp);
-//  
-//  Serial.print ("  Small batt ");
-//  Serial.print (smallbatt);
-//
-//  Serial.print ("  Smalltemp. ");
-//  Serial.print (smalltemp);
-//
-//  Serial.print ("  Pump. ");
-//  Serial.print (pump);
-//
-//  Serial.print ("  Acc. ");
- // Serial.println (acc);
+Serial.print("CurrentDraw=");
+Serial.print (Current);
+Serial.print("A, CellVoltages=");
+Serial.print (Cell1);
+Serial.print ("V. " );
+Serial.print (Cell2);
+Serial.print ("V. ");
+Serial.print (Cell3);
+Serial.print ("V. ");
+Serial.print (Cell4);
+Serial.print ("V. ");
+Serial.print (Cell5);
+Serial.print ("V. " );
+Serial.print (Cell6);
+Serial.print ("V. ");
+Serial.print (Cell7);
+Serial.print ("V. Total = " );
+Serial.print (Cell1+Cell2+Cell3+Cell4+Cell5+Cell6+Cell7);
+ 
+Serial.print ("V, Bigtemp=");
+Serial.print (bigtemp);
+ 
+Serial.print ("C, SmallBattery=");
+Serial.print (smallbatt);
 
+Serial.print ("V, Smalltemp=");
+Serial.print (smalltemp);
+
+Serial.print ("C, PumpPressure=");
+Serial.print (pump);
+//
+Serial.print ("BAR, AccumulatorPressure=");
+Serial.print(acc);
+Serial.println("BAR");
 
   
 }
