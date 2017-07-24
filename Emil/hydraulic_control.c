@@ -27,7 +27,7 @@
 
 
 
-int main ( int argc, ichar *argv[]) //char *argv[]
+int main ( int argc, char *argv[]) //char *argv[]
 {
 	if (wiringPiSetup () == -1)
     {exit (1) ;
