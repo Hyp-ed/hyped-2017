@@ -31,6 +31,6 @@ int main ( int argc, char *argv[] )
 //printf("argc=\n");
 //;
 printf("\nargv\n");
-printf("argv");
+printf(argv);
 return 0;
 }
