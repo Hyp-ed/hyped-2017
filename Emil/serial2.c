@@ -66,9 +66,8 @@ else
 
 
 
-  int fd ;
-  int count ;
-  unsigned int nextTime ;
+  int fd = 10;
+
 
   if ((fd = serialOpen (serial, 115200)) < 0)
   {
