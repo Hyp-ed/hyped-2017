@@ -90,6 +90,6 @@ for (i = 0; i <  serialDataAvail (fd); ++i)
     fflush (stdout) ;
   }
 //}
-
+printf("\n");
   return 0 ;
 }
