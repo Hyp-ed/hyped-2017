@@ -43,7 +43,7 @@ pinMode (PUMP, OUTPUT);
 
 int argc1=2;
 printf("argv=\n");
-printf(argv);
+printf("%s", argv);
 printf("\nargc\n");
 printf("%i", argc1);
 return 0;
