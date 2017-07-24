@@ -82,7 +82,7 @@ else
   }
   // printf ("\n") ;
   int i= 0;
-for (i = 0; i <  serialDataAvail (int fd); ++i)
+for (i = 0; i <  serialDataAvail (fd); ++i)
 {
     putchar (serialGetchar (fd)) ;
     fflush (stdout) ;
