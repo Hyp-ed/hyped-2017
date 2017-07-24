@@ -83,9 +83,9 @@ else
   // printf ("\n") ;
   int i= 0;
  // char serial[];
-  serialFlush (fd);
-  delay(50);
-for (i = 0; i <  serialDataAvail (fd); ++i)
+
+
+for (;;)
 {
     putchar (serialGetchar (fd)) ;
     fflush (stdout) ;
