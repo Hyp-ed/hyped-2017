@@ -101,7 +101,7 @@ while(i != 2)
 	else if (proximity_one == position)
 	{
 		hold_one();
-		i++
+		i++;
 	}
 	if (proximity_two < position)
 	{
@@ -118,7 +118,7 @@ while(i != 2)
 	else if (proximity_two == position)
 	{
 		hold_two();
-		i++
+		i++;
 	}
 }
 
@@ -223,7 +223,7 @@ void standby()
 void chargeAccumulators()
 {
 printf("\nCHARGING ACCUMULATORS\n");   
-while(pressure_reading_accumulator < pressure_nominal_accumulator) {
+while(pressure_accumulator < pressure_nominal_accumulator) {
     digitalWrite(PUMP, LOW);
     delay(pumpSpinup);
     digitalWrite(SOL_1, HIGH);
@@ -250,23 +250,28 @@ while(pressure_reading_accumulator < pressure_nominal_accumulator) {
 int pressure_reading_accumulator()
 {
 //PLACEHOLDER FOR READING THE ACCUMULATOR PRESSURE FROM THE SERIAL INPUT
-
-return pressure_reading_accumulator;
+int pressure_accumulator = 50; //PLACEHOLDER
+return pressure_accumulator;
 }
+
 int pressure_reading_pump()
 {
 //PLACEHOLDER FOR READING THE PUMP PRESSURE FROM THE SERIAL INPUT
-
-return pressure_reading_pump;
+int pressure_pump = 100; //PLACEHOLDER
+return pressure_pump;
 }
+
 int proximity_reading_one()
 {
 //	PLACEHOLDER FOR READING THE PROXIMITY SENSOR ONE
+	int proximity_one = 50; //PLACEHOLDER
 	return proximity_one;
 }
+
 int proximity_reading_two()
 {
 //	PLACEHOLDER FOR READING THE PROXIMITY SENSOR ONE
+	int proximity_two = 50; //PLACEHOLDER
 	return proximity_two;
 }
 
