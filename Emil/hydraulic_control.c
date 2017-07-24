@@ -45,6 +45,6 @@ int argc1=2;
 printf("argv=\n");
 printf("%s", argv[1]);
 printf("\nargc\n");
-printf("%i", argc1);
+printf("%i", argc);
 return 0;
 }
