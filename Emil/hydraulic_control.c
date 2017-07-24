@@ -235,7 +235,7 @@ while(pressure_accumulator < pressure_nominal_accumulator) {
     digitalWrite(SOL_5, HIGH);
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, LOW);
-    pressure_reading_accumulator();
+    pressure_read_accumulator();
 }
 
     digitalWrite(SOL_1, HIGH);
