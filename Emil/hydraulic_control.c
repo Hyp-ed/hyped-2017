@@ -32,4 +32,5 @@ printf("argc=\n");
 printf(argc);
 printf("\nargv\n");
 printf("argv");
+return 0;
 }
