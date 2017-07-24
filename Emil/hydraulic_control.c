@@ -82,9 +82,11 @@ int i = 0;
 
 while(i != 2)
 {
+	int proximity_one = 0;
+	int proximity_two = 0;
 	proximity_reading_one();
 	proximity_reading_two();
-	if (proxmity_one < position)
+	if (proximity_one < position)
 	{
 		extend_one();
 		i = 0;
