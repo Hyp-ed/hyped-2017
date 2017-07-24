@@ -46,6 +46,6 @@ printf("argv=\n");
 //printf("%s", argv[1]);
 printf("\nargc\n");
 //printf("%i\n", argc);
-printf("%i", extension)
+printf("%i", extension);
 return 0;
 }
