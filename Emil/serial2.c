@@ -80,9 +80,8 @@ else
     fprintf (stdout, "Unable to start wiringPi: %s\n", strerror (errno)) ;
     return 1 ;
   }
-for(;;)
   // printf ("\n") ;
-//while (strcmp(serialGetchar(fd),"B") != 0)
+for (int i = 0; i <  serialDataAvail (int fd); ++i)
 {
     putchar (serialGetchar (fd)) ;
     fflush (stdout) ;
