@@ -41,7 +41,6 @@ pinMode (SOL_6, OUTPUT);
 pinMode (SOL_7, OUTPUT);
 pinMode (PUMP, OUTPUT);
 
-int argv1=2;
 printf("argc=\n");
 printf("\nargv\n");
 printf(argv1);
