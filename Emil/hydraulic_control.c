@@ -28,7 +28,7 @@ Check the processing power that this will use and if it is too high, add a delay
 #define PUMP 7	//pin 4
 
 
-#define pressure_reading_accumulator 50 //PLACEHOLDER FOR PRESSURE SENSOR READING
+ //PLACEHOLDER FOR PRESSURE SENSOR READING
 #define distance_one 50 //PLACEHOLDER FOR PROXIMITY SENSOR READING ARRAY ONE
 #define distance_two 50 //PLACEHOLDER FOR PROXIMITY SENSOR READING ARRAY TWO
 #define pressure_nominal_accumulator 75 // nominal pressure for accumulator(s) UNIT: BAR
