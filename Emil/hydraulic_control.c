@@ -28,8 +28,19 @@
 
 int main ( int argc, char *argv[] )
 {
+	if (wiringPiSetup () == -1)
+    {exit (1) ;
+}
+pinMode (SOL_1, OUTPUT);
+pinMode (SOL_2, OUTPUT);
+pinMode (SOL_3, OUTPUT);
+pinMode (SOL_4, OUTPUT);
+pinMode (SOL_5, OUTPUT);
+pinMode (SOL_6, OUTPUT);
+pinMode (SOL_7, OUTPUT);
+pinMode (PUMP, OUTPUT);
+
 //printf("argc=\n");
-//;
 printf("\nargv\n");
 printf(argv);
 return 0;
