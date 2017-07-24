@@ -82,6 +82,8 @@ else
   }
   // printf ("\n") ;
   int i= 0;
+ // char serial[];
+  serialFlush (fd);
 for (i = 0; i <  serialDataAvail (fd); ++i)
 {
     putchar (serialGetchar (fd)) ;
