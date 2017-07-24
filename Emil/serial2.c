@@ -82,7 +82,7 @@ else
   }
 
   // printf ("\n") ;
-while (serialGetchar(fd),"B") != 0)
+while (strcmp(serialGetchar(fd),"B") != 0)
 {
     putchar (serialGetchar (fd)) ;
     fflush (stdout) ;
