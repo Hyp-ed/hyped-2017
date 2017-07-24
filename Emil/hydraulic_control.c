@@ -194,9 +194,9 @@ void standby()
 void chargeAccumulators()
 {
    
-while() {
-   statement(s);
-}
+// while() {
+//    statement(s);
+// }
 
 
     digitalWrite(PUMP, LOW);
