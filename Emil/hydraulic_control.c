@@ -1,5 +1,15 @@
-#include <wiringPi.h>
+/*
+To do: fill the placeholders for pressure readings and proximity sensor readings
+take the exponential averaging from the arduino and check if that is enough to get a reliable function, otherwise, add uncertaintes to the readings
+Check the processing power that this will use and if it is too high, add a delay to the position variable
 
+
+*/
+
+
+
+
+#include <wiringPi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -17,19 +27,23 @@
 #define SOL_7 6	//pin 25
 #define PUMP 7	//pin 4
 
-#define distance 50 //PLACEHOLDER FOR PROXIMITY SENSOR READING!
-#define accumulator_pressure 75 // nominal pressure for accumulator(s)
+
+#define pressure_reading_accumulator 50 //PLACEHOLDER FOR PRESSURE SENSOR READING
+#define distance_one 50 //PLACEHOLDER FOR PROXIMITY SENSOR READING ARRAY ONE
+#define distance_two 50 //PLACEHOLDER FOR PROXIMITY SENSOR READING ARRAY TWO
+#define pressure_nominal_accumulator 75 // nominal pressure for accumulator(s) UNIT: BAR
+
 
 
 #define pumpSpinup 400 //Spinup time for the pump when runing off load. This will occur before every operation that uses the pump, plan timing accordingly
-#define accumulatorChargingTime 2000 //Time that the accumulators will charge up SHOULD BE REPLACED BY A FUNCTION ONCE THE PRESSURE SENSOR IS WORKING
+
 //global functions definitions
 void hold_one(); //Holds brake 1 in place without affecting the operations of brake 2
 void hold_two(); //Holds brake 2 in place without affecting the operations of brake 1
 void retract_one(); //Retracts brake 1 without affecting the operations of brake 2
 void retract_two(); //Retracts brake 2 without affecting the operations of brake 1
-void extend_one(); //Extends brake 1 without affecting the operations of brake 2
-void extend_two(); //Extends brake 2 without affecting the operations of brake 1
+void extend_one(); //Extends brake 1 without affecting the operations of brake 2 RELIES ON THE PUMP RUNNING THROUGH THE OPERATION
+void extend_two(); //Extends brake 2 without affecting the operations of brake 1 RELIES ON THE PUMP RUNNING THROUGHOUT THE OPERATION
 void standby(); //Shuts down the pump and holds both cylinders in place
 void shutDown(); //Shuts down the pump and releases both cylinders
 void chargeAccumulators(); //Charges the accumulators 
@@ -39,8 +53,7 @@ void startUp();// Retracts brakes and charges accumulators
 
 int main ( int argc, char *argv[] )
 {
-int test = (pumpSpinup + accumulatorChargingTime);
-printf("%i", test);
+
 if (wiringPiSetup () == -1)
     {exit (1) ;
 }
@@ -53,19 +66,60 @@ pinMode (SOL_6, OUTPUT);
 pinMode (SOL_7, OUTPUT);
 pinMode (PUMP, OUTPUT);
 
+standby();
 
+	if (strcmp(argv[1], "position") == 0)
+{
+  int position = atoi(argv[2]);
+
+digitalWrite(PUMP, LOW);
+delay(pumpSpinup);
+int i = 0;
+
+while(i != 2)
+{
+	proximity_reading_one();
+	proximity_reading_two();
+	if (proxmity_one < position)
+	{
+		extend_one();
+		i = 0;
+	}
+
+	else if (proximity_one > position)
+	{
+		retract_one();
+		i = 0;
+
+	}
+	else if (proximity_one = position)
+	{
+		hold_one();
+		i++
+	}
+	if (proximity_two < position)
+	{
+		extend_two();
+		i = 0;
+	}
+
+	else if (proximity_two > position)
+	{
+		retract_two();
+		i = 0;
+
+	}
+	else if (proximity_two = position)
+	{
+		hold_two();
+		i++
+	}
+}
 
 standby();
 
 
-
-
-	if (strcmp(argv[1], "position") == 0)
-	{
-  int position = atoi(argv[2]);
-
-
-	}
+}
 	
   	else if(strcmp(argv[1],"startup") == 0)
         {
@@ -100,8 +154,6 @@ void hold_two()
 
 void retract_one()
 {
-    digitalWrite(PUMP, LOW);
-    delay(pumpSpinup);
     digitalWrite(SOL_1, LOW);
     digitalWrite(SOL_2, LOW);
     digitalWrite(SOL_3, HIGH);
@@ -114,8 +166,6 @@ void retract_one()
 
 void retract_two()
 {
-    digitalWrite(PUMP, LOW);
-    delay(pumpSpinup);
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_3, HIGH);
@@ -166,12 +216,8 @@ void standby()
 
 void chargeAccumulators()
 {
-   
-// while() {
-//    statement(s);
-// }
-
-
+printf("\nCHARGING ACCUMULATORS\n");   
+while(pressure_reading_accumulator < pressure_nominal_accumulator) {
     digitalWrite(PUMP, LOW);
     delay(pumpSpinup);
     digitalWrite(SOL_1, HIGH);
@@ -181,8 +227,9 @@ void chargeAccumulators()
     digitalWrite(SOL_5, HIGH);
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, LOW);
-    
-delay(accumulatorChargingTime);
+    pressure_reading_accumulator();
+}
+
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_3, HIGH);
@@ -193,4 +240,28 @@ delay(accumulatorChargingTime);
     digitalWrite(PUMP, HIGH);
     printf("\nACCUMULATORS CHARGED!\n");
 }
+
+int pressure_reading_accumulator()
+{
+//PLACEHOLDER FOR READING THE ACCUMULATOR PRESSURE FROM THE SERIAL INPUT
+
+return pressure_reading_accumulator;
+}
+int pressure_reading_pump()
+{
+//PLACEHOLDER FOR READING THE PUMP PRESSURE FROM THE SERIAL INPUT
+
+return pressure_reading_pump;
+}
+int proximity_reading_one()
+{
+//	PLACEHOLDER FOR READING THE PROXIMITY SENSOR ONE
+	return proximity_one;
+}
+int proximity_reading_two()
+{
+//	PLACEHOLDER FOR READING THE PROXIMITY SENSOR ONE
+	return proximity_two;
+}
+
 
