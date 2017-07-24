@@ -16,6 +16,7 @@
 #define SOL_6 5	//pin 24
 #define SOL_7 6	//pin 25
 #define PUMP 7	//pin 4
+#define argv1 2
 
 
 #define pumpSpinup 400 //Spinup time for the pump when runing off load. This will occur before every operation that uses the pump, plan timing accordingly
