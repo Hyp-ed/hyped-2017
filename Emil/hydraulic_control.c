@@ -40,7 +40,7 @@ pinMode (SOL_6, OUTPUT);
 pinMode (SOL_7, OUTPUT);
 pinMode (PUMP, OUTPUT);
 
-//printf("argc=\n");
+printf("argc=\n");
 printf("\nargv\n");
 printf(argv);
 return 0;
