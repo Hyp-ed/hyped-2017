@@ -81,13 +81,7 @@ standby();
         printf("\nretracting the cylinder\n");
 		retract_one();
 	}
-    else if(strcmp(argv[1],"pump") == 0)
-    {
-    
-        printf("\ntesting the motor\n");
-
-        motorTest();
-    }
+  
   	else if(strcmp(argv[1],"charge") == 0)
         {
         printf("\nCharging Accumulators\n");
@@ -98,12 +92,6 @@ standby();
         printf("\nShutting Down\n");
                 shutDown();
         }
-    else if(strcmp(argv[1],"test") == 0)
-    {
-        printf("\n1\n");
-        test();
-        printf("\n1\n");
-    }
 	else
 	{
 		printf("\nInvalid input\n");
