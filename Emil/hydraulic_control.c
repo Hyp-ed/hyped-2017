@@ -222,7 +222,7 @@ void standby()
 
 void chargeAccumulators()
 {
-
+int pressure_accumulator=0;
 	pressure_read_accumulator();
 printf("\nCHARGING ACCUMULATORS\n");   
 while(pressure_accumulator < pressure_nominal_accumulator) {
