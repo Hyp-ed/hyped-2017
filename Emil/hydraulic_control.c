@@ -48,10 +48,10 @@ void standby(); //Shuts down the pump and holds both cylinders in place
 void shutDown(); //Shuts down the pump and releases both cylinders
 void chargeAccumulators(); //Charges the accumulators 
 void startUp();// Retracts brakes and charges accumulators
-int pressure_reading_accumulator();
-int pressure_reading_pump();
-int proximity_reading_one();
-int proximity_reading_two();
+int pressure_read_accumulator();
+int pressure_read_pump();
+int proximity_read_one();
+int proximity_read_two();
 //main accepts an argument from the command line
  
 
@@ -84,8 +84,8 @@ while(i != 2)
 {
 	int proximity_one = 0;
 	int proximity_two = 0;
-	proximity_reading_one();
-	proximity_reading_two();
+	proximity_read_one();
+	proximity_read_two();
 	if (proximity_one < position)
 	{
 		extend_one();
@@ -222,6 +222,8 @@ void standby()
 
 void chargeAccumulators()
 {
+
+	pressure_read_accumulator();
 printf("\nCHARGING ACCUMULATORS\n");   
 while(pressure_accumulator < pressure_nominal_accumulator) {
     digitalWrite(PUMP, LOW);
@@ -247,28 +249,28 @@ while(pressure_accumulator < pressure_nominal_accumulator) {
     printf("\nACCUMULATORS CHARGED!\n");
 }
 
-int pressure_reading_accumulator()
+int pressure_read_accumulator()
 {
 //PLACEHOLDER FOR READING THE ACCUMULATOR PRESSURE FROM THE SERIAL INPUT
 int pressure_accumulator = 50; //PLACEHOLDER
 return pressure_accumulator;
 }
 
-int pressure_reading_pump()
+int pressure_read_pump()
 {
 //PLACEHOLDER FOR READING THE PUMP PRESSURE FROM THE SERIAL INPUT
 int pressure_pump = 100; //PLACEHOLDER
 return pressure_pump;
 }
 
-int proximity_reading_one()
+int proximity_read_one()
 {
 //	PLACEHOLDER FOR READING THE PROXIMITY SENSOR ONE
 	int proximity_one = 50; //PLACEHOLDER
 	return proximity_one;
 }
 
-int proximity_reading_two()
+int proximity_read_two()
 {
 //	PLACEHOLDER FOR READING THE PROXIMITY SENSOR ONE
 	int proximity_two = 50; //PLACEHOLDER
