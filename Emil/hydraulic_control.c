@@ -39,8 +39,8 @@ void startUp();// Retracts brakes and charges accumulators
 
 int main ( int argc, char *argv[] )
 {
-int test = (pumpSpinup + accumulatorChargingTime);
-printf("%i", test);
+//int test = (pumpSpinup + accumulatorChargingTime);
+//printf("%i", test);
 if (wiringPiSetup () == -1)
     {exit (1) ;
 }
