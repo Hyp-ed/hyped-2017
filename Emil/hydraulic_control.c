@@ -98,7 +98,7 @@ while(i != 2)
 		i = 0;
 
 	}
-	else if (proximity_one = position)
+	else if (proximity_one == position)
 	{
 		hold_one();
 		i++
@@ -115,7 +115,7 @@ while(i != 2)
 		i = 0;
 
 	}
-	else if (proximity_two = position)
+	else if (proximity_two == position)
 	{
 		hold_two();
 		i++
