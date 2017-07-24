@@ -27,7 +27,7 @@
 
 
 
-int main ( int argc, int extension ) //char *argv[]
+int main ( int argc, ichar *argv[]) //char *argv[]
 {
 	if (wiringPiSetup () == -1)
     {exit (1) ;
@@ -41,9 +41,13 @@ pinMode (SOL_6, OUTPUT);
 pinMode (SOL_7, OUTPUT);
 pinMode (PUMP, OUTPUT);
 
+int extension = atoi(argv[2]);
+
+
+
 
 printf("argv=\n");
-//printf("%s", argv[1]);
+printf("%s", argv[1]);
 printf("\nargc\n");
 //printf("%i\n", argc);
 printf("%i", extension);
