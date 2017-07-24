@@ -82,7 +82,10 @@ else
   }
 
   // printf ("\n") ;
-while (;;)
+for (;;)
+ {
+   /* code */
+ } (;;)
 {
     putchar (serialGetchar (fd)) ;
     fflush (stdout) ;
