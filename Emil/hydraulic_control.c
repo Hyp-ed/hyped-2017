@@ -17,19 +17,31 @@
 #define SOL_7 6	//pin 25
 #define PUMP 7	//pin 4
 
+#define distance 50 //PLACEHOLDER FOR PROXIMITY SENSOR READING!
+#define accumulator_pressure 75 // nominal pressure for accumulator(s)
 
 
 #define pumpSpinup 400 //Spinup time for the pump when runing off load. This will occur before every operation that uses the pump, plan timing accordingly
 #define accumulatorChargingTime 2000 //Time that the accumulators will charge up SHOULD BE REPLACED BY A FUNCTION ONCE THE PRESSURE SENSOR IS WORKING
+//global functions definitions
+void hold_one(); //Holds brake 1 in place without affecting the operations of brake 2
+void hold_two(); //Holds brake 2 in place without affecting the operations of brake 1
+void retract_one(); //Retracts brake 1 without affecting the operations of brake 2
+void retract_two(); //Retracts brake 2 without affecting the operations of brake 1
+void extend_one(); //Extends brake 1 without affecting the operations of brake 2
+void extend_two(); //Extends brake 2 without affecting the operations of brake 1
+void standby(); //Shuts down the pump and holds both cylinders in place
+void shutDown(); //Shuts down the pump and releases both cylinders
+void chargeAccumulators(); //Charges the accumulators 
+void startUp();// Retracts brakes and charges accumulators
+//main accepts an argument from the command line
+ 
 
-
-
-
-
-
-int main ( int argc, char *argv[]) //char *argv[]
+int main ( int argc, char *argv[] )
 {
-	if (wiringPiSetup () == -1)
+int test = (pumpSpinup + accumulatorChargingTime);
+printf("%i", test);
+if (wiringPiSetup () == -1)
     {exit (1) ;
 }
 pinMode (SOL_1, OUTPUT);
@@ -41,15 +53,171 @@ pinMode (SOL_6, OUTPUT);
 pinMode (SOL_7, OUTPUT);
 pinMode (PUMP, OUTPUT);
 
-int extension = atoi(argv[2]);
+
+
+standby();
 
 
 
 
-printf("argv=\n");
-printf("%s", argv[1]);
-printf("\nargc\n");
-//printf("%i\n", argc);
-printf("%i", extension);
-return 0;
+	if (strcmp(argv[1], "position") == 0)
+	{
+  int position = atoi(argv[2]);
+
+
+	}
+	else if(strcmp(argv[1],"hold") == 0)
+	{
+		printf("\nholding the cylinder...\n");
+		hold_one();
+	}
+	else if(strcmp(argv[1],"extend") == 0)
+	{
+		printf("\nextending the cylinder\n");
+		extend_one();
+	}
+	else if(strcmp(argv[1],"retract") == 0)
+	{
+        printf("\nretracting the cylinder\n");
+		retract_one();
+	}
+    else if(strcmp(argv[1],"pump") == 0)
+    {
+    
+        printf("\ntesting the motor\n");
+
+        motorTest();
+    }
+  	else if(strcmp(argv[1],"charge") == 0)
+        {
+        printf("\nCharging Accumulators\n");
+                chargeAccumulators();
+        }
+    else if(strcmp(argv[1],"kill") == 0)
+        {
+        printf("\nShutting Down\n");
+                shutDown();
+        }
+    else if(strcmp(argv[1],"test") == 0)
+    {
+        printf("\n1\n");
+        test();
+        printf("\n1\n");
+    }
+	else
+	{
+		printf("\nInvalid input\n");
+	}
+
+return 0 ;
+
 }
+void hold_one()
+{
+    digitalWrite(SOL_2, LOW);
+    digitalWrite(SOL_1, HIGH);
+}
+
+void hold_two()
+{
+    digitalWrite(SOL_6, LOW);
+    digitalWrite(SOL_4, HIGH);
+}
+
+
+void retract_one()
+{
+    digitalWrite(PUMP, LOW);
+    delay(pumpSpinup);
+    digitalWrite(SOL_1, LOW);
+    digitalWrite(SOL_2, LOW);
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, LOW);
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_7, LOW);
+
+}
+
+void retract_two()
+{
+    digitalWrite(PUMP, LOW);
+    delay(pumpSpinup);
+    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, HIGH);
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, LOW);
+    digitalWrite(SOL_5, LOW);
+    digitalWrite(SOL_6, LOW);
+    digitalWrite(SOL_7, LOW);
+    
+}
+
+void extend_one()
+{
+    digitalWrite(SOL_2, HIGH);
+    digitalWrite(SOL_1, HIGH);
+}
+void extend_two()
+{
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_4, HIGH);
+}
+
+void shutDown()
+{
+    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, HIGH);
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, HIGH);
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_7, HIGH);
+    digitalWrite(PUMP, HIGH);
+    delay(1000);
+    printf("\nProgram Complete\nSAFE TO DISCHARGE ACCUMULATORS\n");
+}
+
+void standby()
+{
+    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, LOW);
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, HIGH);
+    digitalWrite(SOL_6, LOW);
+    digitalWrite(SOL_7, HIGH);
+    digitalWrite(PUMP, HIGH);
+
+}
+
+void chargeAccumulators()
+{
+   
+while() {
+   statement(s);
+}
+
+
+    digitalWrite(PUMP, LOW);
+    delay(pumpSpinup);
+    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, HIGH);
+    digitalWrite(SOL_3, LOW);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, HIGH);
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_7, LOW);
+    
+delay(accumulatorChargingTime);
+    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, HIGH);
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, HIGH);
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_7, HIGH);
+    digitalWrite(PUMP, HIGH);
+    printf("\nACCUMULATORS CHARGED!\n");
+}
+
