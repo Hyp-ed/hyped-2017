@@ -111,7 +111,7 @@ else
     putchar (serialGetchar (fd)) ;
     fflush (stdout) ;
   }
-}
-  
+//}
+
   return 0 ;
 }
