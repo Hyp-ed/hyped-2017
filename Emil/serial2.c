@@ -113,6 +113,6 @@ while(serialDataAvail(fd))
   }
 //}
 //printf("%d %d %d %d\n bla",a,b,c,d);
-  //printf("%i\n", a);
+  printf("%i\n", a);
   return 0 ;
 }
