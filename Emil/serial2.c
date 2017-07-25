@@ -33,6 +33,9 @@
 #include <wiringPi.h>
 #include <wiringSerial.h>
 
+
+char buffer[100];
+
 int main ()
 {
 
@@ -83,14 +86,32 @@ else
   // printf ("\n") ;
   int i= 0;
  // char serial[];
+int j=0;
+char current=8;
 
-
-for (;;)
+/*
+int serialGetchar (const int fd)
 {
-    putchar (serialGetchar (fd)) ;
-    fflush (stdout) ;
+  uint8_t x ;
+
+  if (read (fd, &x, 1) != 1)
+    return -1 ;
+
+  return ((int)x) & 0xFF ;
+}
+
+*/
+
+
+int a,b,c,d;
+while(serialDataAvail(fd))
+{
+
+fscanf(fd,%d %d %d %d, &a,&b,&c,&d);
+    //putchar (serialGetchar (fd)) ;
+    //fflush (stdout) ;
   }
 //}
-printf("\n");
+printf("%d %d %d %d\n",a,b,c,d);
   return 0 ;
 }
