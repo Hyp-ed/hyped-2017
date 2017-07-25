@@ -68,6 +68,11 @@
 #define SYSRANGE__STARTSTOP 0x01
 
 
+Vl6180& Vl6180::get_instance(I2C *bus, Pin gpio_pin)
+{
+  
+}
+
 Vl6180::Vl6180(I2C *bus, uint8_t i2c_slave_addr /*= DEFAULT_I2C_SLAVE_ADDR*/)
 {
   this->bus = bus;
@@ -117,7 +122,7 @@ void Vl6180::write8(uint16_t reg_addr, char data)
   buf[0] = (reg_addr & 0xff00) >> 8; // MSB
   buf[1] = reg_addr & 0xff; // LSB
   buf[2] = data;
-  this->bus->write(0x29, 3, buf);
+  this->bus->write(this->i2c_slave_addr, 3, buf);
 }
 
 uint8_t Vl6180::read8(uint16_t reg_addr)
