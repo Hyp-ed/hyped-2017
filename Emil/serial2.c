@@ -102,13 +102,13 @@ int serialGetchar (const int fd)
 }
 
 */
-
+int a;
 while(serialDataAvail(fd))
 {
 
     putchar (serialGetchar (fd)) ;
     fflush (stdout) ;
-    int a=serialGetchar(fd);
+    a=serialGetchar(fd);
   }
 //}
 //printf("%d %d %d %d\n bla",a,b,c,d);
