@@ -117,10 +117,15 @@ int serialGetchar (const int fd)
 }
   
 */
+FILE *aa = fopen(serial,"r");
+
+//fscanf()
 
 int a,b,c,d,e,f,g,h;
-fscanf(fopen(serial,"r"), "%d %d %d %d %d %d %d %d",&a,&b,&c,&d,&e,&f,&g,&h);
+fscanf(aa, "%d %d %d %d %d %d %d %d",&a,&b,&c,&d,&e,&f,&g,&h);
 fprintf(stdout,"%d %d %d %d %d %d %d %d",a,b,c,d,e,f,g,h);
+
+fclose(aa);
    // a= (serialGetchar (fd)) ;
   //  putchar(a);
 //    array[i] = a;

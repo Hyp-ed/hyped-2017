@@ -11,7 +11,7 @@ Serial.begin(115200);
 void loop() {
 int i = 0;
 for (;;){
-if (i > 999)
+if (i > 998)
 {
   i = 0;
   }
