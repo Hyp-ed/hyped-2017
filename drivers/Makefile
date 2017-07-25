@@ -1,4 +1,4 @@
-OBJS = i2c.o mpu6050.o vl6180.o battery.o raspberry_pi.o motion_tracker.o
+OBJS = i2c.o mpu6050.o vl6180.o battery.o raspberry_pi.o quaternion.o motion_tracker.o
 CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
@@ -31,7 +31,7 @@ main.o : main.cpp mpu6050.hpp i2c.hpp
 integrator.o : integrator.cpp mpu6050.hpp i2c.hpp vector3d.hpp
 	$(CC) $(CFLAGS) integrator.cpp
 
-test_motion_tracker.o : test_motion_tracker.cpp mpu6050.hpp i2c.hpp vector3d.hpp motion_tracker.hpp
+test_motion_tracker.o : test_motion_tracker.cpp mpu6050.hpp i2c.hpp vector3d.hpp motion_tracker.hpp quaternion.hpp
 	$(CC) $(CFLAGS) test_motion_tracker.cpp
 
 demo-vl6180.o : demo-vl6180.cpp vl6180.hpp i2c.hpp
@@ -44,8 +44,11 @@ demo-battery.o : demo-battery.cpp battery.hpp i2c.hpp
 	$(CC) $(CFLAGS) demo-battery.cpp
 
 
-motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_point.hpp vector3d.hpp
+motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_point.hpp quaternion.hpp vector3d.hpp
 	$(CC) $(CFLAGS) motion_tracker.cpp
+
+quaternion.o : quaternion.hpp quaternion.cpp vector3d.hpp
+	$(CC) $(CFLAGS) quaternion.cpp
 
 raspberry_pi.o : raspberry_pi.hpp raspberry_pi.cpp
 	$(CC) $(CFLAGS) raspberry_pi.cpp
