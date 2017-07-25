@@ -123,7 +123,9 @@ FILE *aa = fopen(serial,"r");
 
 int a,b,c,d,e,f,g,h;
 fscanf(aa, "%d %d %d %d %d %d %d %d",&a,&b,&c,&d,&e,&f,&g,&h);
+fflush(aa);
 fprintf(stdout,"%d %d %d %d %d %d %d %d",a,b,c,d,e,f,g,h);
+fflush(stdout);
 
 fclose(aa);
    // a= (serialGetchar (fd)) ;
