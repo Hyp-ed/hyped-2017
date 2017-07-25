@@ -84,10 +84,10 @@ else
     return 1 ;
   }
   // printf ("\n") ;
-//  int i= 0;
+  int i= 0;
  // char serial[];
-//int j=0;
-//char current=8;
+int j=0;
+char current=8;
 
 /*
 int serialGetchar (const int fd)
