@@ -85,8 +85,8 @@ else
   }
   if (serialDataAvail(fd) == 0)
   {
-    println("No data avaliable");
-    return 0;
+    printf("No data avaliable");
+    return 1;
   }
 fflush(stdout);
 delay(50);
