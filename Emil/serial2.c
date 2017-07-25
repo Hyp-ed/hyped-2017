@@ -107,7 +107,7 @@ int a,b,c,d;
 while(serialDataAvail(fd))
 {
 
-fscanf(fd,%d %d %d %d, &a,&b,&c,&d);
+fscanf(fd,"%d %d %d %d", &a,&b,&c,&d);
     //putchar (serialGetchar (fd)) ;
     //fflush (stdout) ;
   }
