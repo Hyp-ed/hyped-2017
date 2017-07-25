@@ -83,11 +83,15 @@ else
     fprintf (stdout, "Unable to start wiringPi: %s\n", strerror (errno)) ;
     return 1 ;
   }
-  // printf ("\n") ;
-  int i= 0;
- // char serial[];
-int j=0;
-char current=8;
+  if (serialDataAvail(fd) == 0)
+  {
+    println("No data avaliable");
+    return 0;
+  }
+fflush(stdout);
+delay(50);
+fflush(stdout);
+
 
 /*
 int serialGetchar (const int fd)
@@ -107,9 +111,9 @@ int a,b,c,d;
 while(serialDataAvail(fd))
 {
 
-fscanf(fd,"%d %d %d %d", &a,&b,&c,&d);
-    //putchar (serialGetchar (fd)) ;
-    //fflush (stdout) ;
+    putchar (serialGetchar (fd)) ;
+    delay(200);
+    fflush (stdout) ;
   }
 //}
 printf("%d %d %d %d\n bla",a,b,c,d);
