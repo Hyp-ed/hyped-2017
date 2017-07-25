@@ -115,6 +115,7 @@ while(serialDataAvail(fd))
 //}
 //printf("%d %d %d %d\n bla",a,b,c,d);
   //printf("%c\n", a);
+  printf("Last char: ");
   putchar(a);
   return 0 ;
 }
