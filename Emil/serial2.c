@@ -39,11 +39,11 @@
 int main ()
 {
 
-  int device=0;
+  int dev=0;
 
  int fd;
 
-char array[]; int i = 0;
+char array[100]; int i = 0;
 
 char serial[20]; //Looking for a serial connection 
 //int serialnum = 0;
@@ -119,7 +119,7 @@ int serialGetchar (const int fd)
 */
 
 int a,b,c,d,e,f,g,h;
-fscanf(fopen(serial), "%d %d %d %d %d %d %d %d",&a,&b,&c,&d,&e,&f,&g,&h);
+fscanf(fopen(serial,"r"), "%d %d %d %d %d %d %d %d",&a,&b,&c,&d,&e,&f,&g,&h);
 fprintf(stdout,"%d %d %d %d %d %d %d %d",a,b,c,d,e,f,g,h);
    // a= (serialGetchar (fd)) ;
   //  putchar(a);
