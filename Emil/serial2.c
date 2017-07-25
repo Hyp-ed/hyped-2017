@@ -108,9 +108,10 @@ while(serialDataAvail(fd))
 
     putchar (serialGetchar (fd)) ;
     fflush (stdout) ;
+    int a=serialGetchar(fd);
   }
 //}
 //printf("%d %d %d %d\n bla",a,b,c,d);
-  printf("%i\n", fd);
+  printf("%i\n", a);
   return 0 ;
 }
