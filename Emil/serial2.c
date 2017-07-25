@@ -115,7 +115,7 @@ int serialGetchar (const int fd)
 
   return ((int)x) & 0xFF ;
 }
- 
+  
 */
 
 int a,b,c,d,e,f,g,h;
