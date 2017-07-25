@@ -119,7 +119,7 @@ int serialGetchar (const int fd)
 */
 
 int a,b,c,d,e,f,g,h;
-fscanf(serial, "%d %d %d %d %d %d %d %d",&a,&b,&c,&d,&e,&f,&g,&h);
+fscanf(fopen(serial), "%d %d %d %d %d %d %d %d",&a,&b,&c,&d,&e,&f,&g,&h);
 fprintf(stdout,"%d %d %d %d %d %d %d %d",a,b,c,d,e,f,g,h);
    // a= (serialGetchar (fd)) ;
   //  putchar(a);
@@ -130,7 +130,7 @@ fprintf(stdout,"%d %d %d %d %d %d %d %d",a,b,c,d,e,f,g,h);
     //printf("->  %i\n", a);
     fflush (stdout) ;
 
-    
+
     i++;
     serialClose(fd);
   //}
