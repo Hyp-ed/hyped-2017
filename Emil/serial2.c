@@ -106,13 +106,10 @@ int serialGetchar (const int fd)
 
 */
 
-
-int a,b,c,d;
 while(serialDataAvail(fd))
 {
 
     putchar (serialGetchar (fd)) ;
-    delay(200);
     fflush (stdout) ;
   }
 //}
