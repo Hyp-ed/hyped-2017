@@ -102,20 +102,22 @@ int serialGetchar (const int fd)
 }
 
 */
-char a;
+char array[]; int i = 0;
 while(serialDataAvail(fd))
 {
 
     a= (serialGetchar (fd)) ;
     putchar(a);
+    array[i] = a;
     //printf("->  %i\n", a);
- //   fflush (stdout) ;
-
+    fflush (stdout) ;
+    i++;
   }
 //}
 //printf("%d %d %d %d\n bla",a,b,c,d);
   //printf("%c\n", a);
-  printf("Last char: ");
-  putchar(a);
+  //printf("Last char: ");
+  //putchar(array[
+  serialClose(fd);
   return 0 ;
 }
