@@ -39,43 +39,58 @@
 int main ()
 {
 
+  int device=0;
+
+ int fd;
+
+char array[]; int i = 0;
 
 char serial[20]; //Looking for a serial connection 
 //int serialnum = 0;
+
+//while(serialDataAvail(fd))
+ //{
+
+
 if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
   strcpy(serial,"/dev/ttyACM0");
 //tty = fopen("/dev/ttyACM0","r");
 printf("\nACM0\n");
+dev=0;
 } 
 
 else if( access( "/dev/ttyACM1", F_OK ) != -1 ) {
   strcpy(serial,"/dev/ttyACM1");
 //tty = fopen("/dev/ttyACM1","r");
 printf("\nACM1\n");
+dev=1;
 } 
 
 else if( access( "/dev/ttyACM2", F_OK ) != -1 ) {
 //tty = fopen("/dev/ttyACM2","r");
  strcpy(serial,"/dev/ttyACM2");
 printf("\nACM2\n");
+dev=1;
 } 
 
 else
   {
  printf("error no serial connection detected");
+ dev=-1;
  return 1;
 
   }
 
 
 
-  int fd;
+ 
 
 
   if ((fd = serialOpen (serial, 115200)) < 0)
   {
     fprintf (stderr, "Unable to open serial device: %s\n", strerror (errno)) ;
     return 1;
+
   }
 
   if (wiringPiSetup () == -1)
@@ -102,18 +117,21 @@ int serialGetchar (const int fd)
 }
 
 */
-char array[]; int i = 0;
-while(serialDataAvail(fd))
-{
 
-    a= (serialGetchar (fd)) ;
-    putchar(a);
-    array[i] = a;
+int a,b,c,d,e,f,g,h;
+fscanf(serial, "%d %d %d %d %d %d %d %d",&a,&b,&c,&d,&e,&f,&g,&h);
+fprintf(stdout,"%d %d %d %d %d %d %d %d",a,b,c,d,e,f,g,h);
+   // a= (serialGetchar (fd)) ;
+  //  putchar(a);
+//    array[i] = a;
+
+
+
     //printf("->  %i\n", a);
     fflush (stdout) ;
     i++;
     serialClose(fd);
-  }
+  //}
 //}
 //printf("%d %d %d %d\n bla",a,b,c,d);
   //printf("%c\n", a);
