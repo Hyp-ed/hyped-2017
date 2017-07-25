@@ -88,9 +88,7 @@ else
     printf("No data avaliable");
     return 1;
   }
-fflush(stdout);
-delay(50);
-fflush(stdout);
+
 
 
 /*
