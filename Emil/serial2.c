@@ -128,11 +128,11 @@ fprintf(stdout,"%d %d %d %d %d %d %d %d",a,b,c,d,e,f,g,h);
 
 
     //printf("->  %i\n", a);
-    fflush (stdout) ;
+    //fflush (stdout) ;
 
 
     i++;
-    serialClose(fd);
+    //serialClose(fd);
   //}
 //}
 //printf("%d %d %d %d\n bla",a,b,c,d);
