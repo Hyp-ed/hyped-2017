@@ -112,12 +112,13 @@ while(serialDataAvail(fd))
     //printf("->  %i\n", a);
     fflush (stdout) ;
     i++;
+    serialClose(fd);
   }
 //}
 //printf("%d %d %d %d\n bla",a,b,c,d);
   //printf("%c\n", a);
   //printf("Last char: ");
   //putchar(array[
-  serialClose(fd);
+  
   return 0 ;
 }
