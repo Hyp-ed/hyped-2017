@@ -90,7 +90,6 @@ else
   }
 
 
-
 /*
 int serialGetchar (const int fd)
 {
@@ -112,5 +111,6 @@ while(serialDataAvail(fd))
   }
 //}
 //printf("%d %d %d %d\n bla",a,b,c,d);
+  printf("%i\n", fd);
   return 0 ;
 }
