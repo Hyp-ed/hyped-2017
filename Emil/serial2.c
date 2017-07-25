@@ -63,7 +63,7 @@ printf("\nACM2\n");
 else
   {
  printf("error no serial connection detected");
- return 0;
+ return 1;
 
   }
 
@@ -75,7 +75,7 @@ else
   if ((fd = serialOpen (serial, 115200)) < 0)
   {
     fprintf (stderr, "Unable to open serial device: %s\n", strerror (errno)) ;
-    return 1 ;
+    return 1;
   }
 
   if (wiringPiSetup () == -1)
