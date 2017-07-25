@@ -84,10 +84,10 @@ else
     return 1 ;
   }
   // printf ("\n") ;
-  int i= 0;
+//  int i= 0;
  // char serial[];
-int j=0;
-char current=8;
+//int j=0;
+//char current=8;
 
 /*
 int serialGetchar (const int fd)
@@ -112,6 +112,6 @@ fscanf(fd,%d %d %d %d, &a,&b,&c,&d);
     //fflush (stdout) ;
   }
 //}
-printf("%d %d %d %d\n",a,b,c,d);
+printf("%d %d %d %d\n bla",a,b,c,d);
   return 0 ;
 }
