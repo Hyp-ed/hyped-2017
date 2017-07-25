@@ -10,7 +10,8 @@
 
 long long timestamp() {
   using namespace std::chrono;
-  return duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count();
+  return duration_cast<nanoseconds>(
+      system_clock::now().time_since_epoch()).count();
 }
 
 using namespace std;
@@ -25,8 +26,8 @@ int main()
 
   printf("Calibrating gyros...\n");
   long long t1 = timestamp();
-  sensor.calibrate_gyro(1000);
-  sensor2.calibrate_gyro(1000);
+  sensor.calibrate_gyro(10000);
+  sensor2.calibrate_gyro(10000);
   long long t2 = timestamp(); 
   printf("time: %fs\n", (t2 - t1)/1.0e+9);
 
@@ -34,19 +35,19 @@ int main()
   Vector3D<double> accl2_offset;
   printf("Calibrating accelerometers...\n");
   t1 = timestamp();
-  for (int i = 0; i < 1000; i++)
+  for (int i = 0; i < 10000; i++)
   {
     accl_offset += sensor.get_acceleration();
     accl2_offset += sensor2.get_acceleration();
   }
   accl_offset *= STD_GRAVITY;
   accl2_offset *= STD_GRAVITY;
-  accl_offset /= 1.0e+3;
-  accl2_offset /= 1.0e+3;
+  accl_offset /= 1.0e+4;
+  accl2_offset /= 1.0e+4;
   t2 = timestamp(); 
   printf("time: %fs\n", (t2 - t1)/1.0e+9);
 
-  const int n = 10000;
+  const int n = 100000;
   long long *times = new long long[n];
   SensorData **readings = new SensorData*[2];
   readings[0] = new SensorData[n];
@@ -63,6 +64,8 @@ int main()
   readings[0][0] = sensor.get_sensor_data();
   times[0] = timestamp();
   readings[1][0] = sensor2.get_sensor_data();
+  readings[0][0].accl *= STD_GRAVITY;
+  readings[1][0].accl *= STD_GRAVITY;
   for (int i = 1; i < n; i++)
   {
     //printf("test\n");
@@ -86,7 +89,7 @@ int main()
   }
   printf("time: %fs\n", (times[n-1] - times[0])/1.0e+9);
 
-  ofstream file("double_imu-10k_integration_test.csv");
+  ofstream file("double_imu-100k_integration_test.csv");
   for (int i = 0; i < n; i++)
   {
     file << times[i] << ",,"
