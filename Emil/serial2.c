@@ -34,7 +34,7 @@
 #include <wiringSerial.h>
 
 
-char buffer[100];
+
 
 int main ()
 {
@@ -111,6 +111,6 @@ while(serialDataAvail(fd))
     fflush (stdout) ;
   }
 //}
-printf("%d %d %d %d\n bla",a,b,c,d);
+//printf("%d %d %d %d\n bla",a,b,c,d);
   return 0 ;
 }
