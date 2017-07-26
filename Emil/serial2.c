@@ -39,11 +39,11 @@
 int main ()
 {
 
-  int dev=0;
+  //int dev=0;
 
  int fd;
 
-char array[100]; int i = 0;
+//char array[100]; int i = 0;
 
 char serial[20]; //Looking for a serial connection 
 //int serialnum = 0;
@@ -105,7 +105,7 @@ else
   }
 
 
-char a:
+char a;
 serialPutchar (fd, "a");
 while (serialDataAvail(fd)!= 0)
 {
