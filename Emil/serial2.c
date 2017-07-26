@@ -39,7 +39,7 @@
 int main ()
 {
 
-  //int dev=0;
+
 
  int fd;
 
@@ -56,28 +56,27 @@ if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
   strcpy(serial,"/dev/ttyACM0");
 //tty = fopen("/dev/ttyACM0","r");
 printf("\nACM0\n");
-dev=0;
 } 
 
 else if( access( "/dev/ttyACM1", F_OK ) != -1 ) {
   strcpy(serial,"/dev/ttyACM1");
 //tty = fopen("/dev/ttyACM1","r");
 printf("\nACM1\n");
-dev=1;
+
 } 
 
 else if( access( "/dev/ttyACM2", F_OK ) != -1 ) {
 //tty = fopen("/dev/ttyACM2","r");
  strcpy(serial,"/dev/ttyACM2");
 printf("\nACM2\n");
-dev=1;
+
 } 
 
 else
   {
  printf("error no serial connection detected");
- dev=-1;
- return 1;
+
+ return -1;
 
   }
 
@@ -106,7 +105,7 @@ else
 
 
 char a;
-serialPutchar (fd, "a");
+serialPutchar (fd, 'a');
 while (serialDataAvail(fd)!= 0)
 {
   a = serialGetchar(fd);
