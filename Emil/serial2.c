@@ -105,7 +105,8 @@ else
 
 
 char a;
-serialPutchar (fd, 'a');
+char b = "a";
+serialPutchar (fd, b);
 putchar(serialGetchar(fd));
 while (serialDataAvail(fd)!= 0)
 {
