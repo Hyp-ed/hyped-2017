@@ -97,11 +97,11 @@ else
     fprintf (stdout, "Unable to start wiringPi: %s\n", strerror (errno)) ;
     return 1 ;
   }
-  if (serialDataAvail(fd) == 0)
-  {
-    printf("No data avaliable");
-    return 1;
-  }
+  // if (serialDataAvail(fd) == 0)
+  // {
+  //   printf("No data avaliable");
+  //   return 1;
+  // }
 
 
 char a;
