@@ -278,7 +278,7 @@ Serial.print ("BAR, AccumulatorPressure=");
 Serial.print(acc);
 Serial.println("BAR");
 
-  
+
 }
 
 

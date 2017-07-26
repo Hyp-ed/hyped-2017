@@ -15,8 +15,8 @@ if (i > 998)
 {
   i = 0;
   }
-char x = Serial.read();
-if (x=='a')
+int x = Serial.read();
+if (x==1)
 {
 Serial.print(i);
 Serial.print(" ");
