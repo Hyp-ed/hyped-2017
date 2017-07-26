@@ -106,6 +106,7 @@ else
 
 char a;
 serialPutchar (fd, 'a');
+putchar(serialGetchar(fd));
 while (serialDataAvail(fd)!= 0)
 {
   a = serialGetchar(fd);
