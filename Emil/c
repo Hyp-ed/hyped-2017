@@ -1,4 +1,5 @@
-sudo git pull origin master
+##sudo git pull origin master
 gcc -Wall -o hyd_control hydraulic_control.c -lwiringPi
 gcc -Wall -o serial serial2.c -lwiringPi
-
+gcc -Wall -o serial1 serial1.c -lwiringPi
+./serial

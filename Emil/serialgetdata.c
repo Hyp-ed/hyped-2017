@@ -1,4 +1,3 @@
-
 /*
  * serialTest.c:
  *	Very simple program to test the serial port. Expects
@@ -23,20 +22,25 @@
  *    along with wiringPi.  If not, see <http://www.gnu.org/licenses/>.
  ***********************************************************************
  */
+
 #include <unistd.h>
+
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <string.h> 
+#include <stdlib.h>
 #include <wiringPi.h>
 #include <wiringSerial.h>
 
+
+
+
 int main ()
 {
+ int fd;
 
-char serial[20];
-//int serialnum = 0;
-
+char serial[20]; //Looking for a serial connection 
 if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
   strcpy(serial,"/dev/ttyACM0");
 //tty = fopen("/dev/ttyACM0","r");
@@ -58,17 +62,12 @@ printf("\nACM2\n");
 else
   {
  printf("error no serial connection detected");
- return 0;
-
+ return -1;
   }
-
-
-int fd;
   if ((fd = serialOpen (serial, 115200)) < 0)
   {
     fprintf (stderr, "Unable to open serial device: %s\n", strerror (errno)) ;
     return 1;
-
   }
 
   if (wiringPiSetup () == -1)
@@ -76,14 +75,27 @@ int fd;
     fprintf (stdout, "Unable to start wiringPi: %s\n", strerror (errno)) ;
     return 1 ;
   }
-for (;;)
+
+
+
+char a[100];
+int j = 0;
+int b = 1;
+serialPutchar (fd, b);
+a[j]=(serialGetchar(fd));
+while (serialDataAvail(fd)!= 0)
 {
-	putchar(serialGetchar(fd));
+  j++;
+  a[j] = serialGetchar(fd);
+  delay(1);
 }
+printf(a);
 
+int e,f,g,l,m,n,o,p;
+sscanf(a, "%d %d %d %d %d %d %d %d",&e,&f,&g,&l,&m,&n,&o,&p);
+printf("%i", e+f);
 
-return 0;
-
+  /* code */
+  
+  return 0 ;
 }
-
- 
