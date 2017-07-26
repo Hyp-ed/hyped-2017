@@ -5,6 +5,7 @@ import java.util.*;
 import java.text.*;
 import javax.swing.JFileChooser;
 import java.io.*;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -21,15 +22,25 @@ public class GUI extends javax.swing.JFrame {
      * Creates new form GUI
      */
     
-    int batteryTempThreshold = 100,
-        voltageThreshold = 100,
-        currentThreshold = 50;
+    private static ConsoleWindow consoleWindow = new ConsoleWindow();
+    private static NetworkSettings  settingsWindow = new NetworkSettings();
+    private static Server parentPointer = null;
     
-    public GUI() {
+    double batteryTempThreshold = 70,
+        bigBatMinVoltage = 17.5,
+        bigBatMaxVoltage = 29.4,
+        currentThreshold = 120,
+        smallBatMaxvoltage = 21,
+        smallBatMinVoltage = 12.5;
+    
+    public GUI(/*Server parent*/) {
         try
         {
+            //this.parentPointer = parent;
             UIManager.setLookAndFeel(
             UIManager.getCrossPlatformLookAndFeelClassName());
+            //jScrollPane1.setVisible(false);
+            //console.setVisible(false);
         } 
         catch (Exception e) 
         {
@@ -38,14 +49,10 @@ public class GUI extends javax.swing.JFrame {
         }
         initComponents();
         setLocationRelativeTo(null);
-        initConsole();
         
     }
     
-    public static void initConsole()
-    {
-        // Set indentation for new linewraps
-    }
+    public void setParent(Server parent) { this.parentPointer = parent; }
     
     public static String getCurrentTimeStamp() 
     {
@@ -55,65 +62,241 @@ public class GUI extends javax.swing.JFrame {
     
     public void printToConsole(String message)
     {
-        console.append(this.getCurrentTimeStamp() + ": " + message + "\n");
+        //console.append(this.getCurrentTimeStamp() + ": " + message + "\n");
+        consoleWindow.print(this.getCurrentTimeStamp() + ": " + message + "\n");
     }
     
     // Include colour management later... e.g. over THRESHOLD then RED text
     
-    public void printAcceleration(int acceleration)
+    public void printAcceleration(double acceleration)
     {
-        accelField.setText(Integer.toString(acceleration));
+        accelField.setText(Double.toString(acceleration));
     }
     
-    public void printPosition(int position)
+    public void printVelocity(double velocity)
     {
-        positionField.setText(Integer.toString(position));
+        velocityField.setText(Double.toString(velocity));
     }
     
-    public void printPodTemperature(int temp)
+    public void printPosition(double position)
     {
-        tempField.setText(Integer.toString(temp));
+        positionField.setText(Double.toString(position));
     }
     
-    public void printStripeCount(int count)
+    public void printPodTemperature(double temp)
     {
-        stripeField.setText(Integer.toString(count));
+        tempField.setText(Double.toString(temp));
     }
     
-    public void printBatteryTemperature(int temp)
+    public void printStripeCount(double count)
     {
-        if (temp < batteryTempThreshold) BatTempField.setForeground(new Color(0, 153, 51));
+        stripeField.setText(Double.toString(count));
+    }
+    
+    public void printBattery1Temperature(double temp)
+    {
+        if (temp < batteryTempThreshold) Bat1TempField.setForeground(new Color(0, 153, 51));
         else 
         {
-            BatTempField.setForeground(Color.red);
-            this.printToConsole("BATTERY TEMPERATURE OVER MAXIMUM THRESHOLD");
+            Bat1TempField.setForeground(Color.red);
+            this.printToConsole("BATTERY 1 TEMPERATURE OVER MAXIMUM THRESHOLD");
         }
-        BatTempField.setText(Integer.toString(temp));
+        Bat1TempField.setText(Double.toString(temp));
     }
     
-    public void printVoltage(int voltage) 
+    public void printBattery1Voltage(double voltage) 
+    { 
+        if (voltage < bigBatMinVoltage)
+        {
+            bat1VoltageField.setForeground(Color.red);
+            this.printToConsole("BATTERY 1 VOLTAGE UNDER MINIMUM THRESHOLD");
+        }
+        else if (voltage > bigBatMaxVoltage)
+        {
+            bat1VoltageField.setForeground(Color.red);
+            this.printToConsole("BATTERY 1 VOLTAGE OVER MAXIMUM THRESHOLD");
+        }
+        else  bat1VoltageField.setForeground(new Color(0, 153, 51));
+        
+        bat1VoltageField.setText(Double.toString(voltage));
+    }
+    
+    public void printBattery1Current(double current)
     {
-        if (voltage < voltageThreshold) voltageField.setForeground(new Color(0, 153, 51));
+        if (current < currentThreshold) bat1CurrentField.setForeground(new Color(0, 153, 51));
         else 
         {
-            voltageField.setForeground(Color.red);
-            this.printToConsole("BATTERY VOLTAGE OVER MAXIMUM THRESHOLD");
+            bat1CurrentField.setForeground(Color.red);
+            this.printToConsole("BATTERY 1 CURRENT OVER MAXIMUM THRESHOLD");
         }
         
-        voltageField.setText(Integer.toString(voltage));
+        bat1CurrentField.setText(Double.toString(current));
     }
     
-    public void printCurrent(int current)
+    public void printGroundProximity(double proximity)
     {
-        if (current < currentThreshold) currentField.setForeground(new Color(0, 153, 51));
-        else 
+        groundProximityField.setText(Double.toString(proximity));
+    }
+    
+    public void printRailProximity(double proximity)
+    {
+        railProximityField.setText(Double.toString(proximity));
+    }
+    
+    public void printPusherDetection(int present)
+    {
+        if (present == 1)
         {
-            currentField.setForeground(Color.red);
-            this.printToConsole("BATTERY CURRENT OVER MAXIMUM THRESHOLD");
+            pusherField.setText("YES");
+            pusherField.setForeground(new Color(0, 153, 51));
+        }
+        else
+        {
+            pusherField.setText("NO");
+            pusherField.setForeground(Color.red);
         }
         
-        currentField.setText(Integer.toString(current));
     }
+    
+    public void printBattery2Temperature(double temp)
+    {
+        if (temp < batteryTempThreshold) Bat2TempField.setForeground(new Color(0, 153, 51));
+        else 
+        {
+            Bat2TempField.setForeground(Color.red);
+            this.printToConsole("BATTERY 2 TEMPERATURE OVER MAXIMUM THRESHOLD");
+        }
+        Bat2TempField.setText(Double.toString(temp));
+    }
+    
+    public void printBattery2Current(double current)
+    {
+        if (current < currentThreshold) bat2CurrentField.setForeground(new Color(0, 153, 51));
+        else 
+        {
+            bat2CurrentField.setForeground(Color.red);
+            this.printToConsole("BATTERY 2 CURRENT OVER MAXIMUM THRESHOLD");
+        }
+        bat2CurrentField.setText(Double.toString(current));
+    }
+    
+    public void printBattery2Voltage(double voltage)
+    {
+        if (voltage < bigBatMinVoltage)
+        {
+            bat2VoltageField.setForeground(Color.red);
+            this.printToConsole("BATTERY 2 VOLTAGE UNDER MINIMUM THRESHOLD");
+        }
+        else if (voltage > bigBatMaxVoltage)
+        {
+            bat2VoltageField.setForeground(Color.red);
+            this.printToConsole("BATTERY 2 VOLTAGE OVER MAXIMUM THRESHOLD");
+        }
+        else  bat2VoltageField.setForeground(new Color(0, 153, 51));
+        
+        bat2VoltageField.setText(Double.toString(voltage));
+    }
+    
+    public void printBattery3Temperature(double temp)
+    {
+        if (temp < batteryTempThreshold) Bat3TempField.setForeground(new Color(0, 153, 51));
+        else 
+        {
+            Bat3TempField.setForeground(Color.red);
+            this.printToConsole("BATTERY 3 TEMPERATURE OVER MAXIMUM THRESHOLD");
+        }
+        Bat3TempField.setText(Double.toString(temp));
+    }
+    
+    public void printBattery3Voltage(double voltage)
+    {
+        if (voltage < bigBatMinVoltage)
+        {
+            bat3VoltageField.setForeground(Color.red);
+            this.printToConsole("BATTERY 3 VOLTAGE UNDER MINIMUM THRESHOLD");
+        }
+        else if (voltage > bigBatMaxVoltage)
+        {
+            bat3VoltageField.setForeground(Color.red);
+            this.printToConsole("BATTERY 3 VOLTAGE OVER MAXIMUM THRESHOLD");
+        }
+        else  bat3VoltageField.setForeground(new Color(0, 153, 51));
+        
+        bat3VoltageField.setText(Double.toString(voltage));
+    }
+    
+    public void printHydraulicState(int state)
+    {
+        // Include threshold colouring...
+        if (state == 1) hydraulicStateField.setText("ACTUATED");
+        else hydraulicStateField.setText("OFF");
+    }
+    
+    public void printAccum1(int nominal)
+    {
+        // Pod should send 1 if nominal, 0 otherwise
+        if (nominal == 1)
+        {
+            accum1Field.setText("NOMINAL");
+            accum1Field.setForeground(new Color(0, 153, 51));
+        }
+        else
+        {
+            accum1Field.setText("HIGH!");
+            accum1Field.setForeground(Color.red);
+        }
+    }
+    
+    public void printAccum2(int nominal)
+    {
+        // Pod should send 1 if nominal, 0 otherwise
+        if (nominal == 1)
+        {
+            accum2Field.setText("NOMINAL");
+            accum2Field.setForeground(new Color(0, 153, 51));
+        }
+        else
+        {
+            accum2Field.setText("HIGH!");
+            accum2Field.setForeground(Color.red);
+        }
+    }
+    
+    public void printAccum3(int nominal)
+    {
+        // Pod should send 1 if nominal, 0 otherwise
+        if (nominal == 1)
+        {
+            accum3Field.setText("NOMINAL");
+            accum3Field.setForeground(new Color(0, 153, 51));
+        }
+        else
+        {
+            accum3Field.setText("HIGH!");
+            accum3Field.setForeground(Color.red);
+        }
+    }
+    
+    public void printAccum4(int nominal)
+    {
+        // Pod should send 1 if nominal, 0 otherwise
+        if (nominal == 1)
+        {
+            accum4Field.setText("NOMINAL");
+            accum4Field.setForeground(new Color(0, 153, 51));
+        }
+        else
+        {
+            accum4Field.setText("HIGH!");
+            accum4Field.setForeground(Color.red);
+        }
+    }
+    
+    public int getBasePort() { return settingsWindow.getBasePort(); }
+    
+    public int getSpaceXPort() { return settingsWindow.getSpaceXPort(); }
+    
+    public String getSpaceXIP() { return settingsWindow.getSpaceXIP(); }
     
     public void setMasterOnline(boolean online)
     {
@@ -192,6 +375,7 @@ public class GUI extends javax.swing.JFrame {
         {
             podField.setForeground(Color.red);
              this.printToConsole("POD STATE: FAULT OCCURRED");
+             JOptionPane.showMessageDialog(null, "WARNING: POD ENTERED FAULT STATE.");
         }
         else podField.setForeground(new Color(0,153,51));
     }
@@ -207,7 +391,7 @@ public class GUI extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        currentField = new javax.swing.JTextField();
+        bat1CurrentField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -239,14 +423,11 @@ public class GUI extends javax.swing.JFrame {
         jLabel23 = new javax.swing.JLabel();
         stripeField = new javax.swing.JTextField();
         jLabel24 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
-        BatTempField = new javax.swing.JTextField();
+        Bat1TempField = new javax.swing.JTextField();
         jLabel26 = new javax.swing.JLabel();
         jLabel27 = new javax.swing.JLabel();
-        voltageField = new javax.swing.JTextField();
+        bat1VoltageField = new javax.swing.JTextField();
         jLabel28 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        console = new javax.swing.JTextArea();
         jLabel29 = new javax.swing.JLabel();
         saveButton = new javax.swing.JButton();
         settingsButton = new javax.swing.JButton();
@@ -263,6 +444,51 @@ public class GUI extends javax.swing.JFrame {
         slave3Field = new javax.swing.JTextField();
         jLabel35 = new javax.swing.JLabel();
         jLabel36 = new javax.swing.JLabel();
+        launchConsole = new javax.swing.JButton();
+        groundProximityField = new javax.swing.JTextField();
+        jLabel37 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel38 = new javax.swing.JLabel();
+        railProximityField = new javax.swing.JTextField();
+        jLabel39 = new javax.swing.JLabel();
+        jLabel40 = new javax.swing.JLabel();
+        pusherField = new javax.swing.JTextField();
+        jLabel41 = new javax.swing.JLabel();
+        jLabel42 = new javax.swing.JLabel();
+        jLabel43 = new javax.swing.JLabel();
+        jLabel44 = new javax.swing.JLabel();
+        jLabel45 = new javax.swing.JLabel();
+        Bat2TempField = new javax.swing.JTextField();
+        jLabel46 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        bat2CurrentField = new javax.swing.JTextField();
+        jLabel47 = new javax.swing.JLabel();
+        jLabel48 = new javax.swing.JLabel();
+        bat2VoltageField = new javax.swing.JTextField();
+        jLabel49 = new javax.swing.JLabel();
+        jLabel50 = new javax.swing.JLabel();
+        jLabel51 = new javax.swing.JLabel();
+        Bat3TempField = new javax.swing.JTextField();
+        jLabel52 = new javax.swing.JLabel();
+        jLabel53 = new javax.swing.JLabel();
+        bat3VoltageField = new javax.swing.JTextField();
+        jLabel54 = new javax.swing.JLabel();
+        jLabel55 = new javax.swing.JLabel();
+        jLabel56 = new javax.swing.JLabel();
+        readyButton = new javax.swing.JButton();
+        jLabel57 = new javax.swing.JLabel();
+        jLabel58 = new javax.swing.JLabel();
+        accum1Field = new javax.swing.JTextField();
+        jLabel60 = new javax.swing.JLabel();
+        accum2Field = new javax.swing.JTextField();
+        jLabel61 = new javax.swing.JLabel();
+        accum3Field = new javax.swing.JTextField();
+        jLabel62 = new javax.swing.JLabel();
+        accum4Field = new javax.swing.JTextField();
+        brakeButton = new javax.swing.JButton();
+        killPowerButton1 = new javax.swing.JButton();
+        jLabel59 = new javax.swing.JLabel();
+        hydraulicStateField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -276,35 +502,35 @@ public class GUI extends javax.swing.JFrame {
         jPanel1.setOpaque(false);
         jPanel1.setLayout(null);
 
-        jLabel2.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(204, 204, 255));
-        jLabel2.setText("stripes");
+        jLabel2.setText("mm");
         jPanel1.add(jLabel2);
-        jLabel2.setBounds(330, 280, 80, 20);
+        jLabel2.setBounds(270, 370, 80, 20);
 
-        currentField.setEditable(false);
-        currentField.setBackground(new java.awt.Color(204, 204, 255));
-        currentField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        currentField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        currentField.setText("LOADING...");
-        currentField.setFocusable(false);
-        jPanel1.add(currentField);
-        currentField.setBounds(150, 450, 170, 20);
+        bat1CurrentField.setEditable(false);
+        bat1CurrentField.setBackground(new java.awt.Color(204, 204, 255));
+        bat1CurrentField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        bat1CurrentField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        bat1CurrentField.setText("WAITING...");
+        bat1CurrentField.setFocusable(false);
+        jPanel1.add(bat1CurrentField);
+        bat1CurrentField.setBounds(480, 210, 110, 20);
 
-        jLabel4.setFont(new java.awt.Font("Lucida Grande", 1, 30)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Lucida Grande", 1, 26)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setText("BATTERY DATA");
+        jLabel4.setText("HYDRAULIC DATA");
         jPanel1.add(jLabel4);
-        jLabel4.setBounds(10, 330, 260, 30);
+        jLabel4.setBounds(700, 110, 260, 30);
 
-        jLabel6.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(204, 204, 255));
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel6.setText("Current:");
         jPanel1.add(jLabel6);
-        jLabel6.setBounds(-30, 450, 170, 20);
+        jLabel6.setBounds(360, 210, 110, 20);
 
-        jLabel7.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel7.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(204, 204, 255));
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel7.setText("Acceleration:");
@@ -318,14 +544,14 @@ public class GUI extends javax.swing.JFrame {
         accelField.setText("WAITING...");
         accelField.setFocusable(false);
         jPanel1.add(accelField);
-        accelField.setBounds(150, 160, 170, 20);
+        accelField.setBounds(150, 160, 110, 20);
 
-        jLabel8.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(204, 204, 255));
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel8.setText("Position:");
         jPanel1.add(jLabel8);
-        jLabel8.setBounds(-30, 190, 170, 20);
+        jLabel8.setBounds(-30, 220, 170, 20);
 
         positionField.setEditable(false);
         positionField.setBackground(new java.awt.Color(204, 204, 255));
@@ -334,19 +560,20 @@ public class GUI extends javax.swing.JFrame {
         positionField.setText("WAITING...");
         positionField.setFocusable(false);
         jPanel1.add(positionField);
-        positionField.setBounds(150, 190, 170, 20);
+        positionField.setBounds(150, 220, 110, 20);
 
-        jLabel5.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("MASTER");
         jPanel1.add(jLabel5);
-        jLabel5.setBounds(430, 70, 80, 20);
+        jLabel5.setBounds(370, 60, 60, 20);
 
-        jLabel9.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel9.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(204, 204, 255));
         jLabel9.setText("cm");
         jPanel1.add(jLabel9);
-        jLabel9.setBounds(330, 190, 30, 20);
+        jLabel9.setBounds(270, 220, 30, 20);
 
         jPanel2.setOpaque(false);
         jPanel2.setLayout(null);
@@ -438,12 +665,12 @@ public class GUI extends javax.swing.JFrame {
         jPanel1.add(jPanel2);
         jPanel2.setBounds(0, 0, 0, 0);
 
-        jLabel18.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel18.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel18.setForeground(new java.awt.Color(204, 204, 255));
         jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel18.setText("Velocity:");
         jPanel1.add(jLabel18);
-        jLabel18.setBounds(-30, 220, 170, 20);
+        jLabel18.setBounds(-30, 190, 170, 20);
 
         velocityField.setEditable(false);
         velocityField.setBackground(new java.awt.Color(204, 204, 255));
@@ -452,15 +679,15 @@ public class GUI extends javax.swing.JFrame {
         velocityField.setText("WAITING...");
         velocityField.setFocusable(false);
         jPanel1.add(velocityField);
-        velocityField.setBounds(150, 220, 170, 20);
+        velocityField.setBounds(150, 190, 110, 20);
 
-        jLabel19.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel19.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel19.setForeground(new java.awt.Color(204, 204, 255));
         jLabel19.setText("cm s^-1");
         jPanel1.add(jLabel19);
-        jLabel19.setBounds(330, 220, 80, 20);
+        jLabel19.setBounds(270, 190, 80, 20);
 
-        jLabel20.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel20.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel20.setForeground(new java.awt.Color(204, 204, 255));
         jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel20.setText("Temperature:");
@@ -474,26 +701,27 @@ public class GUI extends javax.swing.JFrame {
         tempField.setText("WAITING...");
         tempField.setFocusable(false);
         jPanel1.add(tempField);
-        tempField.setBounds(150, 250, 170, 20);
+        tempField.setBounds(150, 250, 110, 20);
 
-        jLabel21.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel21.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel21.setForeground(new java.awt.Color(204, 204, 255));
         jLabel21.setText("mA");
         jPanel1.add(jLabel21);
-        jLabel21.setBounds(330, 450, 80, 20);
+        jLabel21.setBounds(600, 210, 80, 20);
 
-        jLabel22.setFont(new java.awt.Font("Lucida Grande", 1, 30)); // NOI18N
+        jLabel22.setFont(new java.awt.Font("Lucida Grande", 1, 26)); // NOI18N
         jLabel22.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel22.setText("CONSOLE");
+        jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel22.setText("CMD PROMPT");
         jPanel1.add(jLabel22);
-        jLabel22.setBounds(430, 110, 170, 30);
+        jLabel22.setBounds(700, 340, 200, 30);
 
-        jLabel23.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel23.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel23.setForeground(new java.awt.Color(204, 204, 255));
         jLabel23.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel23.setText("Stripe Count:");
+        jLabel23.setText("Ground Proximity:");
         jPanel1.add(jLabel23);
-        jLabel23.setBounds(-30, 280, 170, 20);
+        jLabel23.setBounds(-30, 370, 170, 20);
 
         stripeField.setEditable(false);
         stripeField.setBackground(new java.awt.Color(204, 204, 255));
@@ -502,138 +730,127 @@ public class GUI extends javax.swing.JFrame {
         stripeField.setText("WAITING...");
         stripeField.setFocusable(false);
         jPanel1.add(stripeField);
-        stripeField.setBounds(150, 280, 170, 20);
+        stripeField.setBounds(150, 340, 110, 20);
 
-        jLabel24.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel24.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel24.setForeground(new java.awt.Color(204, 204, 255));
         jLabel24.setText("°C / 10");
         jPanel1.add(jLabel24);
-        jLabel24.setBounds(330, 250, 80, 20);
+        jLabel24.setBounds(270, 250, 80, 20);
 
-        jLabel25.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
-        jLabel25.setForeground(new java.awt.Color(204, 204, 255));
-        jLabel25.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel25.setText("Temperature:");
-        jPanel1.add(jLabel25);
-        jLabel25.setBounds(-30, 390, 170, 20);
+        Bat1TempField.setEditable(false);
+        Bat1TempField.setBackground(new java.awt.Color(204, 204, 255));
+        Bat1TempField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        Bat1TempField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        Bat1TempField.setText("WAITING...");
+        Bat1TempField.setFocusable(false);
+        jPanel1.add(Bat1TempField);
+        Bat1TempField.setBounds(480, 180, 110, 20);
 
-        BatTempField.setEditable(false);
-        BatTempField.setBackground(new java.awt.Color(204, 204, 255));
-        BatTempField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        BatTempField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        BatTempField.setText("LOADING...");
-        BatTempField.setFocusable(false);
-        jPanel1.add(BatTempField);
-        BatTempField.setBounds(150, 390, 170, 20);
-
-        jLabel26.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel26.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel26.setForeground(new java.awt.Color(204, 204, 255));
         jLabel26.setText("°C / 10");
         jPanel1.add(jLabel26);
-        jLabel26.setBounds(330, 390, 80, 20);
+        jLabel26.setBounds(600, 180, 80, 20);
 
-        jLabel27.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel27.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel27.setForeground(new java.awt.Color(204, 204, 255));
         jLabel27.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel27.setText("Voltage:");
         jPanel1.add(jLabel27);
-        jLabel27.setBounds(-30, 420, 170, 20);
+        jLabel27.setBounds(360, 240, 110, 20);
 
-        voltageField.setEditable(false);
-        voltageField.setBackground(new java.awt.Color(204, 204, 255));
-        voltageField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        voltageField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        voltageField.setText("LOADING...");
-        voltageField.setFocusable(false);
-        jPanel1.add(voltageField);
-        voltageField.setBounds(150, 420, 170, 20);
+        bat1VoltageField.setEditable(false);
+        bat1VoltageField.setBackground(new java.awt.Color(204, 204, 255));
+        bat1VoltageField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        bat1VoltageField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        bat1VoltageField.setText("WAITING...");
+        bat1VoltageField.setFocusable(false);
+        jPanel1.add(bat1VoltageField);
+        bat1VoltageField.setBounds(480, 240, 110, 20);
 
-        jLabel28.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel28.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel28.setForeground(new java.awt.Color(204, 204, 255));
         jLabel28.setText("mV");
         jPanel1.add(jLabel28);
-        jLabel28.setBounds(330, 420, 80, 20);
+        jLabel28.setBounds(600, 240, 80, 20);
 
-        console.setEditable(false);
-        console.setBackground(new java.awt.Color(204, 204, 255));
-        console.setColumns(20);
-        console.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
-        console.setForeground(new java.awt.Color(0, 0, 153));
-        console.setLineWrap(true);
-        console.setRows(5);
-        console.setWrapStyleWord(true);
-        console.setFocusable(false);
-        jScrollPane1.setViewportView(console);
-
-        jPanel1.add(jScrollPane1);
-        jScrollPane1.setBounds(430, 160, 520, 310);
-
-        jLabel29.setFont(new java.awt.Font("Lucida Grande", 1, 30)); // NOI18N
+        jLabel29.setFont(new java.awt.Font("Lucida Grande", 1, 26)); // NOI18N
         jLabel29.setForeground(new java.awt.Color(255, 255, 255));
         jLabel29.setText("POD DATA");
         jPanel1.add(jLabel29);
-        jLabel29.setBounds(20, 110, 170, 30);
+        jLabel29.setBounds(10, 110, 170, 30);
 
-        saveButton.setText("Save to File...");
+        saveButton.setBackground(new java.awt.Color(204, 204, 255));
+        saveButton.setText("SAVE TO FILE");
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveButtonActionPerformed(evt);
             }
         });
         jPanel1.add(saveButton);
-        saveButton.setBounds(820, 490, 130, 29);
+        saveButton.setBounds(450, 490, 200, 29);
 
-        settingsButton.setText("Network Settings...");
+        settingsButton.setBackground(new java.awt.Color(204, 204, 255));
+        settingsButton.setText("NETWORK SETTINGS...");
+        settingsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                settingsButtonActionPerformed(evt);
+            }
+        });
         jPanel1.add(settingsButton);
-        settingsButton.setBounds(430, 490, 150, 29);
+        settingsButton.setBounds(230, 490, 200, 29);
 
         masterField.setEditable(false);
         masterField.setBackground(new java.awt.Color(255, 51, 51));
         masterField.setFocusable(false);
         jPanel1.add(masterField);
-        masterField.setBounds(440, 20, 50, 40);
+        masterField.setBounds(370, 10, 60, 50);
 
-        jLabel30.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel30.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel30.setForeground(new java.awt.Color(204, 204, 255));
         jLabel30.setText("cm s^-2");
         jPanel1.add(jLabel30);
-        jLabel30.setBounds(330, 160, 80, 20);
+        jLabel30.setBounds(270, 160, 80, 20);
 
         slave0Field.setEditable(false);
         slave0Field.setBackground(new java.awt.Color(255, 51, 51));
         slave0Field.setFocusable(false);
         jPanel1.add(slave0Field);
-        slave0Field.setBounds(530, 20, 50, 40);
+        slave0Field.setBounds(480, 10, 60, 50);
 
-        jLabel31.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        jLabel31.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel31.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel31.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel31.setText("SLAVE 0");
         jPanel1.add(jLabel31);
-        jLabel31.setBounds(520, 70, 80, 20);
+        jLabel31.setBounds(470, 60, 80, 20);
 
         slave1Field.setEditable(false);
         slave1Field.setBackground(new java.awt.Color(255, 51, 51));
         slave1Field.setFocusable(false);
         jPanel1.add(slave1Field);
-        slave1Field.setBounds(620, 20, 50, 40);
+        slave1Field.setBounds(580, 10, 60, 50);
 
-        jLabel32.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        jLabel32.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel32.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel32.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel32.setText("SLAVE 1");
         jPanel1.add(jLabel32);
-        jLabel32.setBounds(610, 70, 80, 20);
+        jLabel32.setBounds(570, 60, 80, 20);
 
         slave2Field.setEditable(false);
         slave2Field.setBackground(new java.awt.Color(255, 51, 51));
         slave2Field.setFocusable(false);
         jPanel1.add(slave2Field);
-        slave2Field.setBounds(710, 20, 50, 40);
+        slave2Field.setBounds(680, 10, 60, 50);
 
-        jLabel33.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        jLabel33.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel33.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel33.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel33.setText("SLAVE 2");
         jPanel1.add(jLabel33);
-        jLabel33.setBounds(700, 70, 80, 20);
+        jLabel33.setBounds(670, 60, 80, 20);
 
         podField.setEditable(false);
         podField.setBackground(new java.awt.Color(204, 204, 255));
@@ -641,35 +858,400 @@ public class GUI extends javax.swing.JFrame {
         podField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         podField.setFocusable(false);
         jPanel1.add(podField);
-        podField.setBounds(880, 20, 50, 40);
+        podField.setBounds(890, 10, 60, 50);
 
-        jLabel34.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        jLabel34.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel34.setForeground(new java.awt.Color(204, 204, 255));
         jLabel34.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel34.setText("STATUS");
         jLabel34.setFocusable(false);
         jPanel1.add(jLabel34);
-        jLabel34.setBounds(870, 90, 70, 20);
+        jLabel34.setBounds(890, 80, 60, 20);
 
         slave3Field.setEditable(false);
         slave3Field.setBackground(new java.awt.Color(255, 51, 51));
         slave3Field.setFocusable(false);
         jPanel1.add(slave3Field);
-        slave3Field.setBounds(800, 20, 50, 40);
+        slave3Field.setBounds(790, 10, 60, 50);
 
-        jLabel35.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        jLabel35.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel35.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel35.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel35.setText("SLAVE 3");
         jPanel1.add(jLabel35);
-        jLabel35.setBounds(790, 70, 80, 20);
+        jLabel35.setBounds(780, 60, 80, 20);
 
-        jLabel36.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        jLabel36.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel36.setForeground(new java.awt.Color(204, 204, 255));
         jLabel36.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel36.setText("POD");
         jLabel36.setFocusable(false);
         jPanel1.add(jLabel36);
-        jLabel36.setBounds(880, 70, 50, 20);
+        jLabel36.setBounds(900, 60, 40, 20);
+
+        launchConsole.setBackground(new java.awt.Color(204, 204, 255));
+        launchConsole.setText("LAUNCH CONSOLE");
+        launchConsole.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                launchConsoleActionPerformed(evt);
+            }
+        });
+        jPanel1.add(launchConsole);
+        launchConsole.setBounds(10, 490, 200, 29);
+
+        groundProximityField.setEditable(false);
+        groundProximityField.setBackground(new java.awt.Color(204, 204, 255));
+        groundProximityField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        groundProximityField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        groundProximityField.setText("WAITING...");
+        groundProximityField.setFocusable(false);
+        groundProximityField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                groundProximityFieldActionPerformed(evt);
+            }
+        });
+        jPanel1.add(groundProximityField);
+        groundProximityField.setBounds(150, 370, 110, 20);
+
+        jLabel37.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel37.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel37.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel37.setText("Stripe Count:");
+        jPanel1.add(jLabel37);
+        jLabel37.setBounds(-30, 340, 170, 20);
+
+        jLabel3.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel3.setText("stripes");
+        jPanel1.add(jLabel3);
+        jLabel3.setBounds(270, 340, 80, 20);
+
+        jLabel38.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel38.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel38.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel38.setText("Rail Proximity:");
+        jPanel1.add(jLabel38);
+        jLabel38.setBounds(-30, 400, 170, 20);
+
+        railProximityField.setEditable(false);
+        railProximityField.setBackground(new java.awt.Color(204, 204, 255));
+        railProximityField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        railProximityField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        railProximityField.setText("WAITING...");
+        railProximityField.setFocusable(false);
+        railProximityField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                railProximityFieldActionPerformed(evt);
+            }
+        });
+        jPanel1.add(railProximityField);
+        railProximityField.setBounds(150, 400, 110, 20);
+
+        jLabel39.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel39.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel39.setText("mm");
+        jPanel1.add(jLabel39);
+        jLabel39.setBounds(270, 400, 80, 20);
+
+        jLabel40.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel40.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel40.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel40.setText("Pusher Detected:");
+        jPanel1.add(jLabel40);
+        jLabel40.setBounds(-30, 430, 170, 20);
+
+        pusherField.setEditable(false);
+        pusherField.setBackground(new java.awt.Color(204, 204, 255));
+        pusherField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        pusherField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        pusherField.setText("WAITING...");
+        pusherField.setFocusable(false);
+        pusherField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pusherFieldActionPerformed(evt);
+            }
+        });
+        jPanel1.add(pusherField);
+        pusherField.setBounds(150, 430, 110, 20);
+
+        jLabel41.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel41.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel41.setText("Y/N");
+        jPanel1.add(jLabel41);
+        jLabel41.setBounds(270, 430, 80, 20);
+
+        jLabel42.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel42.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel42.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel42.setText("Temperature:");
+        jPanel1.add(jLabel42);
+        jLabel42.setBounds(340, 180, 130, 20);
+
+        jLabel43.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel43.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel43.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel43.setText("ACCUMULATOR PRESSURES");
+        jPanel1.add(jLabel43);
+        jLabel43.setBounds(700, 180, 200, 20);
+
+        jLabel44.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel44.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel44.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel44.setText("BATTERY 2");
+        jPanel1.add(jLabel44);
+        jLabel44.setBounds(370, 270, 110, 20);
+
+        jLabel45.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel45.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel45.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel45.setText("Temperature:");
+        jPanel1.add(jLabel45);
+        jLabel45.setBounds(370, 300, 100, 20);
+
+        Bat2TempField.setEditable(false);
+        Bat2TempField.setBackground(new java.awt.Color(204, 204, 255));
+        Bat2TempField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        Bat2TempField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        Bat2TempField.setText("WAITING...");
+        Bat2TempField.setFocusable(false);
+        jPanel1.add(Bat2TempField);
+        Bat2TempField.setBounds(480, 300, 110, 20);
+
+        jLabel46.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel46.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel46.setText("°C / 10");
+        jPanel1.add(jLabel46);
+        jLabel46.setBounds(600, 300, 80, 20);
+
+        jLabel25.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel25.setText("mA");
+        jPanel1.add(jLabel25);
+        jLabel25.setBounds(600, 330, 80, 20);
+
+        bat2CurrentField.setEditable(false);
+        bat2CurrentField.setBackground(new java.awt.Color(204, 204, 255));
+        bat2CurrentField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        bat2CurrentField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        bat2CurrentField.setText("WAITING...");
+        bat2CurrentField.setFocusable(false);
+        jPanel1.add(bat2CurrentField);
+        bat2CurrentField.setBounds(480, 330, 110, 20);
+
+        jLabel47.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel47.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel47.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel47.setText("Current:");
+        jPanel1.add(jLabel47);
+        jLabel47.setBounds(360, 330, 110, 20);
+
+        jLabel48.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel48.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel48.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel48.setText("Voltage:");
+        jPanel1.add(jLabel48);
+        jLabel48.setBounds(360, 360, 110, 20);
+
+        bat2VoltageField.setEditable(false);
+        bat2VoltageField.setBackground(new java.awt.Color(204, 204, 255));
+        bat2VoltageField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        bat2VoltageField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        bat2VoltageField.setText("WAITING...");
+        bat2VoltageField.setFocusable(false);
+        jPanel1.add(bat2VoltageField);
+        bat2VoltageField.setBounds(480, 360, 110, 20);
+
+        jLabel49.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel49.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel49.setText("mV");
+        jPanel1.add(jLabel49);
+        jLabel49.setBounds(600, 360, 80, 20);
+
+        jLabel50.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel50.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel50.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel50.setText("BATTERY 3");
+        jPanel1.add(jLabel50);
+        jLabel50.setBounds(370, 390, 110, 20);
+
+        jLabel51.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel51.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel51.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel51.setText("Temperature:");
+        jPanel1.add(jLabel51);
+        jLabel51.setBounds(370, 420, 100, 20);
+
+        Bat3TempField.setEditable(false);
+        Bat3TempField.setBackground(new java.awt.Color(204, 204, 255));
+        Bat3TempField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        Bat3TempField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        Bat3TempField.setText("WAITING...");
+        Bat3TempField.setFocusable(false);
+        jPanel1.add(Bat3TempField);
+        Bat3TempField.setBounds(480, 420, 110, 20);
+
+        jLabel52.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel52.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel52.setText("°C / 10");
+        jPanel1.add(jLabel52);
+        jLabel52.setBounds(600, 420, 80, 20);
+
+        jLabel53.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel53.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel53.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel53.setText("Voltage:");
+        jPanel1.add(jLabel53);
+        jLabel53.setBounds(360, 450, 110, 20);
+
+        bat3VoltageField.setEditable(false);
+        bat3VoltageField.setBackground(new java.awt.Color(204, 204, 255));
+        bat3VoltageField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        bat3VoltageField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        bat3VoltageField.setText("WAITING...");
+        bat3VoltageField.setFocusable(false);
+        jPanel1.add(bat3VoltageField);
+        bat3VoltageField.setBounds(480, 450, 110, 20);
+
+        jLabel54.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel54.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel54.setText("mV");
+        jPanel1.add(jLabel54);
+        jLabel54.setBounds(600, 450, 80, 20);
+
+        jLabel55.setFont(new java.awt.Font("Lucida Grande", 1, 26)); // NOI18N
+        jLabel55.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel55.setText("TRACK DATA");
+        jPanel1.add(jLabel55);
+        jLabel55.setBounds(10, 290, 220, 30);
+
+        jLabel56.setFont(new java.awt.Font("Lucida Grande", 1, 26)); // NOI18N
+        jLabel56.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel56.setText("BATTERY DATA");
+        jPanel1.add(jLabel56);
+        jLabel56.setBounds(370, 110, 260, 30);
+
+        readyButton.setBackground(new java.awt.Color(0, 153, 51));
+        readyButton.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        readyButton.setForeground(new java.awt.Color(255, 255, 255));
+        readyButton.setText("R E A D Y  T O  L A U N C H");
+        readyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                readyButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(readyButton);
+        readyButton.setBounds(700, 490, 250, 29);
+
+        jLabel57.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel57.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel57.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel57.setText("BATTERY 1");
+        jPanel1.add(jLabel57);
+        jLabel57.setBounds(370, 150, 110, 20);
+
+        jLabel58.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel58.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel58.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel58.setText("Accumulator 1:");
+        jPanel1.add(jLabel58);
+        jLabel58.setBounds(680, 210, 130, 20);
+
+        accum1Field.setEditable(false);
+        accum1Field.setBackground(new java.awt.Color(204, 204, 255));
+        accum1Field.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        accum1Field.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        accum1Field.setText("WAITING...");
+        accum1Field.setFocusable(false);
+        jPanel1.add(accum1Field);
+        accum1Field.setBounds(820, 210, 130, 20);
+
+        jLabel60.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel60.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel60.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel60.setText("Accumulator 2:");
+        jPanel1.add(jLabel60);
+        jLabel60.setBounds(680, 240, 130, 20);
+
+        accum2Field.setEditable(false);
+        accum2Field.setBackground(new java.awt.Color(204, 204, 255));
+        accum2Field.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        accum2Field.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        accum2Field.setText("WAITING...");
+        accum2Field.setFocusable(false);
+        jPanel1.add(accum2Field);
+        accum2Field.setBounds(820, 240, 130, 20);
+
+        jLabel61.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel61.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel61.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel61.setText("Accumulator 3:");
+        jPanel1.add(jLabel61);
+        jLabel61.setBounds(680, 270, 130, 20);
+
+        accum3Field.setEditable(false);
+        accum3Field.setBackground(new java.awt.Color(204, 204, 255));
+        accum3Field.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        accum3Field.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        accum3Field.setText("WAITING...");
+        accum3Field.setFocusable(false);
+        jPanel1.add(accum3Field);
+        accum3Field.setBounds(820, 270, 130, 20);
+
+        jLabel62.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel62.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel62.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel62.setText("Accumulator 4:");
+        jPanel1.add(jLabel62);
+        jLabel62.setBounds(680, 300, 130, 20);
+
+        accum4Field.setEditable(false);
+        accum4Field.setBackground(new java.awt.Color(204, 204, 255));
+        accum4Field.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        accum4Field.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        accum4Field.setText("WAITING...");
+        accum4Field.setFocusable(false);
+        jPanel1.add(accum4Field);
+        accum4Field.setBounds(820, 300, 130, 20);
+
+        brakeButton.setBackground(new java.awt.Color(255, 0, 0));
+        brakeButton.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        brakeButton.setForeground(new java.awt.Color(255, 255, 255));
+        brakeButton.setText("B R A K E");
+        brakeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                brakeButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(brakeButton);
+        brakeButton.setBounds(700, 390, 250, 29);
+
+        killPowerButton1.setBackground(new java.awt.Color(255, 0, 0));
+        killPowerButton1.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        killPowerButton1.setForeground(new java.awt.Color(255, 255, 255));
+        killPowerButton1.setText("K I L L  P O W E R");
+        killPowerButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                killPowerButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(killPowerButton1);
+        killPowerButton1.setBounds(700, 440, 250, 29);
+
+        jLabel59.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel59.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel59.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel59.setText("State:");
+        jPanel1.add(jLabel59);
+        jLabel59.setBounds(680, 150, 130, 20);
+
+        hydraulicStateField.setEditable(false);
+        hydraulicStateField.setBackground(new java.awt.Color(204, 204, 255));
+        hydraulicStateField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
+        hydraulicStateField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        hydraulicStateField.setText("WAITING...");
+        hydraulicStateField.setFocusable(false);
+        jPanel1.add(hydraulicStateField);
+        hydraulicStateField.setBounds(820, 150, 130, 20);
 
         getContentPane().add(jPanel1);
 
@@ -684,9 +1266,45 @@ public class GUI extends javax.swing.JFrame {
         String desktop = System.getProperty ("user.home") + "/Desktop/";
         FileIOClass fileObj = new FileIOClass();
         fileObj.setCreatePath(desktop + this.getCurrentTimeStamp() + ".txt");
-        fileObj.writeFile(console.getText().split("\n"));
+        //fileObj.writeFile(console.getText().split("\n"));
+        fileObj.writeFile(consoleWindow.getText().split("\n"));
         this.printToConsole("CONSOLE LOG SAVED TO DESKTOP");
+        JOptionPane.showMessageDialog(null, "\nConsole Saved to File.");
     }//GEN-LAST:event_saveButtonActionPerformed
+
+    private void launchConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_launchConsoleActionPerformed
+        consoleWindow.setVisible(true);
+    }//GEN-LAST:event_launchConsoleActionPerformed
+
+    private void groundProximityFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_groundProximityFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_groundProximityFieldActionPerformed
+
+    private void railProximityFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_railProximityFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_railProximityFieldActionPerformed
+
+    private void pusherFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pusherFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_pusherFieldActionPerformed
+
+    private void readyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readyButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_readyButtonActionPerformed
+
+    private void brakeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_brakeButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_brakeButtonActionPerformed
+
+    private void killPowerButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_killPowerButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_killPowerButton1ActionPerformed
+
+    private void settingsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsButtonActionPerformed
+        
+        settingsWindow.setVisible(true);
+        
+    }//GEN-LAST:event_settingsButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -718,17 +1336,29 @@ public class GUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GUI().setVisible(true);
+                new GUI(/*parentPointer*/).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField BatTempField;
+    private javax.swing.JTextField Bat1TempField;
+    private javax.swing.JTextField Bat2TempField;
+    private javax.swing.JTextField Bat3TempField;
     private javax.swing.JTextField accelField;
     private javax.swing.JTextField accelField1;
-    private javax.swing.JTextArea console;
-    private javax.swing.JTextField currentField;
+    private javax.swing.JTextField accum1Field;
+    private javax.swing.JTextField accum2Field;
+    private javax.swing.JTextField accum3Field;
+    private javax.swing.JTextField accum4Field;
+    private javax.swing.JTextField bat1CurrentField;
+    private javax.swing.JTextField bat1VoltageField;
+    private javax.swing.JTextField bat2CurrentField;
+    private javax.swing.JTextField bat2VoltageField;
+    private javax.swing.JTextField bat3VoltageField;
+    private javax.swing.JButton brakeButton;
+    private javax.swing.JTextField groundProximityField;
+    private javax.swing.JTextField hydraulicStateField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -751,6 +1381,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
@@ -758,19 +1389,49 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
+    private javax.swing.JLabel jLabel37;
+    private javax.swing.JLabel jLabel38;
+    private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel40;
+    private javax.swing.JLabel jLabel41;
+    private javax.swing.JLabel jLabel42;
+    private javax.swing.JLabel jLabel43;
+    private javax.swing.JLabel jLabel44;
+    private javax.swing.JLabel jLabel45;
+    private javax.swing.JLabel jLabel46;
+    private javax.swing.JLabel jLabel47;
+    private javax.swing.JLabel jLabel48;
+    private javax.swing.JLabel jLabel49;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel50;
+    private javax.swing.JLabel jLabel51;
+    private javax.swing.JLabel jLabel52;
+    private javax.swing.JLabel jLabel53;
+    private javax.swing.JLabel jLabel54;
+    private javax.swing.JLabel jLabel55;
+    private javax.swing.JLabel jLabel56;
+    private javax.swing.JLabel jLabel57;
+    private javax.swing.JLabel jLabel58;
+    private javax.swing.JLabel jLabel59;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel60;
+    private javax.swing.JLabel jLabel61;
+    private javax.swing.JLabel jLabel62;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton killPowerButton1;
+    private javax.swing.JButton launchConsole;
     private javax.swing.JTextField masterField;
     private javax.swing.JTextField podField;
     private javax.swing.JTextField positionField;
     private javax.swing.JTextField positionField1;
+    private javax.swing.JTextField pusherField;
+    private javax.swing.JTextField railProximityField;
+    private javax.swing.JButton readyButton;
     private javax.swing.JButton saveButton;
     private javax.swing.JButton settingsButton;
     private javax.swing.JTextField slave0Field;
@@ -782,6 +1443,5 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JTextField tempField;
     private javax.swing.JTextField velocityField;
     private javax.swing.JTextField velocityField1;
-    private javax.swing.JTextField voltageField;
     // End of variables declaration//GEN-END:variables
 }

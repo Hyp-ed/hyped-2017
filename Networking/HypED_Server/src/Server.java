@@ -11,36 +11,30 @@
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
 
 public class Server
 {
     private static PiList _list = new PiList();
     
-    final private static int _podPort = 5695, _spaceXPort = 3000;
+   final private static int _podPort = 5695;
+   private static int _spaceXPort = 3000;
+   private static String _spaceXIP = "192.168.0.1";
    private static ServerSocket _server;
    private static Socket _podSocket;
    // Implement SpaceX UDP socket via Datagram
-   private static GUI frontEnd = new GUI();
+   //private static Server pointer = this;
+   private static GUI frontEnd = new GUI(/*pointer*/);
    
    public static void main(String args[]) throws IOException
    {
        try
        {
+           //frontEnd.setParent(this);
            frontEnd.setVisible(true);
-           // Demonstratory data ----------------------------------------------
-           frontEnd.printToConsole("DEMONSTRATION DATA:---");
-           //frontEnd.printToConsole("AWAITING PI CONNECTIONS...");
-           frontEnd.printBatteryTemperature(5000);
-           frontEnd.printVoltage(50);
-           frontEnd.printCurrent(20);
-           //frontEnd.setMasterOnline(true);
-           //frontEnd.setSlave3Online(false);
-           frontEnd.setPodStatus(1);
-           frontEnd.printToConsole("------------");
-           //------------------------------------------------------------------
            
            _server = new ServerSocket(_podPort);
-           frontEnd.printToConsole("AWAITING PI CONNECTIONS...");
+           frontEnd.printToConsole("AWAITING SIGNAL FROM POD COMPUTERS...");
            
            while(true)
            {
@@ -68,7 +62,7 @@ public class Server
                         frontEnd.setMasterOnline(true);
                 }
                 
-               //receipt(_podSocket); 
+               sendToPod(_podSocket); 
                UserThread usr = new UserThread(_podSocket);
                usr.start(); 
            }
@@ -82,7 +76,7 @@ public class Server
         {
             Scanner input = new Scanner(sock.getInputStream());
             String piName = input.nextLine();
-            piName = piName.substring(0, piName.indexOf("|"));
+            //piName = piName.substring(0, piName.indexOf("|"));
             // CANNOT CLOSE INPUT OBJ. OR POINT TO NULL AS THIS WOULD CLOSE THE SOCKET DATA STREAM.
             return piName;
         } catch(IOException e) 
@@ -92,15 +86,42 @@ public class Server
         }
     }
     
-    public static void receipt(Socket piConnection) throws Exception
-        {
-            Socket temp = piConnection;
-            PrintWriter tempOut = new PrintWriter(temp.getOutputStream());
+    public static void sendToPod(Socket piConnection) throws Exception
+    {
+        Socket temp = piConnection;
+        PrintWriter tempOut = new PrintWriter(temp.getOutputStream());
             
-            tempOut.println("1"); //message received
-            tempOut.flush(); 
+        tempOut.println(1); //message received
+        tempOut.flush(); 
             
-        }
+    }
+    
+    public static void sendToSpaceX
+    (
+         byte status, byte team_id, int acceleration, int position, 
+         int velocity/*, int voltage, int temperature, int current, 
+         int podTemp*/
+    ) throws IOException
+            
+    {
+        // Test by writing UDP client receiver.
+        
+        DatagramSocket spaceXSocket = new DatagramSocket(_spaceXPort);
+        ByteBuffer buf = ByteBuffer.allocate(34); // BigEndian by default
+        buf.put(team_id);
+        buf.put(status);
+        buf.putInt(acceleration);
+        buf.putInt(position);
+        buf.putInt(velocity);
+        buf.putInt(0);
+        buf.putInt(0);
+        buf.putInt(0);
+        buf.putInt(0);
+        buf.putInt(0);
+        InetAddress IP =  InetAddress.getByName(_spaceXIP);
+        DatagramPacket packet = new DatagramPacket(buf.array(), buf.limit(), IP, _spaceXPort);
+        spaceXSocket.send(packet);
+    }
     
     private static class UserThread extends Thread
     {
@@ -144,7 +165,7 @@ public class Server
             }
         }
         
-        
+        public boolean getStatus() { return subSock.isConnected(); }
         
         public void run()
         {
@@ -158,6 +179,11 @@ public class Server
                     Socket temp = null;
                     PrintWriter tempOut = null;
                     
+                    byte status = 1, team_id = 0;
+                    int acceleration = 0, position = 0, velocity = 0, battery_voltage = 0, 
+                            battery_current = 0, battery_temperature = 0,
+                                pod_temperature = 0;
+                    
                     while(true)
                     {
                         this.verifConnection();
@@ -165,7 +191,7 @@ public class Server
                         if (!_input.hasNext()) return;
                         
                         message = _input.nextLine();
-                        message = message.substring(0, message.indexOf("|"));
+                        //message = message.substring(0, message.indexOf("|"));
                         frontEnd.printToConsole(_list.getPiName(subSock) + " sent data: " + message);
                   
                        /* for (int i = 1; i <= _userList.getNoOfUsers() + 1; i++)
@@ -187,11 +213,117 @@ public class Server
                             System.out.println("Sent to: " + temp.getLocalAddress().getHostName());
                         }*/
                         
-                        if(message.contains("CMD"))
+                        /*if(message.contains("CMD"))
                         {
                             if (message.contains("CMD1"))
+                            {
                                 frontEnd.printPodTemperature(Integer.parseInt(message.substring(4)));
-                        } // change to switch statement, i.e. switch (message.substring(0, 4)) case "CMD1"...
+                                _out.print(1);
+                                receipt(subSock);
+                            }
+                        }*/ // change to switch statement, i.e. switch (message.substring(0, 4)) case "CMD1"...
+                        
+                     
+                        switch(message.substring(0, 5))
+                        {
+                            // Encapsulate each parseint within try block, upon error print receipt 0, pi responds...
+                            case "CMD01":
+                                frontEnd.printAcceleration(Double.parseDouble(message.substring(5)));
+                                //_out.print(1);
+                                sendToPod(subSock);
+                                acceleration = (int) Math.round(Double.parseDouble(message.substring(5)));
+                                break;
+                            case "CMD02":
+                                frontEnd.printVelocity(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                velocity = (int) Math.round(Double.parseDouble(message.substring(5)));
+                                break;
+                            case "CMD03":
+                                frontEnd.printPosition(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                position = (int) Math.round(Double.parseDouble(message.substring(5)));
+                                break;
+                            case "CMD04":
+                                frontEnd.printPodTemperature(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                pod_temperature = (int) Math.round(Double.parseDouble(message.substring(5)));
+                                break;
+                            case "CMD05":
+                                frontEnd.printStripeCount(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD06":
+                                frontEnd.printGroundProximity(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD07":
+                                frontEnd.printRailProximity(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD08":
+                                frontEnd.printPusherDetection(Integer.parseInt(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD09":
+                                frontEnd.printBattery1Temperature(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD10":
+                                frontEnd.printBattery1Current(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD11":
+                                frontEnd.printBattery1Voltage(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD12":
+                                frontEnd.printBattery2Temperature(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD13":
+                                frontEnd.printBattery2Current(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD14":
+                                frontEnd.printBattery2Voltage(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD15":
+                                frontEnd.printBattery3Temperature(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD16":
+                                frontEnd.printBattery3Voltage(Double.parseDouble(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD17":
+                                frontEnd.printHydraulicState(Integer.parseInt(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD18":
+                                frontEnd.printAccum1(Integer.parseInt(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD19":
+                                frontEnd.printAccum2(Integer.parseInt(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD20":
+                                frontEnd.printAccum3(Integer.parseInt(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD21":
+                                frontEnd.printAccum4(Integer.parseInt(message.substring(5)));
+                                sendToPod(subSock);
+                                break;
+                            case "CMD22":
+                                frontEnd.setPodStatus(Integer.parseInt(message.substring(5)));
+                                sendToPod(subSock);
+                                status = (byte)Integer.parseInt(message.substring(5));
+                        }
+                        
+                        //sendToSpaceX(status, team_id, acceleration, position, velocity);
+                        // Commented out because IP for SpaceX is currently in use
                     }
                 } finally { subSock.close(); _input.close(); _out.close();  }
             } catch (Exception e) { System.err.println("3 "+e); }

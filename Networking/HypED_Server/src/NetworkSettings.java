@@ -1,3 +1,6 @@
+
+import javax.swing.UIManager;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,10 +12,21 @@
  */
 public class NetworkSettings extends javax.swing.JFrame {
 
+    
+    private int _defaultBasePort = 5695, _basePort = 5695,
+                _defaultSpaceXPort = 3000, _spaceXPort = 3000;
+    private String _defaultSpaceXIP = "192.168.0.1", _spaceXIP = "192.168.0.1";
+    
     /**
      * Creates new form GUI
      */
     public NetworkSettings() {
+        try
+        {
+        UIManager.setLookAndFeel(
+            UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch(Exception e){}
+        
         initComponents();
         setLocationRelativeTo(null);
     }
@@ -27,8 +41,8 @@ public class NetworkSettings extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        accelField = new javax.swing.JTextField();
-        positionField = new javax.swing.JTextField();
+        basePortField = new javax.swing.JTextField();
+        IPField = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         velocityField1 = new javax.swing.JTextField();
@@ -42,43 +56,46 @@ public class NetworkSettings extends javax.swing.JFrame {
         positionField1 = new javax.swing.JTextField();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
-        velocityField = new javax.swing.JTextField();
-        tempField = new javax.swing.JTextField();
-        stripeField = new javax.swing.JTextField();
-        jLabel29 = new javax.swing.JLabel();
-        saveButton = new javax.swing.JButton();
-        settingsButton = new javax.swing.JButton();
+        spaceXPortField = new javax.swing.JTextField();
+        okButton = new javax.swing.JButton();
+        defaultButton = new javax.swing.JButton();
+        jLabel30 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        cancelButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("HypED – Poddy McPodface");
+        setTitle("Poddy McPodface – Network Settings");
         setBackground(new java.awt.Color(0, 0, 153));
         setForeground(new java.awt.Color(51, 0, 102));
         setResizable(false);
         setSize(new java.awt.Dimension(29, 16));
-        getContentPane().setLayout(new javax.swing.OverlayLayout(getContentPane()));
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setOpaque(false);
         jPanel1.setLayout(null);
 
-        accelField.setEditable(false);
-        accelField.setBackground(new java.awt.Color(204, 204, 255));
-        accelField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        accelField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        accelField.setText("1");
-        accelField.setFocusable(false);
-        jPanel1.add(accelField);
-        accelField.setBounds(520, 150, 170, 20);
+        basePortField.setBackground(new java.awt.Color(204, 204, 255));
+        basePortField.setFont(new java.awt.Font("Lucida Grande", 2, 14)); // NOI18N
+        basePortField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        basePortField.setText("Enter port no. here...");
+        basePortField.setFocusCycleRoot(true);
+        jPanel1.add(basePortField);
+        basePortField.setBounds(220, 70, 170, 20);
 
-        positionField.setEditable(false);
-        positionField.setBackground(new java.awt.Color(204, 204, 255));
-        positionField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        positionField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        positionField.setText("1");
-        positionField.setFocusable(false);
-        jPanel1.add(positionField);
-        positionField.setBounds(520, 180, 170, 20);
+        IPField.setBackground(new java.awt.Color(204, 204, 255));
+        IPField.setFont(new java.awt.Font("Lucida Grande", 2, 14)); // NOI18N
+        IPField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        IPField.setText("Enter IP here...");
+        IPField.setFocusCycleRoot(true);
+        IPField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                IPFieldActionPerformed(evt);
+            }
+        });
+        jPanel1.add(IPField);
+        IPField.setBounds(220, 100, 170, 20);
 
         jPanel2.setOpaque(false);
         jPanel2.setLayout(null);
@@ -170,63 +187,112 @@ public class NetworkSettings extends javax.swing.JFrame {
         jPanel1.add(jPanel2);
         jPanel2.setBounds(0, 0, 0, 0);
 
-        velocityField.setEditable(false);
-        velocityField.setBackground(new java.awt.Color(204, 204, 255));
-        velocityField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        velocityField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        velocityField.setText("1");
-        velocityField.setFocusable(false);
-        jPanel1.add(velocityField);
-        velocityField.setBounds(520, 210, 170, 20);
+        spaceXPortField.setBackground(new java.awt.Color(204, 204, 255));
+        spaceXPortField.setFont(new java.awt.Font("Lucida Grande", 2, 14)); // NOI18N
+        spaceXPortField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        spaceXPortField.setText("Enter port no. here...");
+        spaceXPortField.setFocusCycleRoot(true);
+        jPanel1.add(spaceXPortField);
+        spaceXPortField.setBounds(220, 130, 170, 20);
 
-        tempField.setEditable(false);
-        tempField.setBackground(new java.awt.Color(204, 204, 255));
-        tempField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        tempField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        tempField.setText("1");
-        tempField.setFocusable(false);
-        jPanel1.add(tempField);
-        tempField.setBounds(520, 240, 170, 20);
+        okButton.setBackground(new java.awt.Color(204, 204, 255));
+        okButton.setText("OK");
+        okButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                okButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(okButton);
+        okButton.setBounds(280, 170, 110, 29);
 
-        stripeField.setEditable(false);
-        stripeField.setBackground(new java.awt.Color(204, 204, 255));
-        stripeField.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        stripeField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        stripeField.setText("1");
-        stripeField.setFocusable(false);
-        jPanel1.add(stripeField);
-        stripeField.setBounds(520, 270, 170, 20);
+        defaultButton.setBackground(new java.awt.Color(204, 204, 255));
+        defaultButton.setText("DEFAULT");
+        defaultButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                defaultButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(defaultButton);
+        defaultButton.setBounds(10, 170, 110, 29);
 
-        jLabel29.setFont(new java.awt.Font("Lucida Grande", 1, 30)); // NOI18N
-        jLabel29.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel29.setText("NETWORK SETTINGS");
-        jPanel1.add(jLabel29);
-        jLabel29.setBounds(20, 10, 320, 30);
+        jLabel30.setFont(new java.awt.Font("Lucida Grande", 1, 26)); // NOI18N
+        jLabel30.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel30.setText("NETWORK SETTINGS");
+        jPanel1.add(jLabel30);
+        jLabel30.setBounds(10, 10, 310, 30);
 
-        saveButton.setText("OK");
-        jPanel1.add(saveButton);
-        saveButton.setBounds(430, 470, 110, 29);
-
-        settingsButton.setText("Cancel");
-        jPanel1.add(settingsButton);
-        settingsButton.setBounds(430, 490, 110, 29);
-
-        jLabel7.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel7.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(204, 204, 255));
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel7.setText("Acceleration:");
+        jLabel7.setText("SpaceX IP Address:");
         jPanel1.add(jLabel7);
-        jLabel7.setBounds(-30, 160, 170, 20);
+        jLabel7.setBounds(40, 100, 170, 20);
+
+        jLabel8.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel8.setText("SpaceX Port Number:");
+        jPanel1.add(jLabel8);
+        jLabel8.setBounds(40, 130, 170, 20);
+
+        jLabel9.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(204, 204, 255));
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel9.setText("Base-Station Port Number:");
+        jPanel1.add(jLabel9);
+        jLabel9.setBounds(0, 70, 210, 20);
+
+        cancelButton.setBackground(new java.awt.Color(204, 204, 255));
+        cancelButton.setText("CANCEL");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(cancelButton);
+        cancelButton.setBounds(160, 170, 110, 29);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Background.png"))); // NOI18N
         jPanel1.add(jLabel1);
-        jLabel1.setBounds(0, 0, 800, 370);
+        jLabel1.setBounds(0, 0, 420, 210);
 
-        getContentPane().add(jPanel1);
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 419, 207));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void IPFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IPFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_IPFieldActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        this.setVisible(false);
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void defaultButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtonActionPerformed
+        _basePort = _defaultBasePort;
+        _spaceXPort = _defaultSpaceXPort;
+        _spaceXIP = _defaultSpaceXIP;
+        
+        basePortField.setText(Integer.toString(_basePort));
+        IPField.setText(_spaceXIP);
+        spaceXPortField.setText(Integer.toString(_spaceXPort));
+    }//GEN-LAST:event_defaultButtonActionPerformed
+
+    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+        _basePort = Integer.parseInt(basePortField.getText());
+        _spaceXPort = Integer.parseInt(spaceXPortField.getText());
+        _spaceXIP = IPField.getText();
+        
+        this.setVisible(false);
+    }//GEN-LAST:event_okButtonActionPerformed
+
+    public int getSpaceXPort() { return _spaceXPort; }
+    
+    public int getBasePort() { return _basePort; }
+    
+    public String getSpaceXIP() { return _spaceXIP; }
+    
     /**
      * @param args the command line arguments
      */
@@ -239,7 +305,7 @@ public class NetworkSettings extends javax.swing.JFrame {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Metal".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getCrossPlatformLookAndFeelClassName());
                     break;
                 }
             }
@@ -257,14 +323,17 @@ public class NetworkSettings extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GUI().setVisible(true);
+                new NetworkSettings().setVisible(true); // GUI
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField accelField;
+    private javax.swing.JTextField IPField;
     private javax.swing.JTextField accelField1;
+    private javax.swing.JTextField basePortField;
+    private javax.swing.JButton cancelButton;
+    private javax.swing.JButton defaultButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -274,18 +343,16 @@ public class NetworkSettings extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel29;
+    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JTextField positionField;
+    private javax.swing.JButton okButton;
     private javax.swing.JTextField positionField1;
-    private javax.swing.JButton saveButton;
-    private javax.swing.JButton settingsButton;
+    private javax.swing.JTextField spaceXPortField;
     private javax.swing.JTextField statusField1;
-    private javax.swing.JTextField stripeField;
-    private javax.swing.JTextField tempField;
-    private javax.swing.JTextField velocityField;
     private javax.swing.JTextField velocityField1;
     // End of variables declaration//GEN-END:variables
 }
