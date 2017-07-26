@@ -105,47 +105,67 @@ else
   }
 
 
-/*
-int serialGetchar (const int fd)
+char a:
+serialPutchar (fd, "a");
+while (serialDataAvail(fd)!= 0)
 {
-  uint8_t x ;
-
-  if (read (fd, &x, 1) != 1)
-    return -1 ;
-
-  return ((int)x) & 0xFF ;
+  a = serialGetchar(fd);
+  putchar(a);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// /*
+// int serialGetchar (const int fd)
+// {
+//   uint8_t x ;
+
+//   if (read (fd, &x, 1) != 1)
+//     return -1 ;
+
+//   return ((int)x) & 0xFF ;
+// }
   
-*/
-FILE *aa = fopen(serial,"r");
+// */
+// FILE *aa = fopen(serial,"r");
 
-//fscanf()
+// //fscanf()
 
-int a,b,c,d,e,f,g,h;
-fscanf(aa, "%d %d %d %d %d %d %d %d",&a,&b,&c,&d,&e,&f,&g,&h);
-fflush(aa);
-fprintf(stdout,"%d %d %d %d %d %d %d %d",a,b,c,d,e,f,g,h);
-fflush(stdout);
+// int a,b,c,d,e,f,g,h;
+// fscanf(aa, "%d %d %d %d %d %d %d %d",&a,&b,&c,&d,&e,&f,&g,&h);
+// fflush(aa);
+// fprintf(stdout,"%d %d %d %d %d %d %d %d",a,b,c,d,e,f,g,h);
+// fflush(stdout);
 
-fclose(aa);
-   // a= (serialGetchar (fd)) ;
-  //  putchar(a);
-//    array[i] = a;
-
-
-
-    //printf("->  %i\n", a);
-    //fflush (stdout) ;
+// fclose(aa);
+//    // a= (serialGetchar (fd)) ;
+//   //  putchar(a);
+// //    array[i] = a;
 
 
-    i++;
-    //serialClose(fd);
-  //}
-//}
-//printf("%d %d %d %d\n bla",a,b,c,d);
-  //printf("%c\n", a);
-  //printf("Last char: ");
-  //putchar(array[
+
+//     //printf("->  %i\n", a);
+//     //fflush (stdout) ;
+
+
+//     i++;
+//     //serialClose(fd);
+//   //}
+// //}
+// //printf("%d %d %d %d\n bla",a,b,c,d);
+//   //printf("%c\n", a);
+//   //printf("Last char: ");
+//   //putchar(array[
   
   return 0 ;
 }

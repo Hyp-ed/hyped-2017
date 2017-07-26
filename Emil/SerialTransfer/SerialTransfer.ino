@@ -15,7 +15,9 @@ if (i > 998)
 {
   i = 0;
   }
-
+char x = Serial.read();
+if (x=='a')
+{
 Serial.print(i);
 Serial.print(" ");
 Serial.print(i);
@@ -31,6 +33,7 @@ Serial.print(" ");
 Serial.print(i);
 Serial.print(" ");
 Serial.println(i);
+}
 delay(1000);
 i++;
 }
