@@ -1,4 +1,4 @@
-OBJS = i2c.o mpu6050.o vl6180.o battery.o raspberry_pi.o motion_tracker.o
+OBJS = i2c.o gpio.o mpu6050.o vl6180.o battery.o raspberry_pi.o motion_tracker.o
 CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
@@ -58,6 +58,9 @@ vl6180.o : vl6180.hpp vl6180.cpp i2c.hpp
 
 mpu6050.o : mpu6050.hpp mpu6050.cpp i2c.hpp vector3d.hpp
 	$(CC) $(CFLAGS) mpu6050.cpp
+
+gpio.o : gpio.hpp gpio.cpp
+	$(CC) $(CFLAGS) gpio.cpp
 
 i2c.o : i2c.hpp i2c.cpp
 	$(CC) $(CFLAGS) i2c.cpp

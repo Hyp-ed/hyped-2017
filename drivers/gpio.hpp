@@ -1,3 +1,6 @@
+#ifndef HYPED_DRIVERS_GPIO_HPP_
+#define HYPED_DRIVERS_GPIO_HPP_
+
 #include <map>
 #include <wiringPi.h>
 
@@ -82,4 +85,6 @@ class GpioPin
     PinMode mode;
     PudControl pud;
 };
+
+#endif // HYPED_DRIVERS_GPIO_HPP_
 
