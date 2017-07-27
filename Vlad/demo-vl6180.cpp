@@ -31,6 +31,7 @@ int main()
   move(2, 0);
   refresh();
   int stop = getch();
+  chargeAccumulators();
   while (stop == ERR)
   {
     int dist = sensor.get_distance();
@@ -41,18 +42,18 @@ int main()
         retract_one();
 //	move(10, 10);
        mvprintw(1, 40, "retracting");
-       delay(500);
+       delay(5);
         }
     else if(dist > TARGET)
         {
         extend_one();
 //	move(1, 40);
         mvprintw(1, 40, "extending");
-	delay(500);
+	delay(5);
         }
         else
 	{
-        hold_one();
+        standby();
 	delay(1000);
 //	move(1, 40);
 	mvprintw(1, 40, "holding");
