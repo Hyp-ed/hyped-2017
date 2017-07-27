@@ -23,20 +23,21 @@
  ***********************************************************************
  */
 
-#include <unistd.h>
+// #include <unistd.h>
 
 
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <wiringPi.h>
-#include <wiringSerial.h>
+// #include <stdio.h>
+// #include <string.h>
+// #include <errno.h>
+// #include <stdlib.h>
+// #include <wiringPi.h>
+// #include <wiringSerial.h>
 
+// int getData();
 
+#include "serialData.h"
 
-
-int main ()
+int getData (char *data)
 {
  int fd;
 
@@ -89,13 +90,79 @@ while (serialDataAvail(fd)!= 0)
   a[j] = serialGetchar(fd);
   delay(1);
 }
-printf(a);
+//printf(a);
 
-int e,f,g,l,m,n,o,p;
-sscanf(a, "%d %d %d %d %d %d %d %d",&e,&f,&g,&l,&m,&n,&o,&p);
-printf("%i", e+f);
+int current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp,
+small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure;
+sscanf(a, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d",&current,&cell1V,&cell2V,&cell3V,&cell4V,&cell5V,&cell6V,&cell7V,&big_battery_voltage, &big_battery_temp,
+&small_battery_voltage, &small_battery_temp, &pump_pressure, &accumulator_pressure);
+//printf("%d %d %d %d %d %d %d %d %d %d %d %d %d %d", current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp,
+//small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure);
+int value = -1;
+if (strcmp(data, "current")== 0)
+{
+  value = current;
+}
+else if (strcmp(data, "cell1V")== 0)
+{
+  value = cell1V;
+}
+else if (strcmp(data, "cell2V")== 0)
+{
+  value = cell2V;
+}
+else if (strcmp(data, "cell3V")== 0)
+{
+  value = cell3V;
+}
+else if (strcmp(data, "cell4V")== 0)
+{
+  value = cell4V;
+}
+else if (strcmp(data, "cell5V")== 0)
+{
+  value = cell5V;
+}
+else if (strcmp(data, "cell6V")== 0)
+{
+  value = cell6V;
+}
+else if (strcmp(data, "cell7V")== 0)
+{
+  value = cell7V;
+}
+else if (strcmp(data, "big_battery_voltage")== 0)
+{
+  value = big_battery_voltage;
+}
+else if (strcmp(data, "big_battery_temp")== 0)
+{
+  value = big_battery_temp;
+}
+else if (strcmp(data, "small_battery_voltage")== 0)
+{
+  value = small_battery_voltage;
+}
+else if (strcmp(data, "small_battery_temp")== 0)
+{
+  value = small_battery_temp;
+}
+else if (strcmp(data, "pump_pressure")== 0)
+{
+  value = pump_pressure;
+}
+else if (strcmp(data, "accumulator_pressure")== 0)
+{
+  value = accumulator_pressure;
+}
 
-  /* code */
-  
-  return 0 ;
+
+
+
+
+
+
+
+
+  return value ;
 }
