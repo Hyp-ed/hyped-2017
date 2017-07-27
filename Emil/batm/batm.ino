@@ -243,6 +243,9 @@ void getBattStat() {
 }
 
 void showBattStat() {
+  int x = Serial.read();
+if (x==1)
+{
 Serial.print("CurrentDraw=");
 Serial.print (Current);
 Serial.print("A, CellVoltages=");
@@ -278,7 +281,7 @@ Serial.print ("BAR, AccumulatorPressure=");
 Serial.print(acc);
 Serial.println("BAR");
 
-
+}
 }
 
 
