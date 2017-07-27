@@ -64,37 +64,90 @@
 #define CLEAR_ERROR_INT 0x04
 
 // SYSRANGE__START options
-#define RANGING_MODE_CONT   0x02
-#define SYSRANGE__STARTSTOP 0x01
+#define RANGING_MODE_SINGLESHOT 0x00
+#define RANGING_MODE_CONT       0x02
+#define SYSRANGE__STARTSTOP     0x01
+
+// RESULT__RANGE_STATUS masks
+#define RESULT__RANGE_DEVICE_READY_MASK 0x01
+#define RESULT__RANGE_ERROR_CODE_MASK   0xF0
+
+// RESULT__INTERRUPT_STATUS_GPIO masks
+#define RESULT_INT_ERROR_GPIO_MASK 0xC0
+#define RESULT_INT_ALS_GPIO_MASK   0x38
+#define RESULT_INT_RANGE_GPIO_MASK 0x07
+
+// SYSTEM__FRESH_OUT_OF_RESET masks
+#define FRESH_OUT_OF_RESET_MASK 0x01
 
 
-Vl6180& Vl6180::get_instance(I2C *bus, Pin gpio_pin)
+// Factory class definitions
+Vl6180Factory& Vl6180Factory::instance(I2C* bus)
 {
-  
+  static Vl6180Factory factory(bus); //static here means it's only called once
+  return factory;
 }
 
-Vl6180::Vl6180(I2C *bus, uint8_t i2c_slave_addr /*= DEFAULT_I2C_SLAVE_ADDR*/)
+Vl6180& Vl6180Factory::make_sensor(GpioPinNumber gpio_pin)
+{
+  //check if exists
+  int free_spot = -1;
+  for (int i = 0; i < MAX_SENSORS; ++i)
+  {
+    if (sensors[i] != NULL && sensors[i]->gpio_pin == gpio_pin)
+      return *(sensors[i]);
+    if (free_spot == -1 && sensors[i] == NULL)
+      free_spot = i;
+  }
+
+  //check space
+  //if (free_spot == -1) error;
+
+  //construct
+  sensors[free_spot] = new Vl6180(this->bus,
+                                  gpio_pin,
+                                  i2c_slave_addresses[free_spot]);
+  return *(sensors[free_spot]);
+}
+
+Vl6180Factory::Vl6180Factory(I2C* bus)
 {
   this->bus = bus;
+}
+
+Vl6180Factory::~Vl6180Factory()
+{
+  for (int i = 0; i < MAX_SENSORS; ++i)
+    delete sensors[i];
+}
+
+
+// Sensor class definitions
+void Vl6180::turn_on()
+{
+  if (this->on)
+    return;
+  // Wait in case the sensor has just been turned off
+  std::this_thread::sleep_for(std::chrono::microseconds(1)); //datasheet mentions 100ns but not sure
+  // Turn on and wait for MCU boot
+  this->gpio_pin.write(true);
+  std::this_thread::sleep_for(std::chrono::milliseconds(2)); //datasheet says minimum 1.4ms
+  this->on = true;
 
   // Set the I2C slave address
-  if(i2c_slave_addr != DEFAULT_I2C_SLAVE_ADDR)
-  {
-    this->write8(I2C_SLAVE__DEVICE_ADDRESS, i2c_slave_addr);
-  }
-  this->i2c_slave_addr = i2c_slave_addr;
+  uint8_t temp = this->i2c_slave_addr;
+  this->i2c_slave_addr = DEFAULT_I2C_SLAVE_ADDR;
+  this->write8(I2C_SLAVE__DEVICE_ADDRESS, i2c_slave_addr);
 
-  // Disable GPIO0 XSHUTDOWN
-  this->write8(SYSTEM__MODE_GPIO0, 0x20);
-  //TODO: enable GPIO1 interrupt output
+  // Keep default GPIO0 settings
+  
+  // Enable GPIO1 interrupt output
+  this->write8(SYSTEM__MODE_GPIO1, 0x30);
 
-  //TODO: set up New Sample Ready interrupt (SYSTEM__INTERRUPT_CONFIG_GPIO)
-
-  // Set continuous ranging mode and start measurements
-  this->write8(SYSRANGE__START, RANGING_MODE_CONT | SYSRANGE__STARTSTOP);
-
-  // Set intermeasurement period 10ms
-  this->write8(SYSRANGE__INTERMEASUREMENT_PERIOD, 0x00);
+  // Set up New Sample Ready interrupt
+  this->write8(SYSTEM__GROUPED_PARAMETER_HOLD, 0x01);
+  this->write8(SYSTEM__INTERRUPT_CONFIG_GPIO, 0x04);
+  this->write8(SYSTEM__GROUPED_PARAMETER_HOLD, 0x00);
 
   //TODO: SYSRANGE__EARLY_CONVERGENCE_ESTIMATE, SYSRANGE__RANGE_CHECK_ENABLES,...
 
@@ -103,24 +156,102 @@ Vl6180::Vl6180(I2C *bus, uint8_t i2c_slave_addr /*= DEFAULT_I2C_SLAVE_ADDR*/)
   this->write8(SYSTEM__FRESH_OUT_OF_RESET, 0x00);
 }
 
+void Vl6180::turn_off()
+{
+  this->gpio_pin.write(false);
+  this->on = false;
+}
+
+void Vl6180::is_on()
+{
+  return this->on;
+}
+
+void Vl6180::set_intermeasurement_period(int msec)
+{
+  msec = msec / 10 - 1;
+  if (msec < 0)
+    msec = 0;
+  if (msec > 255)
+    msec = 255;
+  this->write8(SYSRANGE__INTERMEASUREMENT_PERIOD, msec);
+}
+
+void Vl6180::set_continuous_mode(bool enabled)
+{
+  if (enabled == this->cont_mode)
+    return;
+  this->wait_device_ready();
+  if (enabled)
+  {
+    this->write8(SYSRANGE__START, RANGING_MODE_CONT | SYSRANGE__STARTSTOP);
+  }
+  else
+  {
+    //TODO: stop continuous ranging first?
+    this->write8(SYSRANGE__START, RANGING_MODE_SINGLESHOT);
+  }
+  this->cont_mode = enabled;
+}
+
+bool Vl6180::is_continuous_mode()
+{
+  return this->cont_mode;
+}
+
 int Vl6180::get_distance()
 {
-  //TODO: Check for errors (e.g. in RESULT__RANGE_STATUS, RESULT__INTERRUPT_STATUS_GPIO)
-  uint16_t status = this->read8(RESULT__INTERRUPT_STATUS_GPIO);
-  this->write8(SYSTEM__INTERRUPT_CLEAR, CLEAR_RANGE_INT);
-  if ((status & 0x07) == 4)
+  if (this->cont_mode)
+    return (int) this->get_measurement();
+  else
+    return (int) this->poll_measurement();
+}
+
+Vl6180::Vl6180(I2C *bus, GpioPinNumber gpio_pin_num, uint8_t i2c_slave_addr)
+{
+  this->bus = bus;
+  this->gpio_pin = Gpio::get_pin(gpio_pin_num, PinMode::out, PudControl::off);
+  this->i2c_slave_addr = i2c_slave_addr;
+  this->turn_off();
+}
+
+bool Vl6180::wait_device_ready()
+{
+  while(true)
   {
-    // New sample ready
-    this->distance = (int) this->read8(RESULT__RANGE_VAL);
+    uint8_t status = this->read8(RESULT__RANGE_STATUS);
+    if (status & RESULT__RANGE_DEVICE_READY_MASK)
+      return true;
   }
-  return this->distance;
+  return false;
+}
+
+uint8_t Vl6180::poll_measurement()
+{
+  uint8_t status = this->read8(RESULT__INTERRUPT_STATUS_GPIO);
+  while ((status & RESULT_INT_RANGE_GPIO_MASK) == 4)
+  {
+    status = this->read8(RESULT__INTERRUPT_STATUS_GPIO);
+  }
+  this->write8(SYSTEM__INTERRUPT_CLEAR, CLEAR_RANGE_INT);
+  return this->get_measurement();
+}
+
+uint8_t Vl6180::get_measurement()
+{
+  return this->read8(RESULT__RANGE_VAL);
+}
+
+bool Vl6180::is_fresh_out_of_reset()
+{
+  return (this->read8(SYSTEM__FRESH_OUT_OF_RESET) & FRESH_OUT_OF_RESET_MASK);
 }
 
 void Vl6180::write8(uint16_t reg_addr, char data)
 {
   char buf[3];
-  buf[0] = (reg_addr & 0xff00) >> 8; // MSB
-  buf[1] = reg_addr & 0xff; // LSB
+  buf[0] = (reg_addr & 0xFF00) >> 8; // MSB
+  buf[1] = reg_addr & 0xFF; // LSB
   buf[2] = data;
   this->bus->write(this->i2c_slave_addr, 3, buf);
 }
@@ -128,9 +259,10 @@ void Vl6180::write8(uint16_t reg_addr, char data)
 uint8_t Vl6180::read8(uint16_t reg_addr)
 {
   char send_buf[2];
-  send_buf[0] = (reg_addr & 0xff00) >> 8; // MSB
-  send_buf[1] = reg_addr & 0xff; // LSB
+  send_buf[0] = (reg_addr & 0xFF00) >> 8; // MSB
+  send_buf[1] = reg_addr & 0xFF; // LSB
   char recv_buf[1];
   this->bus->write_read(this->i2c_slave_addr, 2, send_buf, 1, recv_buf);
   return (uint8_t) recv_buf[0];
 }
+
