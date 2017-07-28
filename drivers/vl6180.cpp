@@ -146,7 +146,7 @@ void Vl6180::turn_on()
   this->write8(I2C_SLAVE__DEVICE_ADDRESS, temp);
   this->i2c_slave_addr = temp;
 
-  // Do magic
+  // Do magic (taken from ST Microelectronics API; no explanation exists)
   this->write8(0x0207, 0x01);
   this->write8(0x0208, 0x01);
   this->write8(0x0096, 0x00);
