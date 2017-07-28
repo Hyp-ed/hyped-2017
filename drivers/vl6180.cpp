@@ -146,6 +146,38 @@ void Vl6180::turn_on()
   this->write8(I2C_SLAVE__DEVICE_ADDRESS, temp);
   this->i2c_slave_addr = temp;
 
+  // Do magic
+  this->write8(0x0207, 0x01);
+  this->write8(0x0208, 0x01);
+  this->write8(0x0096, 0x00);
+  this->write8(0x0097, 0xfd);
+  this->write8(0x00e3, 0x00);
+  this->write8(0x00e4, 0x04);
+  this->write8(0x00e5, 0x02);
+  this->write8(0x00e6, 0x01);
+  this->write8(0x00e7, 0x03);
+  this->write8(0x00f5, 0x02);
+  this->write8(0x00d9, 0x05);
+  this->write8(0x00db, 0xce);
+  this->write8(0x00dc, 0x03);
+  this->write8(0x00dd, 0xf8);
+  this->write8(0x009f, 0x00);
+  this->write8(0x00a3, 0x3c);
+  this->write8(0x00b7, 0x00);
+  this->write8(0x00bb, 0x3c);
+  this->write8(0x00b2, 0x09);
+  this->write8(0x00ca, 0x09);
+  this->write8(0x0198, 0x01);
+  this->write8(0x01b0, 0x17);
+  this->write8(0x01ad, 0x00);
+  this->write8(0x00ff, 0x05);
+  this->write8(0x0100, 0x05);
+  this->write8(0x0199, 0x05);
+  this->write8(0x01a6, 0x1b);
+  this->write8(0x01ac, 0x3e);
+  this->write8(0x01a7, 0x1f);
+  this->write8(0x0030, 0x00);
+
   // Keep default GPIO0 settings
   
   // Enable GPIO1 interrupt output
@@ -158,9 +190,21 @@ void Vl6180::turn_on()
 
   //TODO: SYSRANGE__EARLY_CONVERGENCE_ESTIMATE, SYSRANGE__RANGE_CHECK_ENABLES,...
 
-  //TODO: VHV recalibration
+  // VHV recalibration
+  this->write8(SYSRANGE__VHV_RECALIBRATE, 0x01); // Manually recalibrate once
+  uint8_t vhv_calib;
+  do
+    vhv_calib = this->read8(SYSRANGE__VHV_RECALIBRATE) & 0x01; // Wait for completion
+  while (vhv_calib);
+  this->write8(SYSRANGE__VHV_REPEAT_RATE, 0x80); // Auto-repeat after every 128 measurements
 
+  // Set intermeasurement period of 1000ms
+  this->set_intermeasurement_period(1000);
+
+  // Config done, not fresh out of reset anymore
   this->write8(SYSTEM__FRESH_OUT_OF_RESET, 0x00);
+
+  this->wait_device_ready();
 }
 
 void Vl6180::turn_off()
@@ -217,11 +261,9 @@ int Vl6180::get_distance()
 Vl6180::Vl6180(I2C *bus, GpioPinNumber gpio_pin_num, uint8_t i2c_slave_addr)
     : bus {bus},
     gpio_pin {Gpio::get_pin(gpio_pin_num, PinMode::out, PudControl::off)},
-    i2c_slave_addr {i2c_slave_addr}
+    i2c_slave_addr {i2c_slave_addr},
+    cont_mode {false}
 {
-  //this->bus = bus;
-  //this->gpio_pin = Gpio::get_pin(gpio_pin_num, PinMode::out, PudControl::off);
-  //this->i2c_slave_addr = i2c_slave_addr;
   this->turn_off();
 }
 
@@ -239,11 +281,12 @@ bool Vl6180::wait_device_ready()
 uint8_t Vl6180::poll_measurement()
 {
   this->write8(SYSRANGE__START, RANGING_MODE_SINGLESHOT | SYSRANGE__STARTSTOP);
-  uint8_t status = this->read8(RESULT__INTERRUPT_STATUS_GPIO);
-  while ((status & RESULT_INT_RANGE_GPIO_MASK) != 4)
+  uint8_t status;
+  do
   {
     status = this->read8(RESULT__INTERRUPT_STATUS_GPIO);
   }
+  while ((status & RESULT_INT_RANGE_GPIO_MASK) != 4);
   this->write8(SYSTEM__INTERRUPT_CLEAR, CLEAR_RANGE_INT);
   return this->get_measurement();
 }

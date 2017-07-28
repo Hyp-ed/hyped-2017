@@ -7,6 +7,11 @@
 #include "gpio.hpp"
 #include "i2c.hpp"
 
+inline double timestamp()
+{
+  using namespace std::chrono;
+  return duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count() / 1.0e+9;
+}
 
 int main()
 {
@@ -43,9 +48,14 @@ int main()
   Vl6180& sensor = factory.make_sensor(PIN18);
   std::this_thread::sleep_for(std::chrono::seconds(3));
   sensor.turn_on();
-  sensor.set_continuous_mode(true);
+  //sensor.set_continuous_mode(true);
   while(true)
   {
-    printf("Distance %d mm\n", sensor.get_distance());
+    double t, t0 = timestamp();
+    int d = sensor.get_distance();
+    t = timestamp();
+    printf("Distance: %3dmm  Time: %fms\n", d, (t - t0) * 1000.0);
+
   }//*/
 }
+
