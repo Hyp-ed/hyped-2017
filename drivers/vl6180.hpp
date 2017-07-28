@@ -7,11 +7,11 @@
 #include <map>
 #include <thread>
 
-#include "gpio.h"
+#include "gpio.hpp"
 #include "i2c.hpp"
 
 #define DEFAULT_I2C_SLAVE_ADDR 0x29
-#define MAX_SENSORS 8 //maximum number of VL6180 units which can be connected to a single i2c bus
+#define MAX_SENSORS 9 //maximum number of VL6180 units which can be connected to a single i2c bus
 
 class Vl6180;
 
@@ -31,10 +31,9 @@ class Vl6180Factory
     ~Vl6180Factory();
 
     I2C* bus; 
-    static const uint8_t i2c_slave_addresses[MAX_SENSORS] =
-        {0x20, 0x21, 0x22, 0x23; 0x24, 0x25, 0x26, 0x27, 0x28};
-    static Vl6180* sensors[MAX_SENSORS] =
-        {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+    static constexpr uint8_t i2c_slave_addresses[MAX_SENSORS] =
+        {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28};
+    static Vl6180* sensors[MAX_SENSORS];
 };
 
 class Vl6180

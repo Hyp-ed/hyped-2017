@@ -94,7 +94,7 @@ Vl6180& Vl6180Factory::make_sensor(GpioPinNumber gpio_pin)
   int free_spot = -1;
   for (int i = 0; i < MAX_SENSORS; ++i)
   {
-    if (sensors[i] != NULL && sensors[i]->gpio_pin == gpio_pin)
+    if (sensors[i] != NULL && sensors[i]->gpio_pin.pin_num == gpio_pin)
       return *(sensors[i]);
     if (free_spot == -1 && sensors[i] == NULL)
       free_spot = i;
@@ -121,6 +121,12 @@ Vl6180Factory::~Vl6180Factory()
     delete sensors[i];
 }
 
+constexpr uint8_t Vl6180Factory::i2c_slave_addresses[];
+
+Vl6180* Vl6180Factory::sensors[MAX_SENSORS] =
+    {nullptr, nullptr, nullptr, nullptr,
+    nullptr, nullptr, nullptr, nullptr, nullptr};
+
 
 // Sensor class definitions
 void Vl6180::turn_on()
@@ -137,7 +143,8 @@ void Vl6180::turn_on()
   // Set the I2C slave address
   uint8_t temp = this->i2c_slave_addr;
   this->i2c_slave_addr = DEFAULT_I2C_SLAVE_ADDR;
-  this->write8(I2C_SLAVE__DEVICE_ADDRESS, i2c_slave_addr);
+  this->write8(I2C_SLAVE__DEVICE_ADDRESS, temp);
+  this->i2c_slave_addr = temp;
 
   // Keep default GPIO0 settings
   
@@ -162,7 +169,7 @@ void Vl6180::turn_off()
   this->on = false;
 }
 
-void Vl6180::is_on()
+bool Vl6180::is_on()
 {
   return this->on;
 }
@@ -208,10 +215,13 @@ int Vl6180::get_distance()
 }
 
 Vl6180::Vl6180(I2C *bus, GpioPinNumber gpio_pin_num, uint8_t i2c_slave_addr)
+    : bus {bus},
+    gpio_pin {Gpio::get_pin(gpio_pin_num, PinMode::out, PudControl::off)},
+    i2c_slave_addr {i2c_slave_addr}
 {
-  this->bus = bus;
-  this->gpio_pin = Gpio::get_pin(gpio_pin_num, PinMode::out, PudControl::off);
-  this->i2c_slave_addr = i2c_slave_addr;
+  //this->bus = bus;
+  //this->gpio_pin = Gpio::get_pin(gpio_pin_num, PinMode::out, PudControl::off);
+  //this->i2c_slave_addr = i2c_slave_addr;
   this->turn_off();
 }
 
@@ -228,8 +238,9 @@ bool Vl6180::wait_device_ready()
 
 uint8_t Vl6180::poll_measurement()
 {
+  this->write8(SYSRANGE__START, RANGING_MODE_SINGLESHOT | SYSRANGE__STARTSTOP);
   uint8_t status = this->read8(RESULT__INTERRUPT_STATUS_GPIO);
-  while ((status & RESULT_INT_RANGE_GPIO_MASK) == 4)
+  while ((status & RESULT_INT_RANGE_GPIO_MASK) != 4)
   {
     status = this->read8(RESULT__INTERRUPT_STATUS_GPIO);
   }
