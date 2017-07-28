@@ -1,6 +1,3 @@
-//MOST UP TO DATE VERSION IN HYDRAULICS FOLDER!
-
-
 /*
  * serialTest.c:
  *	Very simple program to test the serial port. Expects
@@ -40,7 +37,7 @@
 
 #include "serialData.h"
 
-int getData (char *data)
+float getData (char *data)
 {
  int fd;
 
@@ -82,7 +79,7 @@ else
 
 
 
-char a[100];
+char a[112];
 int j = 0;
 int b = 1;
 serialPutchar (fd, b);
@@ -95,9 +92,9 @@ while (serialDataAvail(fd)!= 0)
 }
 //printf(a);
 
-int current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp,
+float current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp,
 small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure;
-sscanf(a, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d",&current,&cell1V,&cell2V,&cell3V,&cell4V,&cell5V,&cell6V,&cell7V,&big_battery_voltage, &big_battery_temp,
+sscanf(a, "%f %f %f %f %f %f %f %f %f %f %f %f %f %f",&current,&cell1V,&cell2V,&cell3V,&cell4V,&cell5V,&cell6V,&cell7V,&big_battery_voltage, &big_battery_temp,
 &small_battery_voltage, &small_battery_temp, &pump_pressure, &accumulator_pressure);
 //printf("%d %d %d %d %d %d %d %d %d %d %d %d %d %d", current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp,
 //small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure);
@@ -158,13 +155,6 @@ else if (strcmp(data, "accumulator_pressure")== 0)
 {
   value = accumulator_pressure;
 }
-
-
-
-
-
-
-
 
 
   return value ;
