@@ -74,6 +74,8 @@ class GpioPin
     /// If this pin is in input mode, PUD is configured for it otherwise nothing happens
     void set_pud(PudControl pud);
 
+    const GpioPinNumber pin_num;
+
     GpioPin()                      = delete;
     GpioPin(GpioPin const&)        = delete;
     void operator=(GpioPin const&) = delete;
@@ -81,7 +83,6 @@ class GpioPin
   private:
     GpioPin(GpioPinNumber pin, PinMode mode, PudControl pud);
 
-    GpioPinNumber pin_num;
     PinMode mode;
     PudControl pud;
 };
