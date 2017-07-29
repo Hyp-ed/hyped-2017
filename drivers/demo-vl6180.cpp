@@ -11,90 +11,120 @@
 #include "gpio.hpp"
 #include "i2c.hpp"
 
+#define SENSOR1_PIN PIN23
+#define SENSOR2_PIN PIN24
+
 bool continuous_mode;
 std::vector<Vl6180*> sensors;
+//Create an I2C instance to represent the bus
+I2C i2c;
+// Create factory to produce sensor drivers for that bus
+Vl6180Factory& factory = Vl6180Factory::instance(&i2c);
 
 inline double timestamp()
 {
   using namespace std::chrono;
-  return duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count() / 1.0e+9;
+  return duration_cast<nanoseconds>(
+      steady_clock::now().time_since_epoch()).count() / 1.0e+9;
+}
+
+void setup()
+{
+  // Produce driver instance for the sensor with GPIO0 connected to specified pin
+  Vl6180& sensor_ref = factory.make_sensor(SENSOR1_PIN);
+  // Store pointer to the driver instance
+  sensors.push_back(&sensor_ref);
+
+  // Uncoment the following line and possibly add more to use more sensors
+  //sensors.push_back( &(factory.make_sensor(SENSOR2_PIN)) );
+
+  for (unsigned int i = 0; i < sensors.size(); ++i)
+  {
+    //std::this_thread::sleep_for(std::chrono::seconds(3));
+    sensors[i]->turn_on();
+    sensors[i]->set_intermeasurement_period(10);
+    sensors[i]->set_continuous_mode(continuous_mode);
+  }
 }
 
 void file_output()
 {
+  // Initialize sensors
+  printf("Initializing...\n");
+  double t, t0 = timestamp();
+  setup();
+  t = timestamp();
+  printf("took %fs\n\n", t - t0);
+
+  // Setup datastructures
   const int n = 10000;
-  double* timestamps = new double[n];
-  int* data = new int[n];
   std::string filename;
   if (continuous_mode)
     filename = "vl6180-cont_mode-";
   else
     filename = "vl6180-singleshot_mode-";
   filename += std::to_string(n/1000) + "k_readings.csv";
+  std::vector<std::vector<double>> times(sensors.size());
+  std::vector<std::vector<int>> data(sensors.size());
 
-  printf("Initializing...\n");
-  double t, t0 = timestamp();
-  I2C i2c;
-  Vl6180Factory& factory = Vl6180Factory::instance(&i2c);
-  Vl6180& sensor = factory.make_sensor(PIN18);
-  std::this_thread::sleep_for(std::chrono::seconds(3));
-  sensor.turn_on();
-  sensor.set_intermeasurement_period(10);
-  sensor.set_continuous_mode(continuous_mode);
-  t = timestamp();
-  printf("took %fs\n\n", t - t0 - 3.0);
-
-  printf("Taking %d readings...\n", n);
+  // Take readings
+  printf("Taking %d readings from each of the %d sensors...\n",
+      n, sensors.size());
   t0 = timestamp();
   for (int i = 0; i < n; ++i)
   {
-    timestamps[i] = timestamp();
-    data[i] = sensor.get_distance();
+    for (unsigned int j = 0; j < sensors.size(); ++j)
+    {
+      times[j].push_back(timestamp());
+      data[j].push_back(sensors[j]->get_distance());
+    }
   }
   t = timestamp();
   printf("time = %fs\n", t - t0);
-  printf("average period = %fms\n", (t - t0) / n * 1000.0);
-  printf("average frequency = %fHz\n\n", (double) n / (t - t0));
+  printf("average period = %fms\n", (t - t0) / (n * sensors.size()) * 1000.0);
+  printf("average frequency = %fHz\n\n",
+      (double) (n * sensors.size()) / (t - t0));
 
+  // Store readings
   printf("Saving to file %s...\n", filename.c_str());
   t0 = timestamp();
   std::ofstream file(filename);
   file.precision(16);
   for (int i = 0; i < n; ++i)
-    file << timestamps[i] << "," << data[i] << std::endl;
+  {
+    file << times[0][i] << "," << data[0][i];
+    for (unsigned int j = 1; j < sensors.size(); ++j)
+      file << ",," << times[j][i] << "," << data[j][i];
+    file << std::endl;
+  }
   file.close();
   t = timestamp();
   printf("took %fs\n", t - t0);
-
-  delete[] timestamps;
-  delete[] data;
 }
 
 void screen_output()
 {
-  mvprintw(5, 0, "Distance:    mm");
-  mvprintw(6, 0, "Measurement period:    ms");
-  refresh();
-
-  I2C i2c;
-  Vl6180Factory& factory = Vl6180Factory::instance(&i2c);
-  Vl6180& sensor = factory.make_sensor(PIN18);
-  std::this_thread::sleep_for(std::chrono::seconds(3));
-  sensor.turn_on();
-  sensor.set_intermeasurement_period(10);
-  sensor.set_continuous_mode(continuous_mode);
-  mvprintw(7, 0, "Type any character to exit");
-  move(8, 0);
+  setup();
+  mvprintw(7 + 3*sensors.size(), 0, "Type any character to exit");
+  move(8 + 3*sensors.size(), 0);
   refresh();
   int stop = getch();
   while (stop == ERR)
   {
-    double t0 = timestamp();
-    int dist = sensor.get_distance();
-    double t = timestamp();
-    mvprintw(5, 10, "%3dmm", dist);
-    mvprintw(6, 20, "%7.3fms   ", (t - t0) * 1000.0);
-    move(8, 0);
+    int sum = 0;
+    for (unsigned int i = 0; i < sensors.size(); ++i)
+    {
+      double t0 = timestamp();
+      int dist = sensors[i]->get_distance();
+      double t = timestamp();
+      sum += dist;
+      mvprintw(5 + 3*i, 0, "#%d Distance: %3dmm", i + 1, dist);
+      mvprintw(6 + 3*i, 0, "#%d Measurement period: %7.3fms   ",
+          i + 1, (t - t0) * 1000.0);
+    }
+    mvprintw(5 + 3*sensors.size(), 0, "Average distance: %5.1fmm",
+        (double) sum / sensors.size());
+    move(8 + 3*sensors.size(), 0);
     refresh();
     stop = getch();
   }
