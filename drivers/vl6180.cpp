@@ -134,7 +134,7 @@ void Vl6180::turn_on()
   if (this->on)
     return;
   // Wait in case the sensor has just been turned off
-  std::this_thread::sleep_for(std::chrono::microseconds(1)); //datasheet mentions 100ns but not sure
+  std::this_thread::sleep_for(std::chrono::milliseconds(100)); //datasheet mentions 100ns but not sure
   // Turn on and wait for MCU boot
   this->gpio_pin.write(true);
   std::this_thread::sleep_for(std::chrono::milliseconds(2)); //datasheet says minimum 1.4ms
