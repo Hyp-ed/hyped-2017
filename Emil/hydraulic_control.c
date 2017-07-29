@@ -127,6 +127,29 @@ standby();
 
 }
 	
+    else if (strcmp(argv[1], "charge")==0)
+    {
+        chargeAccumulators();
+    }
+    else if (strcmp(argv[1], "extend")==0)
+    {
+        int x = atoi(argv[2]);
+        extend_one();
+        extend_two();
+        delay(x);
+        standby();
+            }
+    else if (strcmp(argv[1], "retract")==0)
+    {
+        int x = atoi(argv[2]);
+        digitalWrite(PUMP, LOW);
+        delay(pumpSpinup);
+        retract_one();
+        retract_two();
+        delay(x);
+        standby();
+            }
+   
   	else if(strcmp(argv[1],"startup") == 0)
         {
         printf("\nCharging Accumulators\n");
@@ -160,6 +183,7 @@ void hold_two()
 
 void retract_one()
 {
+
     digitalWrite(SOL_1, LOW);
     digitalWrite(SOL_2, LOW);
     digitalWrite(SOL_3, HIGH);
@@ -167,6 +191,7 @@ void retract_one()
     digitalWrite(SOL_5, LOW);
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, LOW);
+
 
 }
 
@@ -223,9 +248,9 @@ void standby()
 void chargeAccumulators()
 {
 int pressure_accumulator=0;
-	pressure_read_accumulator();
+	// pressure_read_accumulator();
 printf("\nCHARGING ACCUMULATORS\n");   
-while(pressure_accumulator < pressure_nominal_accumulator) {
+// while(pressure_accumulator < pressure_nominal_accumulator) {
     digitalWrite(PUMP, LOW);
     delay(pumpSpinup);
     digitalWrite(SOL_1, HIGH);
@@ -235,9 +260,9 @@ while(pressure_accumulator < pressure_nominal_accumulator) {
     digitalWrite(SOL_5, HIGH);
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, LOW);
-    pressure_read_accumulator();
-}
-
+   // pressure_read_accumulator();
+//}
+delay(1500);
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_3, HIGH);

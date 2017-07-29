@@ -243,42 +243,45 @@ void getBattStat() {
 }
 
 void showBattStat() {
-Serial.print("CurrentDraw=");
+  int x = Serial.read();
+if (x==1)
+{
+//Serial.print("CurrentDraw=");
 Serial.print (Current);
-Serial.print("A, CellVoltages=");
+//Serial.print("A, CellVoltages=");
 Serial.print (Cell1);
-Serial.print ("V. " );
+//Serial.print ("V. " );
 Serial.print (Cell2);
-Serial.print ("V. ");
+//Serial.print ("V. ");
 Serial.print (Cell3);
-Serial.print ("V. ");
+//Serial.print ("V. ");
 Serial.print (Cell4);
-Serial.print ("V. ");
+//Serial.print ("V. ");
 Serial.print (Cell5);
-Serial.print ("V. " );
+//Serial.print ("V. " );
 Serial.print (Cell6);
-Serial.print ("V. ");
+//Serial.print ("V. ");
 Serial.print (Cell7);
-Serial.print ("V. Total = " );
+//Serial.print ("V. Total = " );
 Serial.print (Cell1+Cell2+Cell3+Cell4+Cell5+Cell6+Cell7);
  
-Serial.print ("V, Bigtemp=");
+//Serial.print ("V, Bigtemp=");
 Serial.print (bigtemp);
  
-Serial.print ("C, SmallBattery=");
+//Serial.print ("C, SmallBattery=");
 Serial.print (smallbatt);
 
-Serial.print ("V, Smalltemp=");
+//Serial.print ("V, Smalltemp=");
 Serial.print (smalltemp);
 
-Serial.print ("C, PumpPressure=");
+//Serial.print ("C, PumpPressure=");
 Serial.print (pump);
 //
-Serial.print ("BAR, AccumulatorPressure=");
-Serial.print(acc);
-Serial.println("BAR");
+//Serial.print ("BAR, AccumulatorPressure=");
+Serial.println(acc);
+//Serial.println("BAR");
 
-
+}
 }
 
 

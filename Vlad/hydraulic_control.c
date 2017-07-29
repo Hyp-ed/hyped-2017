@@ -28,11 +28,12 @@ Check the processing power that this will use and if it is too high, add a delay
 //#define PUMP 7	//pin 4
 
 #include "hydraulic_control.h"
+#include "serialData.h"
 
  //PLACEHOLDER FOR PRESSURE SENSOR READING
 #define distance_one 50 //PLACEHOLDER FOR PROXIMITY SENSOR READING ARRAY ONE
 #define distance_two 50 //PLACEHOLDER FOR PROXIMITY SENSOR READING ARRAY TWO
-#define pressure_nominal_accumulator 75 // nominal pressure for accumulator(s) UNIT: BAR
+#define pressure_nominal_accumulator 50 // nominal pressure for accumulator(s) UNIT: BAR
 
 
 
@@ -226,9 +227,11 @@ void standby()
 void chargeAccumulators()
 {
 int pressure_accumulator=0;
-	pressure_read_accumulator();
+	//pressure_read_accumulator();
 printf("\nCHARGING ACCUMULATORS\n");   
-while(pressure_accumulator < pressure_nominal_accumulator) {
+// while(getData("accumulator_pressure") < pressure_nominal_accumulator) {
+//     printf("Pressure is \n%i", getData("accumulator_pressure"))
+//     //IMPLEMENT WHEN SERIAL WORKS BETTER
     digitalWrite(PUMP, LOW);
     delay(pumpSpinup);
     digitalWrite(SOL_1, HIGH);
@@ -238,9 +241,9 @@ while(pressure_accumulator < pressure_nominal_accumulator) {
     digitalWrite(SOL_5, HIGH);
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, LOW);
-    pressure_read_accumulator();
-}
 
+//}
+ delay(2000);
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH);
     digitalWrite(SOL_3, HIGH);
@@ -252,12 +255,7 @@ while(pressure_accumulator < pressure_nominal_accumulator) {
     printf("\nACCUMULATORS CHARGED!\n");
 }
 
-int pressure_read_accumulator()
-{
-//PLACEHOLDER FOR READING THE ACCUMULATOR PRESSURE FROM THE SERIAL INPUT
-int pressure_accumulator = 50; //PLACEHOLDER
-return pressure_accumulator;
-}
+
 
 int pressure_read_pump()
 {
