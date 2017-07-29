@@ -11,7 +11,7 @@
 #include <wiringPi.h>
 #include <wiringSerial.h>
 
-int getData();
+float getData();
 
 
 

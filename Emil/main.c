@@ -4,7 +4,7 @@
 int main()
 {
 const char data[] = "current";
-int x = getData(data);
-printf("%i\n", x);
+float x = getData(data);
+printf("%f\n", x);
 return 0;
 }
