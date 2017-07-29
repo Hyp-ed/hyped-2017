@@ -1,8 +1,8 @@
-OBJS = i2c.o mpu6050.o vl6180.o battery.o raspberry_pi.o motion_tracker.o
+OBJS = i2c.o gpio.o mpu6050.o vl6180.o battery.o raspberry_pi.o motion_tracker.o
 CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
-LFLAGS = -Wall -latomic -lpthread $(DEBUG)
+LFLAGS = -Wall -latomic -lpthread -lwiringPi $(DEBUG)
 
 all : main integrator test_motion_tracker demo-vl6180 demo-raspberry_pi demo-battery
 
@@ -34,7 +34,7 @@ integrator.o : integrator.cpp mpu6050.hpp i2c.hpp vector3d.hpp
 test_motion_tracker.o : test_motion_tracker.cpp mpu6050.hpp i2c.hpp vector3d.hpp motion_tracker.hpp
 	$(CC) $(CFLAGS) test_motion_tracker.cpp
 
-demo-vl6180.o : demo-vl6180.cpp vl6180.hpp i2c.hpp
+demo-vl6180.o : demo-vl6180.cpp vl6180.hpp gpio.hpp i2c.hpp
 	$(CC) $(CFLAGS) demo-vl6180.cpp
 
 demo-raspberry_pi.o : demo-raspberry_pi.cpp raspberry_pi.hpp
@@ -53,11 +53,14 @@ raspberry_pi.o : raspberry_pi.hpp raspberry_pi.cpp
 battery.o : battery.hpp battery.cpp i2c.hpp
 	$(CC) $(CFLAGS) battery.cpp
 
-vl6180.o : vl6180.hpp vl6180.cpp i2c.hpp
+vl6180.o : vl6180.hpp vl6180.cpp gpio.hpp i2c.hpp
 	$(CC) $(CFLAGS) vl6180.cpp
 
 mpu6050.o : mpu6050.hpp mpu6050.cpp i2c.hpp vector3d.hpp
 	$(CC) $(CFLAGS) mpu6050.cpp
+
+gpio.o : gpio.hpp gpio.cpp
+	$(CC) $(CFLAGS) gpio.cpp
 
 i2c.o : i2c.hpp i2c.cpp
 	$(CC) $(CFLAGS) i2c.cpp

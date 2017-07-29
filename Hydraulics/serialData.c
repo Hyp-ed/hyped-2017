@@ -1,6 +1,3 @@
-//MOST UP TO DATE VERSION IN HYDRAULICS FOLDER!
-
-
 /*
  * serialTest.c:
  *	Very simple program to test the serial port. Expects
@@ -82,7 +79,7 @@ else
 
 
 
-char a[100];
+char a[112];
 int j = 0;
 int b = 1;
 serialPutchar (fd, b);
@@ -158,13 +155,6 @@ else if (strcmp(data, "accumulator_pressure")== 0)
 {
   value = accumulator_pressure;
 }
-
-
-
-
-
-
-
 
 
   return value ;
