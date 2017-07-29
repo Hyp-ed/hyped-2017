@@ -2,7 +2,7 @@ OBJS = i2c.o gpio.o mpu6050.o vl6180.o battery.o raspberry_pi.o motion_tracker.o
 CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
-LFLAGS = -Wall -latomic -lpthread $(DEBUG)
+LFLAGS = -Wall -latomic -lpthread -lwiringPi $(DEBUG)
 
 all : main integrator test_motion_tracker demo-vl6180 demo-raspberry_pi demo-battery
 
@@ -16,7 +16,7 @@ test_motion_tracker : $(OBJS) test_motion_tracker.o
 	$(CC) $(OBJS) $(LFLAGS) -lncurses test_motion_tracker.o -o test_motion_tracker
 
 demo-vl6180 : $(OBJS) demo-vl6180.o
-	$(CC) $(OBJS) $(LFLAGS) -lncurses demo-vl6180.o -lwiringPi -o demo-vl6180
+	$(CC) $(OBJS) $(LFLAGS) -lncurses demo-vl6180.o -o demo-vl6180
 
 demo-raspberry_pi : raspberry_pi.o demo-raspberry_pi.o
 	$(CC) raspberry_pi.o $(LFLAGS)  -lncurses demo-raspberry_pi.o -o demo-raspberry_pi
