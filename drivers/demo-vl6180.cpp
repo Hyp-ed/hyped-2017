@@ -36,7 +36,7 @@ void setup()
   sensors.push_back(&sensor_ref);
 
   // Uncoment the following line and possibly add more to use more sensors
-  //sensors.push_back( &(factory.make_sensor(SENSOR2_PIN)) );
+  sensors.push_back( &(factory.make_sensor(SENSOR2_PIN)) );
 
   for (unsigned int i = 0; i < sensors.size(); ++i)
   {
