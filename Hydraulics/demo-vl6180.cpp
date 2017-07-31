@@ -1,6 +1,6 @@
-#include "vl6180.hpp"
+#include "../drivers/vl6180.hpp"
 extern "C" {
-    #include "hydraulic_control.h"
+    #include "hydraulics.h"
 
 }
 
@@ -10,7 +10,7 @@ extern "C" {
 #include <iostream>
 #include <fstream>
 
-#include "i2c.hpp"
+#include "../drivers/i2c.hpp"
 
 #define TARGET 50
 

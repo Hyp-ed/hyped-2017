@@ -5,6 +5,9 @@ Check the processing power that this will use and if it is too high, add a delay
 
 
 */
+
+#include "hydraulics.h"
+
 #define pumpSpinup 400 //Spinup time for the pump when runing off load. This will occur before every operation that uses the pump, plan timing accordingly
 #define inrushLimit 100 // sets the limit of current draw for which the motor will be run off load. 
 

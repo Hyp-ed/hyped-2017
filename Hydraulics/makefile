@@ -1,8 +1,29 @@
-#!/bin/bash
+OBJS = i2c.o gpio.o  vl6180.o 
+CC = g++
+DEBUG = -g
+CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
+LFLAGS = -Wall -latomic -lpthread -lwiringPi $(DEBUG)
 
-sudo gcc -c -std=c11 hydraulics.h -lwiringPi
-sudo gcc -c -std=c11 hydraulics.c -lwiringPi
-sudo g++ -std=c11 -Wall -c -03 -gdemo-vl6180.cpp
-sudo g++ i2c.o vl6180.o hydraulic_control.o  -Wall -latomic -lpthread -lwiringPi -g -lncurses demo-vl6180.o -o demo-vl6180
+all : demo-vl6180
+
+demo-vl6180 : $(OBJS) demo-vl6180.o
+	$(CC) $(OBJS) $(LFLAGS) -lncurses demo-vl6180.o -o demo-vl6180
+
+demo-vl6180.o : demo-vl6180.cpp ../drivers/vl6180.hpp ../drivers/gpio.hpp ../drivers/i2c.hpp
+	$(CC) $(CFLAGS) demo-vl6180.cpp
+
+
+vl6180.o : ../drivers/vl6180.hpp ../drivers/vl6180.cpp ../drivers/gpio.hpp ../drivers/i2c.hpp
+	$(CC) $(CFLAGS) ../drivers/vl6180.cpp
+
+gpio.o : ../drivers/gpio.hpp ../drivers/gpio.cpp
+	$(CC) $(CFLAGS) ../drivers/gpio.cpp
+
+i2c.o : ../drivers/i2c.hpp ../drivers/i2c.cpp
+	$(CC) $(CFLAGS) ../drivers/i2c.cpp
+
+##clean :
+##	rm *.o main integrator test_motion_tracker demo-vl6180 demo-raspberry_pi demo-battery
+
 
 
