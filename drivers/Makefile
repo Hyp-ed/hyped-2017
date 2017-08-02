@@ -1,4 +1,4 @@
-OBJS = i2c.o gpio.o mpu6050.o vl6180.o battery.o raspberry_pi.o motion_tracker.o hydraulic_control.o
+OBJS = i2c.o gpio.o mpu6050.o vl6180.o battery.o raspberry_pi.o motion_tracker.o hydraulics.o serialData.o
 CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
@@ -40,7 +40,7 @@ test_motion_tracker.o : test_motion_tracker.cpp mpu6050.hpp i2c.hpp vector3d.hpp
 demo-vl6180.o : demo-vl6180.cpp vl6180.hpp gpio.hpp i2c.hpp
 	$(CC) $(CFLAGS) demo-vl6180.cpp
 
-proxi-hydro.o : proxi-hydro.cpp vl6180.hpp gpio.hpp i2c.hpp hydraulic_control.c hydraulic_control.h
+proxi-hydro.o : proxi-hydro.cpp vl6180.hpp gpio.hpp i2c.hpp hydraulics.c hydraulics.h serialData.c serialData.h
 	$(CC) $(CFLAGS) proxi-hydro.cpp
 
 demo-raspberry_pi.o : demo-raspberry_pi.cpp raspberry_pi.hpp
@@ -71,8 +71,12 @@ gpio.o : gpio.hpp gpio.cpp
 i2c.o : i2c.hpp i2c.cpp
 	$(CC) $(CFLAGS) i2c.cpp
 
-hydraulic_control.o : hydraulic_control.h hydraulic_control.c
-	g++ -std=c11 -Wall -c hydraulic_control.c -lwiringPi
+hydraulic_control.o : hydraulics.h hydraulics.c
+	g++ -std=c++11 -Wall -c hydraulics.c -lwiringPi
+
+serialData.o : serialData.h serialData.c
+	g++ -std=c++11 -Wall -c serialData.c -lwiringPi
+
 
 clean :
 	rm *.o main integrator test_motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro

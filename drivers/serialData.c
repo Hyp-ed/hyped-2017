@@ -45,19 +45,19 @@ char serial[20]; //Looking for a serial connection
 if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
   strcpy(serial,"/dev/ttyACM0");
 //tty = fopen("/dev/ttyACM0","r");
-printf("\nACM0\n");
+//printf("\nACM0\n");
 } 
 
 else if( access( "/dev/ttyACM1", F_OK ) != -1 ) {
   strcpy(serial,"/dev/ttyACM1");
 //tty = fopen("/dev/ttyACM1","r");
-printf("\nACM1\n");
+//printf("\nACM1\n");
 } 
 
 else if( access( "/dev/ttyACM2", F_OK ) != -1 ) {
 //tty = fopen("/dev/ttyACM2","r");
  strcpy(serial,"/dev/ttyACM2");
-printf("\nACM2\n");
+//printf("\nACM2\n");
 } 
 
 else

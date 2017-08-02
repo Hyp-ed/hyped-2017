@@ -2,8 +2,8 @@
 
 #include "vl6180.hpp"
 //extern "C" {
-    #include "hydraulic_control.h"
-
+ //   #include "hydraulic_control.h"
+#include "hydraulics.h"
 //}
 
 
@@ -18,10 +18,11 @@
 #include "gpio.hpp"
 #include "i2c.hpp"
 
-#define SENSOR1_PIN PIN23
-#define SENSOR2_PIN PIN24
+#define SENSOR1_PIN 4
+#define SENSOR2_PIN 5
 
 #define TARGET 50
+#define accumulator_pressure 50
 
 bool continuous_mode;
 std::vector<Vl6180*> sensors;
@@ -45,7 +46,7 @@ void setup()
   sensors.push_back(&sensor_ref);
 
   // Uncoment the following line and possibly add more to use more sensors
-  //sensors.push_back( &(factory.make_sensor(SENSOR2_PIN)) );
+  sensors.push_back( &(factory.make_sensor(SENSOR1_PIN)) );
 
   for (unsigned int i = 0; i < sensors.size(); ++i)
   {
@@ -118,20 +119,22 @@ void screen_output()
   move(8 + 3*sensors.size(), 0);
   refresh();
   int stop = getch();
-  int avg_dist = 0;
+  int proxi1_dist = 0;
+  int proxi2_dist = 0;
+  bool target_ach_1 = FALSE;
+  bool target_ach_2 = FALSE;
   while (stop == ERR)
   {
-    int sum = 0;
-    for (unsigned int i = 0; i < sensors.size(); ++i)
-    {
-      double t0 = timestamp();
-      int dist = sensors[i]->get_distance();
-      double t = timestamp();
-      sum += dist;
-      mvprintw(5 + 3*i, 0, "#%d Distance: %3dmm", i + 1, dist);
-      mvprintw(6 + 3*i, 0, "#%d Measurement period: %7.3fms   ",
-          i + 1, (t - t0) * 1000.0);
-    }
+  int sum = 0;
+  if(target_ach_1 == FALSE)
+      proxi1_dist = sensors[0]->get_distance();
+  if(target_ach_2 == FALSE)
+      proxi2_dist = sensors[1]->get_distance();
+
+      sum = proxi1_dist + proxi2_dist;
+      mvprintw(5, 0, "#%d Distance 1: %3dmm", 1, proxi1_dist);
+      mvprintw(6, 0, "#%d Distance 2: %3dmm", 2, proxi2_dist);
+
     mvprintw(5 + 3*sensors.size(), 0, "Average distance: %5.1fmm",
         (double) sum / sensors.size());
     move(8 + 3*sensors.size(), 0);
@@ -139,30 +142,46 @@ void screen_output()
     move(11 + 3*sensors.size(), 0);
     //Added to move Hydraulics
 ////////////////////////////////////////////////////////////////////
-	avg_dist = sum / sensors.size();
-	    if(avg_dist < TARGET)
+
+    if(proxi1_dist < TARGET)
         {
-        retract_one();
-//      move(10, 10);
-       mvprintw(11 + 3*sensors.size(), 0, "retracting");
-       delay(500);
+        retract("front", "left");
+        mvprintw(11 + 3*sensors.size(), 0, "retracting", 1);
         }
-    else if(avg_dist > TARGET)
+    else if(proxi1_dist > TARGET)
         {
-        extend_one();
-//      move(1, 40);
-	mvprintw(11 + 3*sensors.size(), 0, "extending");
-        delay(500);
+        extend("front", "left");
+	mvprintw(11 + 3*sensors.size(), 0, "extending", 1);
         }
-        else
+    else
         {
-        hold_one();
-        delay(1000);
-//      move(1, 40);
-	mvprintw(11 + 3*sensors.size(), 0, "holding");
-//      delay(10000);
+        hold("front", "left");
+	mvprintw(11 + 3*sensors.size(), 0, "holding", 1);
+	target_ach_1 = TRUE;
         }
- 
+
+    if(proxi2_dist < TARGET)
+        {
+        retract("front", "right");
+        mvprintw(11 + 3*sensors.size(), 20, "retracting", 2);
+        }
+    else if(proxi2_dist > TARGET)
+        {
+        extend("front", "right");
+        mvprintw(11 + 3*sensors.size(), 20, "extending", 2);
+        }
+    else
+        {
+        hold("front", "right");
+        mvprintw(11 + 3*sensors.size(), 10, "holding", 2);
+	target_ach_2 = TRUE;
+        }
+    if(proxi2_dist == TARGET && proxi1_dist == TARGET)
+	{
+	standby("front");
+	mvprintw(20, 0, "Brakes at correct position");
+	break;
+	}
 ////////////////////////////////////////////////////////////////////
     refresh();
     stop = getch();
@@ -171,6 +190,7 @@ void screen_output()
 
 int main()
 {
+
   initscr();
   raw();
   noecho();
@@ -195,6 +215,7 @@ int main()
   mvaddch(3, 0, opt);
   move(4, 0);
   refresh();
+
   if (opt == 'f')
   {
     endwin();
