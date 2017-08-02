@@ -39,21 +39,21 @@ int main()
     refresh();
     if(dist < TARGET)
         {
-        retract_one();
+        retract("front", "left");
 //	move(10, 10);
        mvprintw(1, 40, "retracting");
        delay(5);
         }
     else if(dist > TARGET)
         {
-        extend_one();
+        extend("front","left");
 //	move(1, 40);
         mvprintw(1, 40, "extending");
 	delay(5);
         }
         else
 	{
-        standby();
+        standby("front");
 	delay(1000);
 //	move(1, 40);
 	mvprintw(1, 40, "holding");
@@ -111,8 +111,8 @@ int main()
 // to record distance in a file
 //    ifstream myfile;
 //   ofstream file("distance.txt",ios::trunc);
-   /* if (myfile.is_open())
-    {*/
+    if (myfile.is_open())
+    {
 //	file << dist;
 //	file.close();
     //}
@@ -128,10 +128,11 @@ int main()
 //  getch();
 //  endwin();
 
-  /*I2C i2c;
+  I2C i2c;
   Vl6180 sensor(&i2c);
   while(true)
   {
     printf("Distance %d mm\n", sensor.get_distance());
-  }//*/
+  }//
 //}
+*/

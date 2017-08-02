@@ -11,14 +11,15 @@ Check the processing power that this will use and if it is too high, add a delay
 #define pumpSpinup 400 //Spinup time for the pump when runing off load. This will occur before every operation that uses the pump, plan timing accordingly
 #define inrushLimit 100 // sets the limit of current draw for which the motor will be run off load. 
 
-#define lowBAttery 23;
-#define overcurrent 150;
-#define overpressureAccumulators 100;
-#define overpressurePump 200;
+#define lowBAttery 23
+#define overcurrent 150
+#define overpressureAccumulators 100
+#define overpressurePump 200
 
 
-void hold(frontrear, leftright)
+int hold(char frontrear[], char leftright[])
 {
+    int SOL_1, SOL_2, SOL_3, SOL_4, SOL_5, SOL_6, SOL_7, PUMP;
 if (strcpm(frontrear, "front") == 0 )
 {
     int SOL_1 = SOL_1_F;
@@ -44,7 +45,7 @@ else if (strcpm(frontrear, "rear")== 0 )
 else 
 {
     printf("invalid input");
-    return
+    return -1;
 }
 
 
@@ -64,8 +65,8 @@ else if (strcpm(leftright, "left")== 0)
 }
 else
 {
-    putchar("invalid input");
-    return
+    printf("invalid input");
+    return -1;
 }
     safetyCheck();
 }
@@ -78,8 +79,9 @@ else
 
 
 
-void retract(frontrear, leftright)
+int retract(char frontrear[], char leftright[])
 {
+    int SOL_1, SOL_2, SOL_3, SOL_4, SOL_5, SOL_6, SOL_7, PUMP;
    if (strcpm(frontrear, "front") == 0 )
 {
     int SOL_1 = SOL_1_F;
@@ -105,7 +107,7 @@ else if (strcpm(frontrear, "rear")== 0 )
 else 
 {
     printf("invalid input");
-    return
+    return -1;
 }
 
 
@@ -142,8 +144,8 @@ else if (strcpm(leftright, "left")== 0)
 }
 else
 {
-    putchar("invalid input");
-    return
+    printf("invalid input");
+    return -1;
 }
 
  
@@ -157,8 +159,9 @@ else
 
 
 
-void extend(frontrear, leftright)
+int extend(char frontrear[], char leftright[])
 {
+    int SOL_1, SOL_2, SOL_3, SOL_4, SOL_5, SOL_6, SOL_7, PUMP;
     if (strcpm(frontrear, "front") == 0 )
 {
     int SOL_1 = SOL_1_F;
@@ -184,7 +187,7 @@ else if (strcpm(frontrear, "rear")== 0 )
 else 
 {
     printf("invalid input");
-    return
+    return -1;
 }
 
 if (strcpm(leftright, "right")== 0)
@@ -203,16 +206,18 @@ else if (strcpm(leftright, "left")== 0)
 }
 else
 {
-    putchar("invalid input");
-    return
+    prinft("invalid input");
+    return -1;
 }
 }
 
 
 
-void shutDown(frontrear)
+int shutDown(char frontrear[])
 {
+    int SOL_1, SOL_2, SOL_3, SOL_4, SOL_5, SOL_6, SOL_7, PUMP;
     if (strcpm(frontrear, "front") == 0 )
+
 {
     int SOL_1 = SOL_1_F;
     int SOL_2 = SOL_2_F;
@@ -237,7 +242,7 @@ else if (strcpm(frontrear, "rear")== 0 )
 else 
 {
     printf("invalid input");
-    return
+    return -1;
 }
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, HIGH);
@@ -253,8 +258,9 @@ else
     printf("Accumulator pressure is: %f\n", getData("accumulator_pressure"));
 }
 
-void standby(frontrear)
+int standby(char frontrear[])
 {
+    int SOL_1, SOL_2, SOL_3, SOL_4, SOL_5, SOL_6, SOL_7, PUMP;
     if (strcpm(frontrear, "front") == 0 )
 {
     int SOL_1 = SOL_1_F;
@@ -280,7 +286,7 @@ else if (strcpm(frontrear, "rear")== 0 )
 else 
 {
     printf("invalid input");
-    return
+    return -1;
 }
     digitalWrite(SOL_1, HIGH);
     digitalWrite(SOL_2, LOW);
@@ -293,8 +299,9 @@ else
     safetyCheck();
 }
 
-void chargeAccumulators(frontrear, pressure_nominal_accumulator) //Takes input argument of the prechage pressure that the accumulators should have. Charges the accumulators until this value is reached.
+int chargeAccumulators(char frontrear[],int pressure_nominal_accumulator) //Takes input argument of the prechage pressure that the accumulators should have. Charges the accumulators until this value is reached.
 {
+    int SOL_1, SOL_2, SOL_3, SOL_4, SOL_5, SOL_6, SOL_7, PUMP;
     if (strcpm(frontrear, "front") == 0 )
 {
     int SOL_1 = SOL_1_F;
@@ -320,7 +327,7 @@ else if (strcpm(frontrear, "rear")== 0 )
 else 
 {
     printf("invalid input");
-    return
+    return -1;
 }
  
 printf("\nCHARGING ACCUMULATORS\n");   
@@ -356,31 +363,31 @@ while(getData("pressure_accumulator")< pressure_nominal_accumulator) {
 
 
 
-int safetyCheck();
+int safetyCheck(char frontrear[])
 {
 if (getData("big_battery_voltage") < lowBAttery) //consider whether to make this one so that it only prevents runnig of the pump. 
 {
-    shutDown();
+    shutDown(frontrear);
     printf("WARNING Battery voltage at:  %f, please recharge battery\n", getData("big_battery_voltage"));
-    return -1
+    return -1;
 }
 else if (getData("pump_pressure") < overpressurePump)
 {
-    shutDown();
-    printf("WARNING pump pressure at:  %f, power disconnected\n", getData("pump_pressure"));
-    return -1
+    shutDown(frontrear);
+     printf("WARNING pump pressure at:  %f, power disconnected\n", getData("pump_pressure"));
+    return -1;
 }
 else if (getData("accumulator_pressure") < overpressureAccumulators)
 {
-    shutDown();
+     shutDown(frontrear);
     printf("WARNING accumulators pressure at:  %f, Power disconnected\n PLEASE DISCHARGE ACCUMULATORS", getData("pump_pressure"));
-    return -1
+    return -1;
 }
 else if (getData("accumulator_pressure") < overpressureAccumulators)
 {
-    shutDown();
+     shutDown(frontrear);
     printf("WARNING accumulators pressure at:  %f, Power disconnected\n PLEASE DISCHARGE ACCUMULATORS", getData("pump_pressure"));
-    return -1
+    return -1;
 }
 }
 

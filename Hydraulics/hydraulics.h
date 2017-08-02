@@ -29,16 +29,17 @@
 
 
 
+char frontrear[5];
+char leftright[5];
 
-
-void hold(frontrear, leftright); //Holds brake 1 in place without affecting the operations of brake 2
-void retract(frontrear, leftright); //Retracts brake 1 without affecting the operations of brake 2
-void extend(frontrear, leftright); //Extends brake 1 without affecting the operations of brake 2 RELIES ON T$
-void standby(frontrear); //Shuts down the pump and holds both cylinders in place
-void shutDown(frontrear); //Shuts down the pump and releases both cylinders
-void chargeAccumulators(frontrear, pressure_nominal_accumulator); //Charges the accumulators
-void startUp(frontrear);// Retracts brakes and charges accumulators
-void safetyCheck(); //Checks that all values are within the nominal range. Checks pump pressure, accumulator pressure, battery voltages and current draw, if any exceed nominal ranges, emergeny procedure will begin.
+int hold(char frontrear[], char leftright[]); //Holds brake 1 in place without affecting the operations of brake 2
+int retract(char frontrear[], char leftright[]); //Retracts brake 1 without affecting the operations of brake 2
+int extend(char frontrear[], char leftright[]); //Extends brake 1 without affecting the operations of brake 2 RELIES ON T$
+int standby(char frontrear[]); //Shuts down the pump and holds both cylinders in place
+int shutDown(char frontrear[]); //Shuts down the pump and releases both cylinders
+int chargeAccumulators(char frontrear[], int pressure_nominal_accumulator); //Charges the accumulators
+int startUp(char frontrear[]);// Retracts brakes and charges accumulators
+int safetyCheck(); //Checks that all values are within the nominal range. Checks pump pressure, accumulator pressure, battery voltages and current draw, if any exceed nominal ranges, emergeny procedure will begin.
 
 
 
