@@ -259,7 +259,7 @@ int Vl6180::get_distance()
 }
 
 Vl6180::Vl6180(I2C *bus, GpioPinNumber gpio_pin_num, uint8_t i2c_slave_addr)
-    {
+    
       : bus {bus},
     
     gpio_pin {Gpio::get_pin(gpio_pin_num, PinMode::out, PudControl::off)},
@@ -268,7 +268,7 @@ Vl6180::Vl6180(I2C *bus, GpioPinNumber gpio_pin_num, uint8_t i2c_slave_addr)
 {
   this->turn_off();
 }
-}
+
 bool Vl6180::wait_device_ready()
 {
   while(true)
