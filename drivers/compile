@@ -1,0 +1,2 @@
+gcc -Wall hydraulics.h hydraulics.c retract.c serialData.c serialData.h -o retract -lwiringPi
+gcc -Wall hydraulics.h hydraulics.c kill.c serialData.c serialData.h -o kill -lwiringPi

@@ -52,15 +52,15 @@ if (strcmp(leftright, "right")== 0)
 {
 
 
-    digitalWrite(SOL_2, HIGH);
-    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, LOW);
+    digitalWrite(SOL_1, LOW);
 }
 else if (strcmp(leftright, "left")== 0)
 {
 
 
-    digitalWrite(SOL_6, HIGH);
-    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_6, LOW);
+    digitalWrite(SOL_4, LOW);
 }
 else
 {
@@ -111,11 +111,11 @@ void retract(char const frontrear[], char const leftright[])
 
     digitalWrite(PUMP, LOW);
     delay(50);
-    while (getData("current")> inrushLimit)
-    {
-        delay(50);
-    }
-
+    // while (getData("current")> inrushLimit)
+    // {
+    //     delay(50);
+    // }
+delay(pumpSpinup);
 
 if (strcmp(leftright, "right")== 0)
 {
@@ -242,7 +242,6 @@ void shutDown(char const frontrear[])
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, HIGH);
     digitalWrite(PUMP, HIGH);
-    delay(1000);
     
     printf("\nProgram Complete\n\n");
     printf("Accumulator pressure is: %f\n", getData("accumulator_pressure"));
@@ -277,10 +276,10 @@ void standby(char const frontrear[])
 // {
 //     printf("invalid input");
 // }
-    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_1, LOW);
     digitalWrite(SOL_2, LOW);
     digitalWrite(SOL_3, HIGH);
-    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_4, LOW);
     digitalWrite(SOL_5, HIGH);
     digitalWrite(SOL_6, LOW);
     digitalWrite(SOL_7, HIGH);
@@ -350,6 +349,7 @@ delay(1500);
     digitalWrite(SOL_7, HIGH);
     digitalWrite(PUMP, HIGH);
     printf("\nACCUMULATORS CHARGED!\n");
+    
  //  safetyCheck("frontrear");
 }
 
