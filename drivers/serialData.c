@@ -37,7 +37,7 @@
 
 #include "serialData.h"
 
-float getData (char *data)
+float getData (char const data[])  //Used to be (char *data)
 {
  int fd;
 

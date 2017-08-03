@@ -18,8 +18,8 @@
 #include "gpio.hpp"
 #include "i2c.hpp"
 
-#define SENSOR1_PIN 4
-#define SENSOR2_PIN 5
+#define SENSOR1_PIN 21
+#define SENSOR2_PIN 22
 
 #define TARGET 50
 #define accumulator_pressure 50
@@ -127,10 +127,13 @@ void screen_output()
   {
   int sum = 0;
   if(target_ach_1 == FALSE)
+  {
       proxi1_dist = sensors[0]->get_distance();
+  }
   if(target_ach_2 == FALSE)
+    {
       proxi2_dist = sensors[1]->get_distance();
-
+}
       sum = proxi1_dist + proxi2_dist;
       mvprintw(5, 0, "#%d Distance 1: %3dmm", 1, proxi1_dist);
       mvprintw(6, 0, "#%d Distance 2: %3dmm", 2, proxi2_dist);
@@ -151,13 +154,13 @@ void screen_output()
     else if(proxi1_dist > TARGET)
         {
         extend("front", "left");
-	mvprintw(11 + 3*sensors.size(), 0, "extending", 1);
+  mvprintw(11 + 3*sensors.size(), 0, "extending", 1);
         }
     else
         {
         hold("front", "left");
-	mvprintw(11 + 3*sensors.size(), 0, "holding", 1);
-	target_ach_1 = TRUE;
+  mvprintw(11 + 3*sensors.size(), 0, "holding", 1);
+  target_ach_1 = TRUE;
         }
 
     if(proxi2_dist < TARGET)
@@ -174,22 +177,24 @@ void screen_output()
         {
         hold("front", "right");
         mvprintw(11 + 3*sensors.size(), 10, "holding", 2);
-	target_ach_2 = TRUE;
+  target_ach_2 = TRUE;
         }
     if(proxi2_dist == TARGET && proxi1_dist == TARGET)
-	{
-	standby("front");
-	mvprintw(20, 0, "Brakes at correct position");
-	break;
-	}
+  {
+  standby("front");
+  mvprintw(20, 0, "Brakes at correct position");
+  break;
+  }
 ////////////////////////////////////////////////////////////////////
     refresh();
     stop = getch();
   }
+  shutDown("front");
 }
 
 int main()
 {
+wiringPiSetup();
 
   initscr();
   raw();
@@ -201,7 +206,9 @@ int main()
   refresh();
   int opt = getch();
   while(opt != 'c' && opt != 's')
-    opt = getch();
+    {
+      opt = getch();
+    }
   continuous_mode = (opt == 'c');
   mvaddch(1, 0, opt);
   refresh();

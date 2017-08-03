@@ -28,9 +28,18 @@
 #define PUMP_R 7  //pin 4
 
 
+#define SOL_1 0    //physical pin 17 COMMENT OUT WHEN FUNCTION CALLING WORKS!
+#define SOL_2 1 //physical pin 18
+#define SOL_3 2 //pin 21
+#define SOL_4 3         //pin 22
+#define SOL_5 4 //pin 23
+#define SOL_6 5 //pin 24
+#define SOL_7 6 //pin 25
+#define PUMP 7  //pin 4
 
-//char frontrear[5];
-//char leftright[5];
+
+
+
 
 void hold(char const frontrear[], char const leftright[]); //Holds brake 1 in place without affecting the operations of brake 2
 void retract(char const frontrear[], char const leftright[]); //Retracts brake 1 without affecting the operations of brake 2

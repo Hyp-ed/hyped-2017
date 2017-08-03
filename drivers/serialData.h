@@ -11,7 +11,7 @@
 #include <wiringPi.h>
 #include <wiringSerial.h>
 
-float getData(char *data);
+float getData(char const data[]); //used to be (char *data)
 
 
 
