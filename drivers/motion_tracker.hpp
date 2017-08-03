@@ -11,7 +11,6 @@
 #include "quaternion.hpp"
 #include "vector3d.hpp"
 
-#define STD_GRAVITY 9.80665
 
 class MotionTracker
 {

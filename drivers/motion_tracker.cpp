@@ -183,7 +183,6 @@ void MotionTracker::get_imu_data_points(
   angv_dp.timestamp /= 2.0;
   accl_dp.timestamp = (accl_dp.timestamp + t) / 2.0;
   accl_dp.value /= (double) (this->accelerometers.size() + this->imus.size());
-  accl_dp.value *= STD_GRAVITY; // convert from g to m/s^2
   angv_dp.value /= (double) (this->gyroscopes.size() + this->imus.size());
 }
 
