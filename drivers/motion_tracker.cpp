@@ -1,5 +1,6 @@
 #include "motion_tracker.hpp"
 #include <chrono>
+#include <cmath>
 
 MotionTracker::MotionTracker()
     : angular_velocity(Vector3D<double>()),
@@ -122,11 +123,15 @@ void MotionTracker::track()
   while(!this->stop_flag)
   {
     this->get_imu_data_points(accl, angv);
-    //rotation += DataPoint<Vector3D<double>>::integrate(angv0, angv).value;
-    rotor =
-        rotor + (angv.timestamp - angv0.timestamp) * rotor * angv0.value / 2.0;
-
-    accl.value -= rotor * avg_accl_offset * Quaternion::inv(rotor);
+    
+    // Update R(t)
+    double l = Quaternion::norm(angv0.value);
+    double theta = (angv.timestamp - angv0.timestamp) * l / 2.0;
+    rotor = cos(theta) * rotor + sin(theta) * rotor * angv0.value / l;
+    
+    // Rotate acceleration
+    accl.value = rotor * accl.value * Quaternion::inv(rotor) - avg_accl_offset;
+    // Update velocity and displacement
     new_velocity = DataPoint<Vector3D<double>>::integrate(accl0, accl);
     new_velocity.value += velocity.value;
     displacement +=
