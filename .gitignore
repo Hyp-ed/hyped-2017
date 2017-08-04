@@ -5,7 +5,7 @@
 # Ignore executables
 main
 integrator
-test_motion_tracker
+demo-motion_tracker
 demo-vl6180
 demo-raspberry_pi
 demo-battery
