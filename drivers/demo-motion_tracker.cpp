@@ -1,6 +1,9 @@
 #include <chrono>
 #include <cmath>
+#include <cstdio>
+#include <fstream>
 #include <ncurses.h>
+#include <string>
 #include <thread>
 
 #include "i2c.hpp"
@@ -59,32 +62,7 @@ int main()
     screen_output();
     endwin();
   }
-  finalize();//*/
-
-  /*mvprintw(0, 0, "Angular velocity = " );
-  mvprintw(1, 0, "Rotor = ");
-  mvprintw(2, 0, "R*k*R^-1 = ( 0.000,  0.000,  1.000)   Angle: ");
-  mvprintw(4, 0, "                 x          y          z          total");
-  mvprintw(5, 0, "Acceleration  ");
-  mvprintw(6, 0, "Velocity      ");
-  mvprintw(7, 0, "Displacement  ");
-  move(8, 0);
-  refresh();
-
-  I2C i2c;
-  Mpu6050 imu1(&i2c);
-  Mpu6050 imu2(&i2c, ALTERNATIVE_SLAVE_ADDR); //uncomment to use 2 imus
-  MotionTracker mt;
-  mt.add_imu(imu1);
-  mt.add_imu(imu2); //uncomment to use 2 imus
-  mt.start();
-  mvprintw(9, 0, "Type any character to exit");
-  move(10, 0);
-  refresh();
-  mt.stop();
-
-  //getch();
-  endwin();//*/
+  finalize();
 }
 
 void setup()
@@ -151,5 +129,63 @@ void screen_output()
 
 void file_output()
 {
+  std::string filename;
+  if (two_imus)
+    filename = "motion_tracker-double_IMU-data.csv";
+  else
+    filename = "motion_tracker-single_IMU-data.csv";
+  std::ofstream file(filename);
+
+  Vector3D<double> v;
+  Quaternion q;
+  int n = 0;
+  std::chrono::seconds test_duration(120); //specifies for how long samples will be taken
+  std::chrono::milliseconds sampling_period(10); //timeout between taking two samples
+  std::chrono::time_point<std::chrono::steady_clock> t0, t;
+
+  printf("Calibrating...\n");
+  t0 = std::chrono::steady_clock::now();
+  setup();
+  t = std::chrono::steady_clock::now();
+  printf("took %fs\n\n",
+      (double) std::chrono::duration_cast<std::chrono::microseconds>(t - t0)
+          .count()
+      / 1.0e+6);
+
+  printf("Collecting data for about %lld seconds\n", test_duration.count());
+  t = t0 = std::chrono::steady_clock::now();
+  while (t - t0 < test_duration)
+  {
+    ++n;
+    file << n << ",";
+    t = std::chrono::steady_clock::now();
+    file <<
+        std::chrono::duration_cast<std::chrono::microseconds>(t - t0).count()
+        << ",";
+    v = mt.get_angular_velocity();
+    file << v.x << "," << v.y << "," << v.z << ",";
+    q = mt.get_rotor();
+    file << q.scal << ","
+         << q.vect.x << ","
+         << q.vect.y << ","
+         << q.vect.z << ",";
+    v = mt.get_acceleration();
+    file << v.x << "," << v.y << "," << v.z << ",";
+    v = mt.get_velocity();
+    file << v.x << "," << v.y << "," << v.z << ",";
+    v = mt.get_displacement();
+    file << v.x << "," << v.y << "," << v.z << std::endl;
+
+    std::this_thread::sleep_for(sampling_period);
+  }
+  printf("Stored %d samples to the file %s\n", n, filename.c_str());
+  std::chrono::milliseconds time =
+      std::chrono::duration_cast<std::chrono::milliseconds>(t - t0);
+  printf("Desired time: %llds\n", test_duration.count());
+  printf("Actual time:  %fs\n", (double) time.count() / 1000.0);
+  printf("Desired sampling period: %lldms\n", sampling_period.count());
+  printf("Actual sampling period:  %fms\n\n", (double) time.count() / n);
+
+  file.close();
 }
 
