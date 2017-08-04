@@ -1,6 +1,7 @@
 #include "motion_tracker.hpp"
 #include <chrono>
 #include <cmath>
+#include <cstdio>
 
 MotionTracker::MotionTracker()
     : angular_velocity(Vector3D<double>()),
@@ -120,6 +121,7 @@ void MotionTracker::track()
   DataPoint<Vector3D<double>> accl0, accl, angv0, angv;
   this->get_imu_data_points(accl0, angv0);
   accl0.value -= avg_accl_offset;
+  velocity.timestamp = accl0.timestamp;
   while(!this->stop_flag)
   {
     this->get_imu_data_points(accl, angv);
