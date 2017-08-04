@@ -115,7 +115,7 @@ void MotionTracker::track()
   avg_accl_offset /= (double) (this->accelerometers.size() + this->imus.size());
 
   Quaternion rotor(1, 0, 0, 0);
-  Vector3D<double> displacement;
+  Vector3D<double> dist(0.0, 0.0, 0.0);
   DataPoint<Vector3D<double>> velocity, new_velocity;
   DataPoint<Vector3D<double>> accl0, accl, angv0, angv;
   this->get_imu_data_points(accl0, angv0);
@@ -134,23 +134,25 @@ void MotionTracker::track()
     // Update velocity and displacement
     new_velocity = DataPoint<Vector3D<double>>::integrate(accl0, accl);
     new_velocity.value += velocity.value;
-    displacement +=
+    dist +=
         DataPoint<Vector3D<double>>::integrate(velocity, new_velocity).value;
     velocity = new_velocity;
     this->angular_velocity.store(angv.value, std::memory_order_relaxed);
     this->rotor.store(rotor, std::memory_order_relaxed);
     this->acceleration.store(accl.value, std::memory_order_relaxed);
     this->velocity.store(velocity.value, std::memory_order_relaxed);
-    this->displacement.store(displacement, std::memory_order_relaxed);
+    this->displacement.store(dist, std::memory_order_relaxed);
     accl0 = accl;
     angv0 = angv;
 
     // MPU6050 does 8 gyro readings per 1 acceleration reading (now hardcoded, in the future might add support for arbitrary ratios)
     for (int i = 0; i < 7; ++i)
     {
+      // Update R(t)
       get_gyro_data_point(angv);
-      rotor = rotor
-          + (angv.timestamp - angv0.timestamp) * rotor * angv0.value / 2.0;
+      l = Quaternion::norm(angv0.value);
+      theta = (angv.timestamp - angv0.timestamp) * l / 2.0;
+      rotor = cos(theta) * rotor + sin(theta) * rotor * angv0.value / l;
       angv0 = angv;
     }
   }
@@ -200,3 +202,4 @@ void MotionTracker::get_gyro_data_point(DataPoint<Vector3D<double>> &angv_dp)
   angv_dp.timestamp /= 2.0;
   angv_dp.value /= (double) (this->gyroscopes.size() + this->imus.size());
 }
+
