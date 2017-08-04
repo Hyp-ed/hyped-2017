@@ -1,7 +1,14 @@
 #include "motion_tracker.hpp"
 #include <chrono>
+#include <cmath>
+#include <cstdio>
 
-MotionTracker::MotionTracker() : rotation(Vector3D<double>()), velocity(Vector3D<double>()), displacement(Vector3D<double>())
+MotionTracker::MotionTracker()
+    : angular_velocity(Vector3D<double>()),
+    rotor(Quaternion(1, 0, 0, 0)),
+    acceleration(Vector3D<double>()),
+    velocity(Vector3D<double>()),
+    displacement(Vector3D<double>())
 {}
 
 MotionTracker::~MotionTracker()
@@ -33,12 +40,14 @@ bool MotionTracker::start()
   for (Imu &imu : this->imus)
     imu.calibrate_gyro(n);
   // Calibrate accelerometers
-  this->accelerometer_offsets = new Vector3D<double>[this->accelerometers.size()];
+  this->accelerometer_offsets =
+      new Vector3D<double>[this->accelerometers.size()];
   this->imu_accl_offsets = new Vector3D<double>[this->imus.size()];
   for (unsigned int i = 0; i < n; ++i)
   {
     for (unsigned int j = 0; j < this->accelerometers.size(); ++j)
-      this->accelerometer_offsets[j] += this->accelerometers[j].get().get_acceleration();
+      this->accelerometer_offsets[j] +=
+          this->accelerometers[j].get().get_acceleration();
     for (unsigned int j = 0; j < this->imus.size(); ++j)
       this->imu_accl_offsets[j] += this->imus[j].get().get_acceleration();
   }
@@ -63,9 +72,19 @@ void MotionTracker::stop()
   this->imu_accl_offsets = nullptr;
 }
 
-Vector3D<double> MotionTracker::get_rotation()
+Vector3D<double> MotionTracker::get_angular_velocity()
 {
-  return this->rotation.load(std::memory_order_relaxed);
+  return this->angular_velocity.load(std::memory_order_relaxed);
+}
+
+Quaternion MotionTracker::get_rotor()
+{
+  return this->rotor.load(std::memory_order_relaxed);
+}
+
+Vector3D<double> MotionTracker::get_acceleration()
+{
+  return this->acceleration.load(std::memory_order_relaxed);
 }
 
 Vector3D<double> MotionTracker::get_velocity()
@@ -83,7 +102,8 @@ Vector3D<double> MotionTracker::get_displacement()
 inline double timestamp()
 {
   using namespace std::chrono;
-  return duration_cast<nanoseconds>(steady_clock::now().time_since_epoch()).count() / 1.0e+9;
+  return duration_cast<nanoseconds>
+    (steady_clock::now().time_since_epoch()).count() / 1.0e+9;
 }
 
 void MotionTracker::track()
@@ -95,31 +115,46 @@ void MotionTracker::track()
     avg_accl_offset += this->imu_accl_offsets[i];
   avg_accl_offset /= (double) (this->accelerometers.size() + this->imus.size());
 
-  Vector3D<double> rotation, displacement;
+  Quaternion rotor(1, 0, 0, 0);
+  Vector3D<double> dist(0.0, 0.0, 0.0);
   DataPoint<Vector3D<double>> velocity, new_velocity;
   DataPoint<Vector3D<double>> accl0, accl, angv0, angv;
   this->get_imu_data_points(accl0, angv0);
   accl0.value -= avg_accl_offset;
+  velocity.timestamp = accl0.timestamp;
   while(!this->stop_flag)
   {
     this->get_imu_data_points(accl, angv);
-    accl.value -= avg_accl_offset;
-    rotation += DataPoint<Vector3D<double>>::integrate(angv0, angv).value;
+    
+    // Update R(t)
+    double l = Quaternion::norm(angv0.value);
+    double theta = (angv.timestamp - angv0.timestamp) * l / 2.0;
+    rotor = cos(theta) * rotor + sin(theta) * rotor * angv0.value / l;
+    
+    // Rotate acceleration
+    accl.value = rotor * accl.value * Quaternion::inv(rotor) - avg_accl_offset;
+    // Update velocity and displacement
     new_velocity = DataPoint<Vector3D<double>>::integrate(accl0, accl);
     new_velocity.value += velocity.value;
-    displacement += DataPoint<Vector3D<double>>::integrate(velocity, new_velocity).value;
+    dist +=
+        DataPoint<Vector3D<double>>::integrate(velocity, new_velocity).value;
     velocity = new_velocity;
-    this->rotation.store(rotation, std::memory_order_relaxed);
+    this->angular_velocity.store(angv.value, std::memory_order_relaxed);
+    this->rotor.store(rotor, std::memory_order_relaxed);
+    this->acceleration.store(accl.value, std::memory_order_relaxed);
     this->velocity.store(velocity.value, std::memory_order_relaxed);
-    this->displacement.store(displacement, std::memory_order_relaxed);
+    this->displacement.store(dist, std::memory_order_relaxed);
     accl0 = accl;
     angv0 = angv;
 
     // MPU6050 does 8 gyro readings per 1 acceleration reading (now hardcoded, in the future might add support for arbitrary ratios)
     for (int i = 0; i < 7; ++i)
     {
+      // Update R(t)
       get_gyro_data_point(angv);
-      rotation += DataPoint<Vector3D<double>>::integrate(angv0, angv).value;
+      l = Quaternion::norm(angv0.value);
+      theta = (angv.timestamp - angv0.timestamp) * l / 2.0;
+      rotor = cos(theta) * rotor + sin(theta) * rotor * angv0.value / l;
       angv0 = angv;
     }
   }
@@ -152,7 +187,6 @@ void MotionTracker::get_imu_data_points(
   angv_dp.timestamp /= 2.0;
   accl_dp.timestamp = (accl_dp.timestamp + t) / 2.0;
   accl_dp.value /= (double) (this->accelerometers.size() + this->imus.size());
-  accl_dp.value *= STD_GRAVITY; // convert from g to m/s^2
   angv_dp.value /= (double) (this->gyroscopes.size() + this->imus.size());
 }
 
@@ -170,3 +204,4 @@ void MotionTracker::get_gyro_data_point(DataPoint<Vector3D<double>> &angv_dp)
   angv_dp.timestamp /= 2.0;
   angv_dp.value /= (double) (this->gyroscopes.size() + this->imus.size());
 }
+

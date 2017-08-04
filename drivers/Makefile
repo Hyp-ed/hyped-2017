@@ -1,10 +1,10 @@
-OBJS = i2c.o gpio.o mpu6050.o vl6180.o battery.o raspberry_pi.o motion_tracker.o hydraulics.o serialData.o
+OBJS = i2c.o gpio.o mpu6050.o vl6180.o battery.o raspberry_pi.o quaternion.o motion_tracker.o hydraulics.o serialData.o
 CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
 LFLAGS = -Wall -latomic -lpthread -lwiringPi $(DEBUG)
 
-all : main integrator test_motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
+all : main integrator demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
 
 main : $(OBJS) main.o
 	$(CC) $(OBJS) $(LFLAGS) main.o -o main
@@ -12,8 +12,8 @@ main : $(OBJS) main.o
 integrator : $(OBJS) integrator.o
 	$(CC) $(OBJS) $(LFLAGS) integrator.o -o integrator
 
-test_motion_tracker : $(OBJS) test_motion_tracker.o
-	$(CC) $(OBJS) $(LFLAGS) -lncurses test_motion_tracker.o -o test_motion_tracker
+demo-motion_tracker : $(OBJS) demo-motion_tracker.o
+	$(CC) $(OBJS) $(LFLAGS) -lncurses demo-motion_tracker.o -o demo-motion_tracker
 
 demo-vl6180 : $(OBJS) demo-vl6180.o
 	$(CC) $(OBJS) $(LFLAGS) -lncurses demo-vl6180.o -o demo-vl6180
@@ -34,8 +34,8 @@ main.o : main.cpp mpu6050.hpp i2c.hpp
 integrator.o : integrator.cpp mpu6050.hpp i2c.hpp vector3d.hpp
 	$(CC) $(CFLAGS) integrator.cpp
 
-test_motion_tracker.o : test_motion_tracker.cpp mpu6050.hpp i2c.hpp vector3d.hpp motion_tracker.hpp
-	$(CC) $(CFLAGS) test_motion_tracker.cpp
+demo-motion_tracker.o : demo-motion_tracker.cpp mpu6050.hpp i2c.hpp vector3d.hpp motion_tracker.hpp quaternion.hpp
+	$(CC) $(CFLAGS) demo-motion_tracker.cpp
 
 demo-vl6180.o : demo-vl6180.cpp vl6180.hpp gpio.hpp i2c.hpp
 	$(CC) $(CFLAGS) demo-vl6180.cpp
@@ -50,8 +50,11 @@ demo-battery.o : demo-battery.cpp battery.hpp i2c.hpp
 	$(CC) $(CFLAGS) demo-battery.cpp
 
 
-motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_point.hpp vector3d.hpp
+motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_point.hpp quaternion.hpp vector3d.hpp
 	$(CC) $(CFLAGS) motion_tracker.cpp
+
+quaternion.o : quaternion.hpp quaternion.cpp vector3d.hpp
+	$(CC) $(CFLAGS) quaternion.cpp
 
 raspberry_pi.o : raspberry_pi.hpp raspberry_pi.cpp
 	$(CC) $(CFLAGS) raspberry_pi.cpp
@@ -79,5 +82,5 @@ serialData.o : serialData.h serialData.c
 
 
 clean :
-	rm *.o main integrator test_motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
+	rm *.o main integrator demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
 
