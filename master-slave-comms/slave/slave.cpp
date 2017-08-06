@@ -9,11 +9,13 @@ void * loop(void * m)
         pthread_detach(pthread_self());
 	while(1)
 	{
+		
 		string str = master.getMessage();
-		if( str != "" )
+		if( str != "get" )
 		{
+			string readings = ""; // populate with readings from proxy
 			cout << "Message:" << str << endl;
-			master.Send("OK");
+			master.Send(readings); // send the readings
 			master.clean();
 		}
 		usleep(1000);
