@@ -6,7 +6,7 @@ LFLAGS = -Wall -lpthread -lwiringPi
 #	g++ -Wall -o slave -I ../../ slave.cpp -std=c++11 -lpthread -fpermissive
 
 slave : drivers slave.o NetworkSlave.o
-	$(CC) $(LFLAGS) ../../drivers/i2c.o ../../drivers/gpio.o ../../drivers/vl6180.o NetworkSlave.o slave.o
+	$(CC) $(LFLAGS) ../../drivers/i2c.o ../../drivers/gpio.o ../../drivers/vl6180.o NetworkSlave.o slave.o -o slave
 
 .PHONY : drivers
 drivers :

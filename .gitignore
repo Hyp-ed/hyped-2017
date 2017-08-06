@@ -10,6 +10,7 @@ demo-vl6180
 demo-raspberry_pi
 demo-battery
 proxi-hydro
+slave
 
 # Outputs
 *.csv
