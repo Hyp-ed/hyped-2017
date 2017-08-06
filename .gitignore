@@ -11,3 +11,9 @@ demo-raspberry_pi
 demo-battery
 proxi-hydro
 
+# Outputs
+*.csv
+
+# Text editors
+*.swp
+
