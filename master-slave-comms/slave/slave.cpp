@@ -5,7 +5,7 @@
 
 #include "drivers/i2c.hpp"
 #include "drivers/vl6180.hpp"
-#include "NetworkSlave.cpp"
+#include "NetworkSlave.hpp"
 
 #define SENSOR1_PIN PIN23
 #define SENSOR2_PIN PIN24
@@ -35,7 +35,7 @@ void * loop(void * m)
   while(1)
   {
 
-    string str = master.getMessage();
+    std::string str = master.getMessage();
     if( str != "get" )
     {
       std::string readings = NAME + "\n"; // populate with readings from proxy
@@ -48,7 +48,7 @@ void * loop(void * m)
             + ",OK\n";
       }
       readings += "end";
-      cout << "Message:" << str << std::endl;
+      std::cout << "Message:" << str << std::endl;
       master.Send(readings); // send the readings
       master.clean();
     }
@@ -83,3 +83,4 @@ int main()
   }
   return 0;
 }
+
