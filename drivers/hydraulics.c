@@ -317,7 +317,7 @@ printf("\nCHARGING ACCUMULATORS\n");
 
 
 
-// while(getData("pressure_accumulator")< pressure_nominal_accumulator) { //ADD WHEN CONFIDENT IN PRESSURE SENSOR
+//  { //ADD WHEN CONFIDENT IN PRESSURE SENSOR
    // safetyCheck();
     digitalWrite(PUMP, LOW);
         // while (getData("current")> inrushLimit)  //ADD WHEN CURRENT SENSOR WORKS!
@@ -348,31 +348,63 @@ delay(1500);
  //  safetyCheck("frontrear");
 }
 
+void pressure(const char frontrear, int pressure)
+{
+    digitalWrite(PUMP, LOW);
+    
+    delay(pumpSpinup);
+    digitalWrite(SOL_1, HIGH);//MOVE UP LATER
+    digitalWrite(SOL_2, HIGH);
+    digitalWrite(SOL_3, LOW);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, HIGH);
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_7, LOW);
+    float p = 0;
+       while(p < pressure || p != -1)//ADD WHEN CURRENT SENSOR WORKS!
+    {
+        p = getData("accumulator_pressure");
+        printf("%f", p);
+        delay(50);
+    }
 
+
+
+    digitalWrite(SOL_1, HIGH);
+    digitalWrite(SOL_2, HIGH);
+    digitalWrite(SOL_3, HIGH);
+    digitalWrite(SOL_4, HIGH);
+    digitalWrite(SOL_5, HIGH);
+    digitalWrite(SOL_6, HIGH);
+    digitalWrite(SOL_7, HIGH);
+    digitalWrite(PUMP, HIGH);
+    printf("\nACCUMULATORS CHARGED!\n FINAL PRESSURE IS %f", getData("accumulator_pressure"));
+
+
+}
 
 void safetyCheck(char const frontrear[])
 {
-    int fd = openData();
-if (getData(fd, "big_battery_voltage") < lowBAttery) //consider whether to make this one so that it only prevents runnig of the pump. 
+
+if (getData("big_battery_voltage") < lowBAttery) //consider whether to make this one so that it only prevents runnig of the pump. 
 {
     shutDown(frontrear);
-    printf("WARNING Battery voltage at:  %f, please recharge battery\n", getData(fd, "big_battery_voltage"));
+    printf("WARNING Battery voltage at:  %f, please recharge battery\n", getData("big_battery_voltage"));
 }
-else if (getData(fd, "pump_pressure") < overpressurePump)
+else if (getData("pump_pressure") < overpressurePump)
 {
     shutDown(frontrear);
-     printf("WARNING pump pressure at:  %f, power disconnected\n", getData(fd, "pump_pressure"));
+     printf("WARNING pump pressure at:  %f, power disconnected\n", getData("pump_pressure"));
 }
-else if (getData(fd, "accumulator_pressure") < overpressureAccumulators)
+else if (getData("accumulator_pressure") < overpressureAccumulators)
 {
      shutDown(frontrear);
-    printf("WARNING accumulators pressure at:  %f, Power disconnected\n PLEASE DISCHARGE ACCUMULATORS", getData(fd, "pump_pressure"));
+    printf("WARNING accumulators pressure at:  %f, Power disconnected\n PLEASE DISCHARGE ACCUMULATORS", getData("pump_pressure"));
 }
-else if (getData(fd, "accumulator_pressure") < overpressureAccumulators)
+else if (getData("accumulator_pressure") < overpressureAccumulators)
 {
      shutDown(frontrear);
-    printf("WARNING accumulators pressure at:  %f, Power disconnected\n PLEASE DISCHARGE ACCUMULATORS", getData(fd, "pump_pressure"));
+    printf("WARNING accumulators pressure at:  %f, Power disconnected\n PLEASE DISCHARGE ACCUMULATORS", getData("pump_pressure"));
 }
-closeData(fd);
 }
 

@@ -71,13 +71,13 @@ else
   if ((fd = serialOpen (serial, 115200)) < 0)
   {
     fprintf (stderr, "Unable to open serial device: %s\n", strerror (errno)) ;
-    return 1;
+    return -1;
   }
 
   if (wiringPiSetup () == -1)
   {
     fprintf (stdout, "Unable to start wiringPi: %s\n", strerror (errno)) ;
-    return 1 ;
+    return -1 ;
   }
 
 
@@ -157,6 +157,11 @@ else if (strcmp(data, "pump_pressure")== 0)
 else if (strcmp(data, "accumulator_pressure")== 0)
 {
   value = accumulator_pressure;
+}
+else 
+{
+  printf("error invalid request");
+  return -1;
 }
 
 serialClose (fd) ;

@@ -1,2 +1,5 @@
 gcc -Wall hydraulics.h hydraulics.c retract.c serialData.c serialData.h -o retract -lwiringPi
 gcc -Wall hydraulics.h hydraulics.c kill.c serialData.c serialData.h -o kill -lwiringPi
+gcc -Wall test.c -o test -lwiringPi
+gcc -Wall setup.c hydraulics.c hydraulics.h serialData.c serialData.h -o setup -lwiringPi
+gcc primeMotor.c -o primeMotor -lwiringPi

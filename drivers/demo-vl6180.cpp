@@ -11,8 +11,8 @@
 #include "gpio.hpp"
 #include "i2c.hpp"
 
-#define SENSOR1_PIN PIN23
-#define SENSOR2_PIN PIN24
+#define SENSOR1_PIN 15
+#define SENSOR2_PIN 16
 
 bool continuous_mode;
 std::vector<Vl6180*> sensors;
