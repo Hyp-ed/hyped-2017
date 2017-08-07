@@ -5,7 +5,7 @@ int main(int argc, char const *argv[])
 {
 	wiringPiSetup();
 	if (getData("current") == -1)
-		printf("serial ERROR");
+		printf("Current sensor not detected\n ");
 		return -1;
 	pinMode(0, OUTPUT);
 	pinMode(1, OUTPUT);

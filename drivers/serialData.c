@@ -65,7 +65,7 @@ else if( access( "/dev/ttyACM2", F_OK ) != -1 ) {
 
 else
   {
- printf("error no serial connection detected");
+ printf("error no serial connection detected\n");
  return -1;
   }
   if ((fd = serialOpen (serial, 115200)) < 0)
@@ -96,7 +96,7 @@ while (serialDataAvail(fd)!= 0)
 //printf(a);
 
 float current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp,
-small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure;
+small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure = -1;
 sscanf(a, "%f %f %f %f %f %f %f %f %f %f %f %f %f %f",&current,&cell1V,&cell2V,&cell3V,&cell4V,&cell5V,&cell6V,&cell7V,&big_battery_voltage, &big_battery_temp,
 &small_battery_voltage, &small_battery_temp, &pump_pressure, &accumulator_pressure);
 //printf("%f %f %f %f %f %f %f %f %f %f %f %f %f %f", current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp,
