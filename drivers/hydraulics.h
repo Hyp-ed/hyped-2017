@@ -1,5 +1,5 @@
-#ifndef _hydraulic_control_h
-#define _hydraulic_control_h
+#ifndef _hydraulics_h
+#define _hydraulics_h
 
 #include <wiringPi.h>
 #include <stdio.h>
@@ -40,7 +40,7 @@
 
 
 
-
+void spinup(char const frontrear[]);
 void hold(char const frontrear[], char const leftright[]); //Holds brake 1 in place without affecting the operations of brake 2
 void retract(char const frontrear[], char const leftright[]); //Retracts brake 1 without affecting the operations of brake 2
 void extend(char const frontrear[], char const leftright[]); //Extends brake 1 without affecting the operations of brake 2 RELIES ON T$

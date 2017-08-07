@@ -18,10 +18,10 @@
 #include "gpio.hpp"
 #include "i2c.hpp"
 
-#define SENSOR1_PIN 21
-#define SENSOR2_PIN 22
+#define SENSOR_RIGHT_PIN 15
+#define SENSOR_LEFT_PIN 16
 
-#define TARGET 50
+#define TARGET 110
 #define accumulator_pressure 50
 
 bool continuous_mode;
@@ -41,12 +41,12 @@ inline double timestamp()
 void setup()
 {
   // Produce driver instance for the sensor with GPIO0 connected to specified pin
-  Vl6180& sensor_ref = factory.make_sensor(SENSOR2_PIN);
+  Vl6180& sensor_ref = factory.make_sensor(SENSOR_RIGHT_PIN);
   // Store pointer to the driver instance
   sensors.push_back(&sensor_ref);
 
   // Uncoment the following line and possibly add more to use more sensors
-  sensors.push_back( &(factory.make_sensor(SENSOR1_PIN)) );
+  sensors.push_back( &(factory.make_sensor(SENSOR_LEFT_PIN)) );
 
   for (unsigned int i = 0; i < sensors.size(); ++i)
   {
@@ -119,24 +119,25 @@ void screen_output()
   move(8 + 3*sensors.size(), 0);
   refresh();
   int stop = getch();
-  int proxi1_dist = 0;
-  int proxi2_dist = 0;
+  int proxiright_dist = 0;
+  int proxileft_dist = 0;
   bool target_ach_1 = FALSE;
   bool target_ach_2 = FALSE;
+  spinup("front");
   while (stop == ERR)
   {
   int sum = 0;
   if(target_ach_1 == FALSE)
   {
-      proxi1_dist = sensors[0]->get_distance();
+      proxiright_dist = sensors[0]->get_distance();
   }
   if(target_ach_2 == FALSE)
     {
-      proxi2_dist = sensors[1]->get_distance();
+      proxileft_dist = sensors[1]->get_distance();
 }
-      sum = proxi1_dist + proxi2_dist;
-      mvprintw(5, 0, "#%d Distance 1: %3dmm", 1, proxi1_dist);
-      mvprintw(6, 0, "#%d Distance 2: %3dmm", 2, proxi2_dist);
+      sum = proxiright_dist + proxileft_dist;
+      mvprintw(5, 0, "#%d Distance right 1: %3dmm", 1, proxiright_dist);
+      mvprintw(6, 0, "#%d Distance left 2: %3dmm", 2, proxileft_dist);
 
     mvprintw(5 + 3*sensors.size(), 0, "Average distance: %5.1fmm",
         (double) sum / sensors.size());
@@ -146,56 +147,67 @@ void screen_output()
     //Added to move Hydraulics
 ////////////////////////////////////////////////////////////////////
 
-    if(proxi1_dist < TARGET)
-        {
-        retract("front", "left");
-        mvprintw(11 + 3*sensors.size(), 0, "retracting", 1);
-        }
-    else if(proxi1_dist > TARGET)
-        {
-        extend("front", "left");
-  mvprintw(11 + 3*sensors.size(), 0, "extending", 1);
-        }
-    else
-        {
-        hold("front", "left");
-  mvprintw(11 + 3*sensors.size(), 0, "holding", 1);
-  target_ach_1 = TRUE;
-        }
 
-    if(proxi2_dist < TARGET)
-        {
-        retract("front", "right");
-        mvprintw(11 + 3*sensors.size(), 20, "retracting", 2);
-        }
-    else if(proxi2_dist > TARGET)
+    if(proxiright_dist +2 < TARGET)
         {
         extend("front", "right");
-        mvprintw(11 + 3*sensors.size(), 20, "extending", 2);
+	// delay(40);
+	// hold("front", "right");
+	// delay(100);
+        mvprintw(11 + 3*sensors.size(), 0, "extending", 1);
+        }
+    else if(proxiright_dist - 2> TARGET)
+        {
+        retract("front", "right");
+	// delay(40);
+	// hold("front", "right");
+	// delay(100);
+  mvprintw(11 + 3*sensors.size(), 0, "retracting", 1);
         }
     else
         {
         hold("front", "right");
-        mvprintw(11 + 3*sensors.size(), 10, "holding", 2);
-  target_ach_2 = TRUE;
+  	mvprintw(11 + 3*sensors.size(), 0, "holding", 1);
+  	target_ach_1 = TRUE;
+//	delay(100);
+//	target_ach_1 = FALSE;
         }
-    if(proxi2_dist == TARGET && proxi1_dist == TARGET)
+
+    if(proxileft_dist + 2 < TARGET)
+        {
+        extend("front", "left");
+        mvprintw(11 + 3*sensors.size(), 20, "extending", 2);
+        }
+    else if(proxileft_dist - 2 > TARGET)
+        {
+        retract("front", "left");
+        mvprintw(11 + 3*sensors.size(), 20, "retracting", 2);
+        }
+    else
+        {
+        hold("front", "left");
+        mvprintw(11 + 3*sensors.size(), 10, "holding", 2);
+  	target_ach_2 = TRUE;
+//	delay(100);
+//	target_ach_2 = FALSE;
+        }
+    if(target_ach_1 == TRUE && target_ach_2 == TRUE)
   {
   standby("front");
   mvprintw(20, 0, "Brakes at correct position");
-  break;
+  
   }
 ////////////////////////////////////////////////////////////////////
     refresh();
     stop = getch();
   }
+
   shutDown("front");
 }
 
 int main()
 {
 wiringPiSetup();
-
   initscr();
   raw();
   noecho();

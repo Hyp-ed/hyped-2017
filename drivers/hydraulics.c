@@ -4,6 +4,8 @@ take the exponential averaging from the arduino and check if that is enough to g
 Check the processing power that this will use and if it is too high, add a delay to the position variable
 
 
+//by convention: cylinder 1 on the wiringdiagram is left!
+
 */
 
 #include "hydraulics.h"
@@ -17,9 +19,17 @@ Check the processing power that this will use and if it is too high, add a delay
 #define overpressurePump 200
 
 
+void spinup(char const frontrear[])
+{
+digitalWrite(PUMP, LOW);
+delay(pumpSpinup);
+digitalWrite(SOL_5, LOW);
+digitalWrite(SOL_7, LOW);  
+}
+
 void hold(char const frontrear[], char const leftright[])
 {
-//     int SOL_1, SOL_2, SOL_3, SOL_4, SOL_5, SOL_6, SOL_7, PUMP;
+//     int SOL_1, SOL_2, SOL_3, SOL_4, SOL_5, SOL_6, SOL_7, PUMP; //SOLVE THE CHOSING OF SIDES! CAN BE DONE POST SHIPPING
 // if (strcmp(frontrear, "front") == 0 )
 // {
 //     int SOL_1 = SOL_1_F;
@@ -53,14 +63,14 @@ if (strcmp(leftright, "right")== 0)
 
 
     digitalWrite(SOL_2, LOW);
-    digitalWrite(SOL_1, LOW);
+    digitalWrite(SOL_1, HIGH);
 }
 else if (strcmp(leftright, "left")== 0)
 {
 
 
     digitalWrite(SOL_6, LOW);
-    digitalWrite(SOL_4, LOW);
+    digitalWrite(SOL_4, HIGH);
 }
 else
 {
@@ -109,39 +119,22 @@ void retract(char const frontrear[], char const leftright[])
    
 // }
 
-    digitalWrite(PUMP, LOW);
-    delay(50);
-    // while (getData("current")> inrushLimit)
-    // {
-    //     delay(50);
-    // }
-delay(pumpSpinup);
 
 if (strcmp(leftright, "right")== 0)
 {
-
-    digitalWrite(SOL_1, LOW);
-    digitalWrite(SOL_2, LOW);
-    digitalWrite(SOL_3, HIGH);
-    digitalWrite(SOL_4, HIGH);
-    digitalWrite(SOL_5, LOW);
-    digitalWrite(SOL_6, HIGH);
-    digitalWrite(SOL_7, LOW);
+digitalWrite(SOL_1, LOW);
+digitalWrite(SOL_2, LOW);
 }
 else if (strcmp(leftright, "left")== 0)
 {
-
-    digitalWrite(SOL_1, HIGH);
-    digitalWrite(SOL_2, HIGH);
-    digitalWrite(SOL_3, HIGH);
     digitalWrite(SOL_4, LOW);
-    digitalWrite(SOL_5, LOW);
     digitalWrite(SOL_6, LOW);
-    digitalWrite(SOL_7, LOW);
 }
 else
 {
     printf("invalid input");
+    digitalWrite(PUMP, HIGH);
+    digitalWrite(SOL_7, HIGH);
 }
 }
 
@@ -185,16 +178,13 @@ void extend(char const frontrear[], char const leftright[])
 if (strcmp(leftright, "right")== 0)
 {
 
-
     digitalWrite(SOL_2, HIGH);
-    digitalWrite(SOL_1, HIGH);
 }
 else if (strcmp(leftright, "left")== 0)
 {
 
 
     digitalWrite(SOL_6, HIGH);
-    digitalWrite(SOL_4, HIGH);
 }
 else
 {
@@ -242,9 +232,12 @@ void shutDown(char const frontrear[])
     digitalWrite(SOL_6, HIGH);
     digitalWrite(SOL_7, HIGH);
     digitalWrite(PUMP, HIGH);
-    
+   
+
     printf("\nProgram Complete\n\n");
-    printf("Accumulator pressure is: %f\n", getData("accumulator_pressure"));
+    // int fd = openData();
+    // printf("Accumulator pressure is: %f\n", getData(fd, "accumulator_pressure"));
+    // closeData(fd);
 }
 
 void standby(char const frontrear[])
@@ -276,6 +269,9 @@ void standby(char const frontrear[])
 // {
 //     printf("invalid input");
 // }
+    hold(frontrear, "left");
+    hold(frontrear, "right");
+    delay(50);
     digitalWrite(SOL_1, LOW);
     digitalWrite(SOL_2, LOW);
     digitalWrite(SOL_3, HIGH);
@@ -324,8 +320,7 @@ printf("\nCHARGING ACCUMULATORS\n");
 // while(getData("pressure_accumulator")< pressure_nominal_accumulator) { //ADD WHEN CONFIDENT IN PRESSURE SENSOR
    // safetyCheck();
     digitalWrite(PUMP, LOW);
-    delay(50);
-    // while (getData("current")> inrushLimit)  //ADD WHEN CURRENT SENSOR WORKS!
+        // while (getData("current")> inrushLimit)  //ADD WHEN CURRENT SENSOR WORKS!
     // {
     //     delay(50);
     // }
@@ -357,25 +352,27 @@ delay(1500);
 
 void safetyCheck(char const frontrear[])
 {
-if (getData("big_battery_voltage") < lowBAttery) //consider whether to make this one so that it only prevents runnig of the pump. 
+    int fd = openData();
+if (getData(fd, "big_battery_voltage") < lowBAttery) //consider whether to make this one so that it only prevents runnig of the pump. 
 {
     shutDown(frontrear);
-    printf("WARNING Battery voltage at:  %f, please recharge battery\n", getData("big_battery_voltage"));
+    printf("WARNING Battery voltage at:  %f, please recharge battery\n", getData(fd, "big_battery_voltage"));
 }
-else if (getData("pump_pressure") < overpressurePump)
+else if (getData(fd, "pump_pressure") < overpressurePump)
 {
     shutDown(frontrear);
-     printf("WARNING pump pressure at:  %f, power disconnected\n", getData("pump_pressure"));
+     printf("WARNING pump pressure at:  %f, power disconnected\n", getData(fd, "pump_pressure"));
 }
-else if (getData("accumulator_pressure") < overpressureAccumulators)
+else if (getData(fd, "accumulator_pressure") < overpressureAccumulators)
 {
      shutDown(frontrear);
-    printf("WARNING accumulators pressure at:  %f, Power disconnected\n PLEASE DISCHARGE ACCUMULATORS", getData("pump_pressure"));
+    printf("WARNING accumulators pressure at:  %f, Power disconnected\n PLEASE DISCHARGE ACCUMULATORS", getData(fd, "pump_pressure"));
 }
-else if (getData("accumulator_pressure") < overpressureAccumulators)
+else if (getData(fd, "accumulator_pressure") < overpressureAccumulators)
 {
      shutDown(frontrear);
-    printf("WARNING accumulators pressure at:  %f, Power disconnected\n PLEASE DISCHARGE ACCUMULATORS", getData("pump_pressure"));
+    printf("WARNING accumulators pressure at:  %f, Power disconnected\n PLEASE DISCHARGE ACCUMULATORS", getData(fd, "pump_pressure"));
 }
+closeData(fd);
 }
 
