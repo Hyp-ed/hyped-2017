@@ -27,6 +27,9 @@
 #define DEFAULT_SLAVE_ADDR     0x68 // AD0 pin is low (0V)
 #define ALTERNATIVE_SLAVE_ADDR 0x69 // AD0 pin is high (3.3V)
 
+const double PI = 3.141592653589793238;
+const double STD_GRAVITY = 9.80665; // m/s^2
+
 class RawAcclData : public Vector3D<short> {};
 class RawGyroData : public Vector3D<short> {};
 class Acceleration : public Vector3D<double> {};

@@ -288,9 +288,9 @@ Vector3D<double> Mpu6050::get_acceleration()
 Acceleration Mpu6050::get_acceleration(RawAcclData accl_reading)
 {
   Acceleration a;
-  a.x = accl_reading.x / this->accl_scale;
-  a.y = accl_reading.y / this->accl_scale;
-  a.z = accl_reading.z / this->accl_scale;
+  a.x = accl_reading.x * STD_GRAVITY / this->accl_scale;
+  a.y = accl_reading.y * STD_GRAVITY / this->accl_scale;
+  a.z = accl_reading.z * STD_GRAVITY / this->accl_scale;
   return a;
 }
 
@@ -307,9 +307,9 @@ Vector3D<double> Mpu6050::get_angular_velocity()
 AngularVelocity Mpu6050::get_angular_velocity(RawGyroData gyro_reading)
 {
   AngularVelocity omega;
-  omega.x = (gyro_reading.x - this->gyro_offset.x) / this->gyro_scale;
-  omega.y = (gyro_reading.y - this->gyro_offset.y) / this->gyro_scale;
-  omega.z = (gyro_reading.z - this->gyro_offset.z) / this->gyro_scale;
+  omega.x = (gyro_reading.x - this->gyro_offset.x) / this->gyro_scale * PI / 180.0;
+  omega.y = (gyro_reading.y - this->gyro_offset.y) / this->gyro_scale * PI / 180.0;
+  omega.z = (gyro_reading.z - this->gyro_offset.z) / this->gyro_scale * PI / 180.0;
   return omega;
 }
 

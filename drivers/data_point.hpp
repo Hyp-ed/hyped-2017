@@ -8,7 +8,7 @@ class DataPoint
     double timestamp;
     T value;
 
-    DataPoint() : timestamp(0.0)
+    DataPoint() : timestamp(0.0), value()
     {}
     DataPoint(double timestamp, T value) : timestamp(timestamp), value(value)
     {}

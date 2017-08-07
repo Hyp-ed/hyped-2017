@@ -1,5 +1,5 @@
-#ifndef MOTION_TRACKER_H_
-#define MOTION_TRACKER_H_
+#ifndef MOTION_TRACKER_HPP_
+#define MOTION_TRACKER_HPP_
 
 #include <atomic>
 #include <functional>
@@ -8,9 +8,9 @@
 
 #include "data_point.hpp"
 #include "interfaces.hpp"
+#include "quaternion.hpp"
 #include "vector3d.hpp"
 
-#define STD_GRAVITY 9.80665
 
 class MotionTracker
 {
@@ -23,7 +23,9 @@ class MotionTracker
     void add_imu(Imu &imu);
     bool start();
     void stop();
-    Vector3D<double> get_rotation();
+    Vector3D<double> get_angular_velocity();
+    Quaternion get_rotor();
+    Vector3D<double> get_acceleration();
     Vector3D<double> get_velocity();
     Vector3D<double> get_displacement();
 
@@ -35,7 +37,10 @@ class MotionTracker
     std::thread tracking_thread;
     Vector3D<double> *accelerometer_offsets = nullptr;
     Vector3D<double> *imu_accl_offsets = nullptr;
-    std::atomic<Vector3D<double>> rotation;
+
+    std::atomic<Vector3D<double>> angular_velocity; 
+    std::atomic<Quaternion> rotor;
+    std::atomic<Vector3D<double>> acceleration;
     std::atomic<Vector3D<double>> velocity;
     std::atomic<Vector3D<double>> displacement;
 
@@ -45,4 +50,4 @@ class MotionTracker
     void get_gyro_data_point(DataPoint<Vector3D<double>> &angular_velocity);
 };
 
-#endif // MOTION_TRACKER_H_
+#endif // MOTION_TRACKER_HPP_

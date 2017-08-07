@@ -5,26 +5,22 @@ template<typename T>
 class Vector3D
 {
   public:
-  T x, y, z;
+    T x, y, z;
 
-    Vector3D<T>(T x = 0, T y = 0, T z = 0)
-    {
-      this->x = x;
-      this->y = y;
-      this->z = z;
-    }
+    Vector3D<T>(T x = 0, T y = 0, T z = 0) : x(x), y(y), z(z)
+    {}
 
-  Vector3D<T> operator-() const;
+    Vector3D<T> operator-() const;
 
-  Vector3D<T> &operator+=(const Vector3D<T> &rhs);
-  Vector3D<T> &operator+=(const T rhs);
+    Vector3D<T> &operator+=(const Vector3D<T> &rhs);
+    Vector3D<T> &operator+=(const T rhs);
 
-  Vector3D<T> &operator-=(const Vector3D<T> &rhs);
-  Vector3D<T> &operator-=(const T rhs);
+    Vector3D<T> &operator-=(const Vector3D<T> &rhs);
+    Vector3D<T> &operator-=(const T rhs);
 
-  Vector3D<T> &operator*=(const T rhs); //scalar multiplication
+    Vector3D<T> &operator*=(const T rhs); //scalar multiplication
 
-  Vector3D<T> &operator/=(const T rhs); // scalar division
+    Vector3D<T> &operator/=(const T rhs); // scalar division
 };
 
 template<typename T>
@@ -154,3 +150,4 @@ std::ostream &operator<<(std::ostream &out, const Vector3D<T> &v)
 }//*/
 
 #endif  // VECTOR3D_H_
+
