@@ -4,13 +4,10 @@ DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
 LFLAGS = -Wall -latomic -lpthread -lwiringPi $(DEBUG)
 
-all : main integrator demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
+all : main demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
 
 main : $(OBJS) main.o
 	$(CC) $(OBJS) $(LFLAGS) main.o -o main
-
-integrator : $(OBJS) integrator.o
-	$(CC) $(OBJS) $(LFLAGS) integrator.o -o integrator
 
 demo-motion_tracker : $(OBJS) demo-motion_tracker.o
 	$(CC) $(OBJS) $(LFLAGS) -lncurses demo-motion_tracker.o -o demo-motion_tracker
@@ -30,9 +27,6 @@ demo-battery : demo-battery.o battery.o i2c.o
 
 main.o : main.cpp mpu6050.hpp i2c.hpp
 	$(CC) $(CFLAGS) main.cpp
-
-integrator.o : integrator.cpp mpu6050.hpp i2c.hpp vector3d.hpp
-	$(CC) $(CFLAGS) integrator.cpp
 
 demo-motion_tracker.o : demo-motion_tracker.cpp mpu6050.hpp i2c.hpp vector3d.hpp motion_tracker.hpp quaternion.hpp
 	$(CC) $(CFLAGS) demo-motion_tracker.cpp
@@ -82,5 +76,5 @@ serialData.o : serialData.h serialData.c
 
 
 clean :
-	rm *.o main integrator demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
+	rm *.o main demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
 
