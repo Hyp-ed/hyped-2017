@@ -4,9 +4,11 @@
 int main(int argc, char const *argv[])
 {
 	wiringPiSetup();
+	printf("setting up");
 	if (getData("current") == -1)
-		printf("Current sensor not detected\n ");
+	{	printf("Current sensor not detected\n ");
 		return -1;
+}
 	pinMode(0, OUTPUT);
 	pinMode(1, OUTPUT);
 	pinMode(2, OUTPUT);
@@ -17,7 +19,7 @@ int main(int argc, char const *argv[])
 	pinMode(7, OUTPUT);
 	int p = atoi(argv[1]);
 
-	pressure("front", p);
+	charge("front", p);
 
 
 
