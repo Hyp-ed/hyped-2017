@@ -1,5 +1,5 @@
-#ifndef INTERFACES_H_
-#define INTERFACES_H_
+#ifndef HYPED_DRIVERS_INTERFACES_HPP_
+#define HYPED_DRIVERS_INTERFACES_HPP_
 
 #include "vector3d.hpp"
 
@@ -7,12 +7,16 @@
 class Accelerometer
 {
   public:
+    virtual ~Accelerometer() {}
+
     virtual Vector3D<double> get_acceleration() = 0;
 };
 
 class Gyroscope
 {
   public:
+    virtual ~Gyroscope() {}
+
     virtual void calibrate_gyro(int n) = 0;
     virtual Vector3D<double> get_angular_velocity() = 0;
 };
@@ -31,7 +35,17 @@ struct ImuData
 class Imu : public Accelerometer, public Gyroscope
 {
   public:
+    virtual ~Imu() {}
+
     virtual ImuData get_imu_data() = 0;
 };
 
-#endif // INTERFACES_H_
+class Proxi
+{
+  public:
+    virtual ~Proxi() {}
+
+    virtual int get_distance() = 0;
+};
+
+#endif // HYPED_DRIVERS_INTERFACES_HPP_
