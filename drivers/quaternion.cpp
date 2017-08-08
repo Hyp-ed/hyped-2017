@@ -125,22 +125,3 @@ Quaternion operator/(Quaternion lhs, const double rhs)
   return lhs;
 }
 
-/*
-#include <cstdio>
-int main()
-{
-  Quaternion q(1, 2, 3, 4), r(1, 1, 1, 1);
-  printf("q=%f + %fi + %fj + %fk\n", q.scal, q.vect.x, q.vect.y, q.vect.z);
-  printf("r=%f + %fi + %fj + %fk\n", r.scal, r.vect.x, r.vect.y, r.vect.z);
-  Quaternion t = q*r;
-  printf("q*r=%f + %fi + %fj + %fk\n", t.scal, t.vect.x, t.vect.y, t.vect.z);
-  t = r*q;
-  printf("r*q=%f + %fi + %fj + %fk\n", t.scal, t.vect.x, t.vect.y, t.vect.z);
-  Vector3D<double> v(0, 0, 1);
-  v = r*v*Quaternion::inv(r);
-  printf("v' = (%f, %f, %f)\n", v.x, v.y, v.z);
-
-  return 0;
-}
-/**/
-
