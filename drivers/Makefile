@@ -62,10 +62,10 @@ raspberry_pi.o : raspberry_pi.hpp raspberry_pi.cpp
 battery.o : battery.hpp battery.cpp i2c.hpp
 	$(CC) $(CFLAGS) battery.cpp
 
-vl6180.o : vl6180.hpp vl6180.cpp gpio.hpp i2c.hpp
+vl6180.o : vl6180.hpp vl6180.cpp gpio.hpp i2c.hpp interfaces.hpp
 	$(CC) $(CFLAGS) vl6180.cpp
 
-mpu6050.o : mpu6050.hpp mpu6050.cpp i2c.hpp vector3d.hpp
+mpu6050.o : mpu6050.hpp mpu6050.cpp i2c.hpp vector3d.hpp interfaces.hpp
 	$(CC) $(CFLAGS) mpu6050.cpp
 
 gpio.o : gpio.hpp gpio.cpp

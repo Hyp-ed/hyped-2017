@@ -1,5 +1,5 @@
-#ifndef INTERFACES_H_
-#define INTERFACES_H_
+#ifndef HYPED_DRIVERS_INTERFACES_HPP_
+#define HYPED_DRIVERS_INTERFACES_HPP_
 
 #include "vector3d.hpp"
 
@@ -34,4 +34,10 @@ class Imu : public Accelerometer, public Gyroscope
     virtual ImuData get_imu_data() = 0;
 };
 
-#endif // INTERFACES_H_
+class Proxi
+{
+  public:
+    virtual int get_distance() = 0;
+};
+
+#endif // HYPED_DRIVERS_INTERFACES_HPP_

@@ -9,6 +9,7 @@
 
 #include "gpio.hpp"
 #include "i2c.hpp"
+#include "interfaces.hpp"
 
 #define DEFAULT_I2C_SLAVE_ADDR 0x29
 #define MAX_SENSORS 9 //maximum number of VL6180 units which can be connected to a single i2c bus
@@ -36,7 +37,7 @@ class Vl6180Factory
     static Vl6180* sensors[MAX_SENSORS];
 };
 
-class Vl6180
+class Vl6180 : public Proxi
 {
   friend class Vl6180Factory;
   public:
@@ -47,7 +48,7 @@ class Vl6180
     void set_continuous_mode(bool enabled);
     bool is_continuous_mode();
     /// Retrieves distance in mm (blocks if not in continuous mode)
-    int get_distance();
+    virtual int get_distance();
 
     Vl6180()                      = delete;
     Vl6180(Vl6180 const&)         = delete;
