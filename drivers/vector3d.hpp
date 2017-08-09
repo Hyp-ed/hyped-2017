@@ -142,6 +142,12 @@ Vector3D<T> operator/(Vector3D<T> lhs, const T rhs)
   return lhs;
 }
 
+template<typename T1, typename T2>
+bool operator==(const Vector3D<T1>& lhs, const Vector3D<T2>& rhs)
+{
+  return (lhs.x == rhs.x) && (lhs.y == rhs.y) && (lhs.z == rhs.z);
+}
+
 /*template<typename T>
 std::ostream &operator<<(std::ostream &out, const Vector3D<T> &v)
 {
