@@ -45,7 +45,7 @@ demo-battery.o : demo-battery.cpp battery.hpp i2c.hpp
 
 
 motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_point.hpp quaternion.hpp vector3d.hpp
-	$(CC) $(CFLAGS) motion_tracker.cpp
+	$(CC) $(CFLAGS) -I /usr/local/include/eigen3/ motion_tracker.cpp
 
 quaternion.o : quaternion.hpp quaternion.cpp vector3d.hpp
 	$(CC) $(CFLAGS) quaternion.cpp

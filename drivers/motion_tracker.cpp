@@ -2,6 +2,8 @@
 #include <chrono>
 #include <cmath>
 #include <cstdio>
+#include <Eigen/Dense>
+#include <Eigen/SVD>
 
 MotionTracker::MotionTracker()
     : angular_velocity(Vector3D<double>()),
@@ -31,8 +33,32 @@ void MotionTracker::add_imu(Imu &imu)
   this->imus.push_back(imu);
 }
 
+void MotionTracker::add_ground_proxi(Proxi& sensor, Vector3D<double> position)
+{
+  for (unsigned int i = 0; this->ground_proxi_positions.size(); ++i)
+    if (this->ground_proxi_positions[i] == position)
+    {
+      this->ground_proxis[i].push_back(sensor);
+      return;
+    }
+  this->ground_proxi_positions.push_back(position);
+  this->ground_proxis.emplace_back(); //add new vector
+  this->ground_proxis.back().push_back(sensor);
+}
+
+void MotionTracker::add_brake_proxis(Proxi& front, Proxi& rear, RailSide side)
+{
+  if (side == RailSide::left)
+    this->brakes.emplace_back(front, rear);
+  else if (side == RailSide::right)
+    this->brakes.emplace_back(rear, front);
+}
+
 bool MotionTracker::start()
 {
+  //TODO: check not already started
+  //TODO: check enough sensors configured
+
   const int n = 10000;
   //Calibrate gyros
   for (Gyroscope &g : this->gyroscopes)
@@ -106,6 +132,8 @@ inline double timestamp()
     (steady_clock::now().time_since_epoch()).count() / 1.0e+9;
 }
 
+
+
 void MotionTracker::track()
 {
   Vector3D<double> avg_accl_offset;
@@ -122,6 +150,7 @@ void MotionTracker::track()
   this->get_imu_data_points(accl0, angv0);
   accl0.value -= avg_accl_offset;
   velocity.timestamp = accl0.timestamp;
+  double t0 = accl0.timestamp;
   while(!this->stop_flag)
   {
     this->get_imu_data_points(accl, angv);
@@ -157,7 +186,46 @@ void MotionTracker::track()
       rotor = cos(theta) * rotor + sin(theta) * rotor * angv0.value / l;
       angv0 = angv;
     }
+
+    if (angv0.timestamp - t0 > 0.01 && this->ground_proxis.size() >= 3)
+    {
+      rotor *= Quaternion::pow(Quaternion::inv(rotor) * this->get_proxi_rotor(),
+          PROXI_WEIGHT);
+      t0 = angv0.timestamp;
+    }
   }
+}
+
+Quaternion MotionTracker::get_proxi_rotor()
+{
+  Eigen::Matrix<double, 3, Eigen::Dynamic> m(3, this->ground_proxis.size());
+  for (unsigned int i = 0; i < this->ground_proxis.size(); ++i)
+  {
+    double avg_dist = 0.0;
+    for (Proxi& p : this->ground_proxis[i])
+      avg_dist += p.get_distance();
+    avg_dist /= this->ground_proxis[i].size();
+    m.col(i) << this->ground_proxi_positions[i].x,
+                this->ground_proxi_positions[i].y,
+                this->ground_proxi_positions[i].z + avg_dist;
+  }
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(m, Eigen::ComputeThinU);
+  // Normal vector of the best-fit plane:
+  Eigen::Vector3d n = svd.matrixU().col(svd.matrixU().cols() - 1);
+  if (n(2) < 0.0)
+    n = -n;
+  double angle = acos(n(2) / n.norm());
+  Vector3D<double> axis(n(1), -n(0), 0); //cross product of n and (0, 0, 1)
+  Quaternion r1(cos(angle/2.0), sin(angle/2.0) * axis / Quaternion::norm(axis));
+
+  angle = 0.0;
+  for (int i = 0; i < 4; ++i)
+    angle += atan((double) (this->brakes[i].front->get_distance()
+          - this->brakes[i].rear->get_distance()) / BRAKE_PROXI_SEPARATION);
+  angle /= 4.0/*this->brakes.size()*/;
+  Quaternion r2(cos(angle/2.0), Vector3D<double>(0, 0, sin(angle/2.0)));
+
+  return r2*r1;
 }
 
 void MotionTracker::get_imu_data_points(
