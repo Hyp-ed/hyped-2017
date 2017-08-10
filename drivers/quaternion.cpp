@@ -71,13 +71,6 @@ Quaternion Quaternion::operator-() const
   return Quaternion(-this->scal, -this->vect);
 }
 
-Quaternion Quaternion::pow(double exp) const
-{
-  double theta = acos(this->scal / Quaternion::norm(*this));
-  return pow(Quaternion::norm(*this), exp) * Quaternion(cos(exp * theta),
-      sin(exp * theta) * this->vect / Quaternion::norm(this->vect));
-}
-
 double Quaternion::norm(const Quaternion& q)
 {
   return sqrt(q.scal * q.scal + q.vect.x * q.vect.x
@@ -94,6 +87,13 @@ Quaternion Quaternion::inv(const Quaternion& q)
   return Quaternion::conjugate(q)
       / (q.scal * q.scal + q.vect.x * q.vect.x
       + q.vect.y * q.vect.y + q.vect.z * q.vect.z);
+}
+
+Quaternion Quaternion::pow(const Quaternion base, double exp)
+{
+  double theta = acos(base.scal / Quaternion::norm(base));
+  return std::pow(Quaternion::norm(base), exp) * Quaternion(cos(exp * theta),
+      sin(exp * theta) * base.vect / Quaternion::norm(base.vect));
 }
 
 Quaternion operator+(Quaternion lhs, const Quaternion &rhs)
