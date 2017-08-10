@@ -24,6 +24,8 @@ class Quaternion
 
     Quaternion operator-() const;
 
+    Quaternion pow(double exponent) const;
+
     static double norm(const Quaternion& q);
     static Quaternion conjugate(const Quaternion& q);
     static Quaternion inv(const Quaternion& q);
