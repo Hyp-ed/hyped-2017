@@ -83,21 +83,21 @@ float accvalue = 0;
 float CurrZeropoint = 0;
 
 
-int Cell1 = 0; // variable to store actual cell voltages
-int Cell2 = 0;
-int Cell3 = 0;
-int Cell4 = 0;
-int Cell5 = 0;
-int Cell6 = 0;
-int Cell7 = 0;
-int Current = 0;
-int bigtemp = 0;
+float Cell1 = 0; // variable to store actual cell voltages  //ALL THESE USED TO BE INT
+float Cell2 = 0;
+float Cell3 = 0;
+float Cell4 = 0;
+float Cell5 = 0;
+float Cell6 = 0;
+float Cell7 = 0;
+float Current = 0;
+float bigtemp = 0;
 
-int smallbatt = 0;
-int smalltemp = 0;
+float smallbatt = 0;
+float smalltemp = 0;
 
-int pump = 0;
-int acc = 0;
+float pump = 0;
+float acc = 0;
 
 int i=0;
 
@@ -156,7 +156,7 @@ void setup() {
 
 void loop() {
   // basic get and show voltages
-  //getBattStat();
+  getBattStat();
 
   #ifdef SERIALDEBUG
   showBattStat();
@@ -219,7 +219,7 @@ void getBattStat() {
 
   Cell1 = adcVolt * analogRead(battPin0) * (46.5+39.1)/39.1 * 1000;
   Cell2 = adcVolt * (analogRead(battPin1) * ((120.0+39.0)/39.0)) * 1000 - Cell1;
-  Cell3 = (adcVolt * (analogRead(battPin2) * ((180.0+39.0)/39.0))* 1000 - Cell2-Cell1);
+  Cell3 = (adcVolt * (analogRead(battPin2) * ((180.0+39.0)/39.0))* 1000 - Cell2-Cell1); //Fix this here! It should just be subtracted from cell 2 because cell 2 already subtracts cell 1.. I think..
   Cell4 = (adcVolt * (analogRead(battPin3) * ((270.0+39.0)/39.0))* 1000 - Cell3-Cell2-Cell1);
   Cell5 = (adcVolt * (analogRead(battPin4) * ((330.0+39.0)/39.0))* 1000 - Cell4-Cell3-Cell2-Cell1);
   Cell6 = (adcVolt * (analogRead(battPin5) * ((390.0+39.0)/39.0))* 1000 - Cell5-Cell4-Cell3-Cell2-Cell1);
@@ -241,45 +241,127 @@ void getBattStat() {
   
 
 }
-
 void showBattStat() {
+//Serial.print("Pin ");
+//Serial.print(analogRead(accpin));  
+//Serial.print("        Pressure " );
+//Serial.print(acc);
+//Serial.print("\n");
   int x = Serial.read();
-if (x==1)
+if (x==1 || x == '1')
 {
 //Serial.print("CurrentDraw=");
 Serial.print (Current);
+Serial.print (' ');
 //Serial.print("A, CellVoltages=");
 Serial.print (Cell1);
+Serial.print (' ');
+
 //Serial.print ("V. " );
 Serial.print (Cell2);
+Serial.print (' ');
+
 //Serial.print ("V. ");
 Serial.print (Cell3);
+
+Serial.print (' ');
 //Serial.print ("V. ");
 Serial.print (Cell4);
+
+Serial.print (' ');
 //Serial.print ("V. ");
 Serial.print (Cell5);
+
+Serial.print (' ');
 //Serial.print ("V. " );
 Serial.print (Cell6);
+
+Serial.print (' ');
 //Serial.print ("V. ");
 Serial.print (Cell7);
+
+Serial.print (' ');
 //Serial.print ("V. Total = " );
 Serial.print (Cell1+Cell2+Cell3+Cell4+Cell5+Cell6+Cell7);
+Serial.print (' ');
  
 //Serial.print ("V, Bigtemp=");
 Serial.print (bigtemp);
+Serial.print (' ');
  
 //Serial.print ("C, SmallBattery=");
 Serial.print (smallbatt);
+Serial.print (' ');
 
 //Serial.print ("V, Smalltemp=");
 Serial.print (smalltemp);
+Serial.print (' ');
 
 //Serial.print ("C, PumpPressure=");
 Serial.print (pump);
+Serial.print (' ');
 //
 //Serial.print ("BAR, AccumulatorPressure=");
 Serial.println(acc);
 //Serial.println("BAR");
+
+}
+else if (x == 'a')
+{
+Serial.print("CurrentDraw=");
+Serial.print (Current);
+Serial.print (' ');
+Serial.print("A, CellVoltages=");
+Serial.print (Cell1);
+Serial.print (' ');
+
+Serial.print ("V. " );
+Serial.print (Cell2);
+Serial.print (' ');
+
+Serial.print ("V. ");
+Serial.print (Cell3);
+
+Serial.print (' ');
+Serial.print ("V. ");
+Serial.print (Cell4);
+
+Serial.print (' ');
+Serial.print ("V. ");
+Serial.print (Cell5);
+
+Serial.print (' ');
+Serial.print ("V. " );
+Serial.print (Cell6);
+
+Serial.print (' ');
+Serial.print ("V. ");
+Serial.print (Cell7);
+
+Serial.print (' ');
+Serial.print ("V. Total = " );
+Serial.print (Cell1+Cell2+Cell3+Cell4+Cell5+Cell6+Cell7);
+Serial.print (' ');
+ 
+Serial.print ("V, Bigtemp=");
+Serial.print (bigtemp);
+Serial.print (' ');
+ 
+Serial.print ("C, SmallBattery=");
+Serial.print (smallbatt);
+Serial.print (' ');
+
+Serial.print ("V, Smalltemp=");
+Serial.print (smalltemp);
+Serial.print (' ');
+
+Serial.print ("C, PumpPressure=");
+Serial.print (pump);
+Serial.print (' ');
+
+Serial.print ("BAR, AccumulatorPressure=");
+Serial.println(acc);
+Serial.println("BAR");
 
 }
 }
