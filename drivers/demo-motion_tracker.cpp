@@ -18,12 +18,12 @@
 #define GYRO_POS 5
 #define ACCL_POS 9 
 
-#define SENSOR1_PIN 3
-#define SENSOR2_PIN 4
-#define SENSOR3_PIN 5
-#define SENSOR4_PIN 6
-#define SENSOR5_PIN 7
-#define SENSOR6_PIN 1
+#define SENSOR1_PIN PIN22
+#define SENSOR2_PIN PIN23
+#define SENSOR3_PIN PIN24
+#define SENSOR4_PIN PIN25
+#define SENSOR5_PIN PIN4
+#define SENSOR6_PIN PIN18
 
 
 bool two_imus;
