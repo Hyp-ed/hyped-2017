@@ -35,7 +35,7 @@ void MotionTracker::add_imu(Imu &imu)
 
 void MotionTracker::add_ground_proxi(Proxi& sensor, Vector3D<double> position)
 {
-  for (unsigned int i = 0; this->ground_proxi_positions.size(); ++i)
+  for (unsigned int i = 0; i < this->ground_proxi_positions.size(); ++i)
     if (this->ground_proxi_positions[i] == position)
     {
       this->ground_proxis[i].push_back(sensor);
@@ -217,12 +217,12 @@ Quaternion MotionTracker::get_proxi_rotor()
   double angle = acos(n(2) / n.norm());
   Vector3D<double> axis(n(1), -n(0), 0); //cross product of n and (0, 0, 1)
   Quaternion r1(cos(angle/2.0), sin(angle/2.0) * axis / Quaternion::norm(axis));
-
+  
   angle = 0.0;
-  for (int i = 0; i < 4; ++i)
+  for (unsigned int i = 0; i < this->brakes.size(); ++i)
     angle += atan((double) (this->brakes[i].front->get_distance()
           - this->brakes[i].rear->get_distance()) / BRAKE_PROXI_SEPARATION);
-  angle /= 4.0/*this->brakes.size()*/;
+  angle /= this->brakes.size();
   Quaternion r2(cos(angle/2.0), Vector3D<double>(0, 0, sin(angle/2.0)));
 
   return r2*r1;

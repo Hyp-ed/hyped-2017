@@ -14,7 +14,7 @@
 
 #define BRAKE_PROXI_SEPARATION 250.0 //mm
 
-const double GYRO_WEIGHT = 0.9;
+const double GYRO_WEIGHT = 0.99;
 const double PROXI_WEIGHT = 1 - GYRO_WEIGHT;
 
 enum class RailSide
