@@ -1,7 +1,9 @@
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <fstream>
+#include <functional>
 #include <ncurses.h>
 #include <string>
 #include <thread>
@@ -11,15 +13,25 @@
 #include "motion_tracker.hpp"
 #include "quaternion.hpp"
 #include "vector3d.hpp"
+#include "vl6180.hpp"
 
 #define GYRO_POS 5
 #define ACCL_POS 9 
+
+#define SENSOR1_PIN 3
+#define SENSOR2_PIN 4
+#define SENSOR3_PIN 5
+#define SENSOR4_PIN 6
+#define SENSOR5_PIN 7
+#define SENSOR6_PIN 1
+
 
 bool two_imus;
 I2C i2c;
 Mpu6050 imu1(&i2c);
 Mpu6050* imu2 = nullptr;
 MotionTracker mt;
+Vl6180Factory& factory = Vl6180Factory::instance(&i2c);
 
 void setup();
 void finalize();
@@ -73,6 +85,26 @@ void setup()
     imu2 = new Mpu6050(&i2c, ALTERNATIVE_SLAVE_ADDR);
     mt.add_imu(*imu2);
   }
+
+  std::array<Vl6180*, 6> sensors;
+  sensors[0] = &(factory.make_sensor(SENSOR1_PIN));
+  sensors[1] = &(factory.make_sensor(SENSOR2_PIN));
+  sensors[2] = &(factory.make_sensor(SENSOR3_PIN));
+  sensors[3] = &(factory.make_sensor(SENSOR4_PIN));
+  sensors[4] = &(factory.make_sensor(SENSOR5_PIN));
+  sensors[5] = &(factory.make_sensor(SENSOR6_PIN));
+  for (int i = 0; i < 6; ++i)
+  {
+    sensors[i]->turn_on();
+    sensors[i]->set_intermeasurement_period(10);
+    sensors[i]->set_continuous_mode(true);
+  }
+  mt.add_ground_proxi(*sensors[0], Vector3D<double>(500, 1000, 0));
+  mt.add_ground_proxi(*sensors[1], Vector3D<double>(500, -1000, 0));
+  mt.add_ground_proxi(*sensors[2], Vector3D<double>(-500, -1000, 0));
+  mt.add_ground_proxi(*sensors[3], Vector3D<double>(-500, 1000, 0));
+  mt.add_brake_proxis(*sensors[4], *sensors[5], RailSide::left);
+
   mt.start();
 }
 
