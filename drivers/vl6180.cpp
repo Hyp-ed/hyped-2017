@@ -228,6 +228,17 @@ void Vl6180::set_intermeasurement_period(int msec)
   this->write8(SYSRANGE__INTERMEASUREMENT_PERIOD, msec);
 }
 
+void Vl6180::calibrate(int dist, int n)
+{
+  bool was_cont = this->cont_mode;
+  this->set_continuous_mode(false);
+  int sum = 0;
+  for (int i = 0; i < n; ++i)
+    sum += this->get_distance();
+  this->offset = sum/n - dist;
+  this->set_continuous_mode(was_cont);
+}
+
 void Vl6180::set_continuous_mode(bool enabled)
 {
   if (enabled == this->cont_mode)
@@ -253,18 +264,15 @@ bool Vl6180::is_continuous_mode()
 int Vl6180::get_distance()
 {
   if (this->cont_mode)
-    return (int) this->get_measurement();
+    return (int) this->get_measurement() - this->offset;
   else
-    return (int) this->poll_measurement();
+    return (int) this->poll_measurement() - this->offset;
 }
 
 Vl6180::Vl6180(I2C *bus, GpioPinNumber gpio_pin_num, uint8_t i2c_slave_addr)
-    
-      : bus {bus},
-    
+    : bus {bus},
     gpio_pin {Gpio::get_pin(gpio_pin_num, PinMode::out, PudControl::off)},
-    i2c_slave_addr {i2c_slave_addr},
-    cont_mode {false}
+    i2c_slave_addr {i2c_slave_addr}
 {
   this->turn_off();
 }

@@ -86,7 +86,8 @@ void setup()
     mt.add_imu(*imu2);
   }
 
-  std::array<Vl6180*, 6> sensors;
+  // Uncomment to use 6 proxis (4 to ground, 2 to rail from left)
+  /*std::array<Vl6180*, 6> sensors;
   sensors[0] = &(factory.make_sensor(SENSOR1_PIN));
   sensors[1] = &(factory.make_sensor(SENSOR2_PIN));
   sensors[2] = &(factory.make_sensor(SENSOR3_PIN));
@@ -96,6 +97,7 @@ void setup()
   for (int i = 0; i < 6; ++i)
   {
     sensors[i]->turn_on();
+    sensors[i]->calibrate(50, 100);
     sensors[i]->set_intermeasurement_period(10);
     sensors[i]->set_continuous_mode(true);
   }
@@ -103,7 +105,7 @@ void setup()
   mt.add_ground_proxi(*sensors[1], Vector3D<double>(500, -1000, 0));
   mt.add_ground_proxi(*sensors[2], Vector3D<double>(-500, -1000, 0));
   mt.add_ground_proxi(*sensors[3], Vector3D<double>(-500, 1000, 0));
-  mt.add_brake_proxis(*sensors[4], *sensors[5], RailSide::left);
+  mt.add_brake_proxis(*sensors[4], *sensors[5], RailSide::left);*/
 
   mt.start();
 }

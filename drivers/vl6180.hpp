@@ -45,6 +45,7 @@ class Vl6180 : public Proxi
     void turn_off();
     bool is_on();
     void set_intermeasurement_period(int msec);
+    void calibrate(int true_distance, int num_measurements);
     void set_continuous_mode(bool enabled);
     bool is_continuous_mode();
     /// Retrieves distance in mm (blocks if not in continuous mode)
@@ -67,9 +68,9 @@ class Vl6180 : public Proxi
     I2C *bus;
     GpioPin& gpio_pin;
     uint8_t i2c_slave_addr = DEFAULT_I2C_SLAVE_ADDR;
-    int distance = -1;
-    bool cont_mode;
+    bool cont_mode = false;
     bool on;
+    int offset = 0;
 };
 
 #endif //HYPED_DRIVERS_VL6180_HPP_
