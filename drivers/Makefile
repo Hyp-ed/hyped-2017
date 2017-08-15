@@ -2,27 +2,27 @@ OBJS = i2c.o gpio.o mpu6050.o vl6180.o battery.o raspberry_pi.o quaternion.o mot
 CC = g++
 DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
-LFLAGS = -Wall -latomic -lpthread -lwiringPi $(DEBUG)
+LFLAGS = -Wall -latomic -lpthread -lwiringPi -lncurses $(DEBUG)
 
 all : main demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
 
-main : $(OBJS) main.o
-	$(CC) $(OBJS) $(LFLAGS) main.o -o main
+main : main.o mpu6050.o i2c.o
+	$(CC) i2c.o mpu6050.o $(LFLAGS) main.o -o main
 
-demo-motion_tracker : $(OBJS) demo-motion_tracker.o
-	$(CC) $(OBJS) $(LFLAGS) -lncurses demo-motion_tracker.o -o demo-motion_tracker
+demo-motion_tracker : demo-motion_tracker.o motion_tracker.o quaternion.o mpu6050.o vl6180.o gpio.o i2c.o
+	$(CC) i2c.o gpio.o vl6180.o mpu6050.o quaternion.o motion_tracker.o $(LFLAGS) demo-motion_tracker.o -o demo-motion_tracker
 
-demo-vl6180 : $(OBJS) demo-vl6180.o
-	$(CC) $(OBJS) $(LFLAGS) -lncurses demo-vl6180.o -o demo-vl6180
+demo-vl6180 : demo-vl6180.o vl6180.o gpio.o i2c.o
+	$(CC) i2c.o gpio.o vl6180.o $(LFLAGS) demo-vl6180.o -o demo-vl6180
 
-proxi-hydro : $(OBJS) proxi-hydro.o
+proxi-hydro : $(OBJS) proxi-hydro.o 
 	$(CC) $(OBJS) $(LFLAGS) -lncurses proxi-hydro.o -o proxi-hydro
 
 demo-raspberry_pi : raspberry_pi.o demo-raspberry_pi.o
-	$(CC) raspberry_pi.o $(LFLAGS)  -lncurses demo-raspberry_pi.o -o demo-raspberry_pi
+	$(CC) raspberry_pi.o $(LFLAGS) demo-raspberry_pi.o -o demo-raspberry_pi
 
 demo-battery : demo-battery.o battery.o i2c.o
-	$(CC) $(LFLAGS) i2c.o battery.o demo-battery.o -lncurses -o demo-battery
+	$(CC) i2c.o battery.o $(LFLAGS) demo-battery.o -o demo-battery
 
 
 main.o : main.cpp mpu6050.hpp i2c.hpp
