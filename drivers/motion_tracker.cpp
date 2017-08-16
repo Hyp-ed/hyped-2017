@@ -216,7 +216,8 @@ Quaternion MotionTracker::get_proxi_rotor()
     n = -n;
   double angle = acos(n(2) / n.norm());
   Vector3D<double> axis(n(1), -n(0), 0); //cross product of n and (0, 0, 1)
-  Quaternion r1(cos(angle/2.0), sin(angle/2.0) * axis / Quaternion::norm(axis));
+  double l = Quaternion::norm(axis);
+  Quaternion r1(cos(angle/2.0), sin(angle/2.0) * ((l == 0.0) ? axis : axis / l));
   
   angle = 0.0;
   for (unsigned int i = 0; i < this->brakes.size(); ++i)
