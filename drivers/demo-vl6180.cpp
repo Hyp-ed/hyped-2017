@@ -11,8 +11,13 @@
 #include "gpio.hpp"
 #include "i2c.hpp"
 
-#define SENSOR1_PIN PIN23
-#define SENSOR2_PIN PIN24
+#define SENSOR1_PIN PIN22
+#define SENSOR2_PIN PIN23
+#define SENSOR3_PIN PIN24
+#define SENSOR4_PIN PIN25
+#define SENSOR5_PIN PIN4
+#define SENSOR6_PIN PIN18
+
 
 bool continuous_mode;
 std::vector<Vl6180*> sensors;
@@ -36,7 +41,11 @@ void setup()
   sensors.push_back(&sensor_ref);
 
   // Uncoment the following line and possibly add more to use more sensors
-  //sensors.push_back( &(factory.make_sensor(SENSOR2_PIN)) );
+  /*sensors.push_back( &(factory.make_sensor(SENSOR2_PIN)) );
+  sensors.push_back( &(factory.make_sensor(SENSOR3_PIN)) );
+  sensors.push_back( &(factory.make_sensor(SENSOR4_PIN)) );
+  sensors.push_back( &(factory.make_sensor(SENSOR5_PIN)) );
+  sensors.push_back( &(factory.make_sensor(SENSOR6_PIN)) );*/
 
   for (unsigned int i = 0; i < sensors.size(); ++i)
   {
