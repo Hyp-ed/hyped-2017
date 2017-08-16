@@ -1,12 +1,12 @@
 /*
  * serialTest.c:
- *	Very simple program to test the serial port. Expects
- *	the port to be looped back to itself
+ *  Very simple program to test the serial port. Expects
+ *  the port to be looped back to itself
  *
  * Copyright (c) 2012-2013 Gordon Henderson. <projects@drogon.net>
  ***********************************************************************
  * This file is part of wiringPi:
- *	https://projects.drogon.net/raspberry-pi/wiringpi/
+ *  https://projects.drogon.net/raspberry-pi/wiringpi/
  *
  *    wiringPi is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU Lesser General Public License as published by
@@ -44,30 +44,36 @@ float getData (char const data[])  //Used to be (char *data)
 {
  int fd;
 
-char serial[20]; //Looking for a serial connection 
-if( access( "/dev/ttyACM0", F_OK ) != -1 ) {
-  strcpy(serial,"/dev/ttyACM0");
-//tty = fopen("/dev/ttyACM0","r");
-//printf("\nACM0\n");
-} 
 
-else if( access( "/dev/ttyACM1", F_OK ) != -1 ) {
-  strcpy(serial,"/dev/ttyACM1");
-//tty = fopen("/dev/ttyACM1","r");
-//printf("\nACM1\n");
-} 
 
-else if( access( "/dev/ttyACM2", F_OK ) != -1 ) {
-//tty = fopen("/dev/ttyACM2","r");
- strcpy(serial,"/dev/ttyACM2");
-//printf("\nACM2\n");
-} 
+char serial[20]; //Looking for a serial connection, Goes through the possible files where the serial stream can be found and connects once it finds an open steam, if more than one arduino will be connected to the same pi, this will have to involve an authentication.
+int i = 0;
+int lim = 128;
+char* chari = malloc(sizeof(*chari));
+while ( i < lim)
+{
 
-else
-  {
- printf("error no serial connection detected\n");
- return -1;
+  sprintf(chari, "%d", i);
+  strcpy(serial, "/dev/ttyACM");
+  strcat(serial, chari);
+    
+   // printf("%s\n", serial);
+  if( access(serial, F_OK ) != -1 )
+   {
+  break;
   }
+else if ((i = lim -1 ))
+{
+  printf("ERROR, No serial connection detected");
+  return -1;
+}
+
+  i++;
+}
+
+
+ 
+
   if ((fd = serialOpen (serial, 115200)) < 0)
   {
     fprintf (stderr, "Unable to open serial device: %s\n", strerror (errno)) ;
@@ -82,7 +88,7 @@ else
 
 
 
-char a[1120] ;
+char a[256] ;
 int j = 0;
 int b = 1;
 serialPutchar (fd, b);
@@ -95,12 +101,10 @@ while (serialDataAvail(fd)!= 0)
 }
 //printf(a);
 
-float current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp,
-small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure = -1;
+float current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp, small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure = -1;
 sscanf(a, "%f %f %f %f %f %f %f %f %f %f %f %f %f %f",&current,&cell1V,&cell2V,&cell3V,&cell4V,&cell5V,&cell6V,&cell7V,&big_battery_voltage, &big_battery_temp,
 &small_battery_voltage, &small_battery_temp, &pump_pressure, &accumulator_pressure);
-//printf("%f %f %f %f %f %f %f %f %f %f %f %f %f %f", current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp,
-//small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure);
+//printf("%f %f %f %f %f %f %f %f %f %f %f %f %f %f", current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp, small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure);
 float value = -1;
 if (strcmp(data, "current")== 0)
 {
