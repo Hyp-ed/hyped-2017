@@ -4,10 +4,10 @@ DEBUG = -g
 CFLAGS = -std=c++11 -Wall -c -O3 $(DEBUG)
 LFLAGS = -Wall -latomic -lpthread -lwiringPi -lncurses $(DEBUG)
 
-all : main demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
+all : demo-mpu6050 demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
 
-main : main.o mpu6050.o i2c.o
-	$(CC) i2c.o mpu6050.o $(LFLAGS) main.o -o main
+demo-mpu6050 : demo-mpu6050.o mpu6050.o i2c.o
+	$(CC) i2c.o mpu6050.o $(LFLAGS) demo-mpu6050.o -o demo-mpu6050
 
 demo-motion_tracker : demo-motion_tracker.o motion_tracker.o quaternion.o mpu6050.o vl6180.o gpio.o i2c.o
 	$(CC) i2c.o gpio.o vl6180.o mpu6050.o quaternion.o motion_tracker.o $(LFLAGS) demo-motion_tracker.o -o demo-motion_tracker
@@ -25,8 +25,8 @@ demo-battery : demo-battery.o battery.o i2c.o
 	$(CC) i2c.o battery.o $(LFLAGS) demo-battery.o -o demo-battery
 
 
-main.o : main.cpp mpu6050.hpp i2c.hpp
-	$(CC) $(CFLAGS) main.cpp
+demo-mpu6050.o : demo-mpu6050.cpp mpu6050.hpp i2c.hpp
+	$(CC) $(CFLAGS) demo-mpu6050.cpp
 
 demo-motion_tracker.o : demo-motion_tracker.cpp mpu6050.hpp i2c.hpp vector3d.hpp motion_tracker.hpp quaternion.hpp
 	$(CC) $(CFLAGS) demo-motion_tracker.cpp
@@ -76,5 +76,5 @@ serialData.o : serialData.h serialData.c
 
 
 clean :
-	rm *.o main demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
+	rm *.o demo-mpu6050 demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
 

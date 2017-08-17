@@ -3,14 +3,17 @@
 .DS_Store
 
 # Ignore executables
-main
-integrator
+demo-mpu6050
 demo-motion_tracker
 demo-vl6180
 demo-raspberry_pi
 demo-battery
 proxi-hydro
 slave
+# Old executables
+main
+integrator
+test_motion_tracker
 
 # Outputs
 *.csv

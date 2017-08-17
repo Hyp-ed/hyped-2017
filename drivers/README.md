@@ -17,7 +17,7 @@ Utilities:
  - Timestamped datapoints and basic integration (`data_point.hpp`)
 
 Demos and tests:
- - For MPU6050: `main.cpp`
+ - For MPU6050: `demo-mpu6050.cpp`
  - For VL6180: `demo-vl6180.cpp`
  - For Raspberry Pi: `demo-raspberry_pi.cpp`
  - For Motion Tracker: `demo-motion_tracker.cpp`
