@@ -76,5 +76,5 @@ serialData.o : serialData.h serialData.c
 
 
 clean :
-	rm *.o demo-mpu6050 demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
+	rm -f *.o demo-mpu6050 demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-battery proxi-hydro
 
