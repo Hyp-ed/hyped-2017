@@ -1,8 +1,7 @@
 /*
  * LESSONS LEARNED
  *  1. Correct i2c-dev.h
- *    The default `/usr/include/linux/i2c-dev.h` is only meant to be used by the kernel and does not
- *    contain the `i2c_smbus_...()` functions.
+ *    The default `/usr/include/linux/i2c-dev.h` is only meant to be used by the kernel.
  *    Fixed by `sudo apt install libi2c-dev`.
  *  2. Add users to i2c group
  *    By default, users do not have permission to access the `/dev/i2c-1` file, hence error on
@@ -16,6 +15,8 @@
 #include <array>
 #include <cstdio>
 #include <cmath>
+#include <ios> // for std::hex and std::dec
+#include <sstream> // for std::stringstream
 
 // MPU6050's register addresses
 // For more information refer to MPU-6050 Register Map and Descriptions at
@@ -71,83 +72,70 @@
 #define DEFAULT_ACCL_RANGE ACCL_RANGE_2G
 #define DEFAULT_GYRO_RANGE GYRO_RANGE_250DPS
 
-using namespace std;
 
-const array<double, 4> ACCL_SCALES = {16384.0, 8192.0, 4096.0, 2048.0};
-const array<double, 4> GYRO_SCALES = {131.0, 65.5, 32.8, 16.4};
+const std::array<double, 4> ACCL_SCALES = {16384.0, 8192.0, 4096.0, 2048.0};
+const std::array<double, 4> GYRO_SCALES = {131.0, 65.5, 32.8, 16.4};
 
 Mpu6050::Mpu6050(I2C *bus, uint8_t slave_addr /*= DEFAULT_SLAVE_ADDR*/)
+    : bus(bus), slave_addr(slave_addr), gyro_offset(0.0, 0.0, 0.0)
 {
-  this->bus = bus;
-  this->gyro_offset.x = 0.0;
-  this->gyro_offset.y = 0.0;
-  this->gyro_offset.z = 0.0;
-  this->slave_addr = slave_addr;
+  try
+  {
+    // POWER MGMT setup
+    this->write8(PWR_MGMT_1, 0x80); //PWR_MGMT_1 - reset
+    sleep(1); //sleep for 1 second, probably not necessary but just in case...
 
-  // POWER MGMT setup
-  this->write8(PWR_MGMT_1, 0x80); //PWR_MGMT_1 - reset
-  sleep(1); //sleep for 1 second, probably not necessary but just in case...
-  
-  this->write8(PWR_MGMT_1, 0x03); //PWR_MGMT_1 - set gyro z as clock source
-  sleep(1); //sleep for 1 second, probably not necessary but just in case...
+    this->write8(PWR_MGMT_1, 0x03); //PWR_MGMT_1 - set gyro z as clock source
+    sleep(1); //sleep for 1 second, probably not necessary but just in case...
+  }
+  catch (I2CException& e)
+  {
+    std::stringstream message;
+    message << "MPU6050 @ 0x" << std::hex << (int) this->slave_addr
+        << ": Initialization failed: " << e.what();
+    throw Mpu6050Exception(message.str(), this->slave_addr);
+  }
 
   this->set_accl_range(DEFAULT_ACCL_RANGE);
   this->set_gyro_range(DEFAULT_GYRO_RANGE);
 }
 
-void Mpu6050::write8(char reg_addr, char data)
-{
-  char buf[2] = {reg_addr, data};
-  this->bus->write(this->slave_addr, 2, buf);
-}
-
-uint8_t Mpu6050::read8(char reg_addr)
-{
-  char send_buf[1] = {reg_addr};
-  char recv_buf[1];
-  this->bus->write_read(this->slave_addr, 1, send_buf, 1, recv_buf);
-  return (uint8_t) recv_buf[0];
-}
-
-short Mpu6050::read16(char reg_addr)
-{
-  char send_buf[1] = {reg_addr};
-  char recv_buf[2];
-  this->bus->write_read(this->slave_addr, 1, send_buf, 2, recv_buf);
-  return (short) ((recv_buf[0] << 8) | recv_buf[1]); //little-endian
-}
-
-vector<uint8_t> Mpu6050::read_bytes(char reg_addr, short length)
-{
-  char send_buf[1] = {reg_addr};
-  char recv_buf[length];
-  this->bus->write_read(this->slave_addr, 1, send_buf, length, recv_buf);
-  vector<uint8_t> vec (length); // new vector of size `length`
-  for (int i = 0; i < length; i++)
-  {
-    vec[i] = (uint8_t) recv_buf[i];
-  }
-  return vec;
-}
-
-
-
 void Mpu6050::set_accl_range(char range)
 {
   if (range < ACCL_RANGE_MIN || range > ACCL_RANGE_MAX)
     range = DEFAULT_ACCL_RANGE;
-  // TODO: do not reset the self-test bits (ACCEL_CONFIG[7:5])
-  this->write8(ACCEL_CONFIG, range); //range selection in ACCEL_CONFIG[4:3] (3 lsb empty)
-  this->accl_scale = ACCL_SCALES[range >> 3];
+  try
+  {
+    // TODO: do not reset the self-test bits (ACCEL_CONFIG[7:5])
+    this->write8(ACCEL_CONFIG, range); //rng sel in ACCEL_CONFIG[4:3] (3 lsb empty)
+    this->accl_scale = ACCL_SCALES[range >> 3];
+  }
+  catch (I2CException& e)
+  {
+    std::stringstream message;
+    message << "MPU6050 @ 0x" << std::hex << (int) this->slave_addr
+      << ": Accelerometer range selection failed: " << e.what();
+    throw Mpu6050Exception(message.str(), this->slave_addr);
+  }
 }
 
 void Mpu6050::set_gyro_range(char range)
 {
   if (range < GYRO_RANGE_MIN || range > GYRO_RANGE_MAX)
     range = DEFAULT_GYRO_RANGE;
-  // TODO: do not reset the self-test bits (GYRO_CONFIG[7:5])
-  this->write8(GYRO_CONFIG, range); //range selection in GYRO_CONFIG[4:3] (3 lsb empty)
-  this->gyro_scale = GYRO_SCALES[range >> 3];
+  try
+  {
+    // TODO: do not reset the self-test bits (GYRO_CONFIG[7:5])
+    this->write8(GYRO_CONFIG, range); //rng sel in GYRO_CONFIG[4:3] (3 lsb empty)
+    this->gyro_scale = GYRO_SCALES[range >> 3];
+  }
+  catch (I2CException& e)
+  {
+    std::stringstream message;
+    message << "MPU6050 @ 0x" << std::hex << (int) this->slave_addr
+        << ": Gyroscope range selection failed: " << e.what();
+    throw Mpu6050Exception(message.str(), this->slave_addr);
+  }
 }
 
 void Mpu6050::calibrate_gyro(int num_samples)
@@ -155,12 +143,22 @@ void Mpu6050::calibrate_gyro(int num_samples)
   this->gyro_offset.x = 0.0;
   this->gyro_offset.y = 0.0;
   this->gyro_offset.z = 0.0;
-  for (int i = 0; i < num_samples; i++)
+  try
   {
-    RawGyroData data = this->get_raw_gyro_data();
-    this->gyro_offset.x += data.x;
-    this->gyro_offset.y += data.y;
-    this->gyro_offset.z += data.z;
+    for (int i = 0; i < num_samples; i++)
+    {
+      RawGyroData data = this->get_raw_gyro_data();
+      this->gyro_offset.x += data.x;
+      this->gyro_offset.y += data.y;
+      this->gyro_offset.z += data.z;
+    }
+  }
+  catch (I2CException& e)
+  {
+    std::stringstream message;
+    message << "MPU6050 @ 0x" << std::hex << (int) this->slave_addr
+        << ": Gyroscope calibration failed: " << e.what();
+    throw Mpu6050Exception(message.str(), this->slave_addr);
   }
   this->gyro_offset.x /= num_samples;
   this->gyro_offset.y /= num_samples;
@@ -169,70 +167,92 @@ void Mpu6050::calibrate_gyro(int num_samples)
 
 SelfTestResult Mpu6050::test_accl()
 {
-  uint8_t rng = this->read8(ACCEL_CONFIG) & 0x18; // save current range setting
-  
   RawAcclData rad1, rad2;
-  
-  this->write8(ACCEL_CONFIG, XA_ST | YA_ST | ZA_ST | ACCL_RANGE_8G); // self-test config
-  sleep(2);
-  rad1 = this->get_raw_accl_data();
+  std::array<double, 3> ft;
+  try
+  {
+    uint8_t rng = this->read8(ACCEL_CONFIG) & 0x18; // save current range setting
 
-  // Get factory trim (FT)
-  vector<uint8_t> test = this->read_bytes(SELF_TEST_X, 4);
-  /*for (int i = 0; i < 3; i++)
-    test[i] = ((test[i] & 0xE0) >> 3) | ((test[4] & (0x3 << (4 - 2*i))) >> (4 - 2*i));//*/
-  test[0] = ((test[0] & 0xE0) >> 3) | ((test[4] & 0x30) >> 4);
-  test[1] = ((test[1] & 0xE0) >> 3) | ((test[4] & 0x0C) >> 2);
-  test[2] = ((test[2] & 0xE0) >> 3) | (test[4] & 0x03);
-  array<double, 3> ft;
-  for (int i = 0; i < 3; i++)
-    if (test[i] != 0)
-      ft[i] = 4096 * 0.34 * pow(0.92 / 0.34, (test[i] - 1) / 30); //magic numbers from register desc.
-    else
-      ft[i] = 0;
+    this->write8(ACCEL_CONFIG, XA_ST | YA_ST | ZA_ST | ACCL_RANGE_8G); // self-test config
+    sleep(2);
+    rad1 = this->get_raw_accl_data();
 
-  this->write8(ACCEL_CONFIG, ACCL_RANGE_8G); // stop self-test
-  sleep(2);
-  rad2 = this->get_raw_accl_data();
-  this->write8(ACCEL_CONFIG, rng); // restore range setting
+    // Get factory trim (FT)
+    std::vector<uint8_t> test = this->read_bytes(SELF_TEST_X, 4);
+    /*for (int i = 0; i < 3; i++)
+      test[i] = ((test[i] & 0xE0) >> 3) | ((test[4] & (0x3 << (4 - 2*i))) >> (4 - 2*i));//*/
+    test[0] = ((test[0] & 0xE0) >> 3) | ((test[4] & 0x30) >> 4);
+    test[1] = ((test[1] & 0xE0) >> 3) | ((test[4] & 0x0C) >> 2);
+    test[2] = ((test[2] & 0xE0) >> 3) | (test[4] & 0x03);
+    for (int i = 0; i < 3; i++)
+      if (test[i] != 0)
+        ft[i] = 4096 * 0.34 * pow(0.92 / 0.34, (test[i] - 1) / 30); //magic numbers from register desc.
+      else
+        ft[i] = 0;
+
+    this->write8(ACCEL_CONFIG, ACCL_RANGE_8G); // stop self-test
+    sleep(2);
+    rad2 = this->get_raw_accl_data();
+    this->write8(ACCEL_CONFIG, rng); // restore range setting
+  }
+  catch (I2CException& e)
+  {
+    // Sensor may be in various states now; program should terminate or more
+    // handling should be done to recover
+    std::stringstream message;
+    message << "MPU6050 @ 0x" << std::hex << (int) this->slave_addr
+        << ": Error during accelerometer self test: " << e.what();
+    throw Mpu6050Exception(message.str(), this->slave_addr);
+  }
 
   // Calculate percentage deviation from FT
   SelfTestResult result;
   result.x_dev = ((rad1.x - rad2.x) - ft[0]) / ft[0] * 100.0;
   result.y_dev = ((rad1.y - rad2.y) - ft[1]) / ft[1] * 100.0;
   result.z_dev = ((rad1.z - rad2.z) - ft[2]) / ft[2] * 100.0;
-  result.passed = abs(result.x_dev) <= result.max_dev &&     
-                  abs(result.y_dev) <= result.max_dev &&     
-                  abs(result.z_dev) <= result.max_dev;       
+  result.passed = (std::abs(result.x_dev) <= result.max_dev) &&     
+                  (std::abs(result.y_dev) <= result.max_dev) &&     
+                  (std::abs(result.z_dev) <= result.max_dev);       
 
   return result;
 }
 
 SelfTestResult Mpu6050::test_gyro()
 {
-  uint8_t rng = this->read8(GYRO_CONFIG) & 0x18; // save current range setting
-
   RawGyroData rgd1, rgd2;
+  std::array<double, 3> ft;
+  try
+  {
+    uint8_t rng = this->read8(GYRO_CONFIG) & 0x18; // save current range setting
 
-  this->write8(GYRO_CONFIG, XG_ST | YG_ST | ZG_ST | GYRO_RANGE_250DPS); //all tests, 250dps range
-  sleep(1);
-  rgd1 = this->get_raw_gyro_data();
+    this->write8(GYRO_CONFIG, XG_ST | YG_ST | ZG_ST | GYRO_RANGE_250DPS); //all tests, 250dps range
+    sleep(1);
+    rgd1 = this->get_raw_gyro_data();
 
-  // Get factory trim (FT)
-  vector<uint8_t> test = this->read_bytes(SELF_TEST_X, 3);
-  for (int i = 0; i < 3; i++) test[i] = test[i] & 0x1F;
-  array<double, 3> ft;
-  for (int i = 0; i < 3; i++)
-    if (test[i] != 0)
-      ft[i] = 25 * 131 * pow(1.046, test[i] - 1); // magic numbers from register descriptions doc
-    else
-      ft[i] = 0;
-  ft[1] = -ft[1];
+    // Get factory trim (FT)
+    std::vector<uint8_t> test = this->read_bytes(SELF_TEST_X, 3);
+    for (int i = 0; i < 3; i++) test[i] = test[i] & 0x1F;
+    for (int i = 0; i < 3; i++)
+      if (test[i] != 0)
+        ft[i] = 25 * 131 * pow(1.046, test[i] - 1); // magic numbers from register descriptions doc
+      else
+        ft[i] = 0;
+    ft[1] = -ft[1];
 
-  this->write8(GYRO_CONFIG, GYRO_RANGE_250DPS); // stop self-test
-  sleep(1);
-  rgd2 = this->get_raw_gyro_data();
-  this->write8(GYRO_CONFIG, rng); // restore range setting
+    this->write8(GYRO_CONFIG, GYRO_RANGE_250DPS); // stop self-test
+    sleep(1);
+    rgd2 = this->get_raw_gyro_data();
+    this->write8(GYRO_CONFIG, rng); // restore range setting
+  }
+  catch (I2CException& e)
+  {
+    // Sensor may be in various states now; program should terminate or more
+    // handling should be done to recover
+    std::stringstream message;
+    message << "MPU6050 @ 0x" << std::hex << (int) this->slave_addr
+        << ": Error during gyroscope self test: " << e.what();
+    throw Mpu6050Exception(message.str(), this->slave_addr);
+  }
 
   // Calculate percentage deviation from FT
   SelfTestResult result;
@@ -248,7 +268,18 @@ SelfTestResult Mpu6050::test_gyro()
 
 RawAcclData Mpu6050::get_raw_accl_data()
 {
-  vector<uint8_t> bytes = this->read_bytes(ACCEL_XOUT_H, 6); //read all 6 accl output registers
+  std::vector<uint8_t> bytes;
+  try
+  {
+    bytes = this->read_bytes(ACCEL_XOUT_H, 6); //read all 6 accl output registers
+  }
+  catch (I2CException& e)
+  {
+    std::stringstream message;
+    message << "MPU6050 @ 0x" << std::hex << (int) this->slave_addr
+        << ": Accelerometer data access failed: " << e.what();
+    throw Mpu6050Exception(message.str(), this->slave_addr);
+  }
   RawAcclData data;
   data.x = (short) ((bytes[0] << 8) | bytes[1]);
   data.y = (short) ((bytes[2] << 8) | bytes[3]);
@@ -258,7 +289,18 @@ RawAcclData Mpu6050::get_raw_accl_data()
 
 RawGyroData Mpu6050::get_raw_gyro_data()
 {
-  vector<uint8_t> bytes = this->read_bytes(GYRO_XOUT_H, 6); //read all 6 gyro output registers
+  std::vector<uint8_t> bytes;
+  try
+  {
+    bytes = this->read_bytes(GYRO_XOUT_H, 6); //read all 6 gyro output registers
+  }
+  catch (I2CException& e)
+  {
+    std::stringstream message;
+    message << "MPU6050 @ 0x" << std::hex << (int) this->slave_addr
+        << ": Gyroscope data access failed: " << e.what();
+    throw Mpu6050Exception(message.str(), this->slave_addr);
+  }
   RawGyroData data;
   data.x = (short) ((bytes[0] << 8) | bytes[1]);
   data.y = (short) ((bytes[2] << 8) | bytes[3]);
@@ -268,7 +310,18 @@ RawGyroData Mpu6050::get_raw_gyro_data()
 
 RawSensorData Mpu6050::get_raw_sensor_data()
 {
-  vector<uint8_t> bytes = this->read_bytes(ACCEL_XOUT_H, 14); //read all 14 output registers
+  std::vector<uint8_t> bytes;
+  try
+  {
+    bytes = this->read_bytes(ACCEL_XOUT_H, 14); //read all 14 output registers
+  }
+  catch (I2CException& e)
+  {
+    std::stringstream message;
+    message << "MPU6050 @ 0x" << std::hex << (int) this->slave_addr
+        << ": Sensor data access failed: " << e.what();
+    throw Mpu6050Exception(message.str(), this->slave_addr);
+  }
   RawSensorData data;
   data.accl.x = (short) ((bytes[0] << 8) | bytes[1]);
   data.accl.y = (short) ((bytes[2] << 8) | bytes[3]);
@@ -336,4 +389,51 @@ ImuData Mpu6050::get_imu_data()
 {
   SensorData data = this->get_sensor_data();
   return ImuData(data.accl, data.angv);
+}
+
+
+void Mpu6050::write8(char reg_addr, char data) const
+{
+  char buf[2] = {reg_addr, data};
+  this->bus->write(this->slave_addr, 2, buf);
+}
+
+uint8_t Mpu6050::read8(char reg_addr) const
+{
+  char send_buf[1] = {reg_addr};
+  char recv_buf[1];
+  this->bus->write_read(this->slave_addr, 1, send_buf, 1, recv_buf);
+  return (uint8_t) recv_buf[0];
+}
+
+short Mpu6050::read16(char reg_addr) const
+{
+  char send_buf[1] = {reg_addr};
+  char recv_buf[2];
+  this->bus->write_read(this->slave_addr, 1, send_buf, 2, recv_buf);
+  return (short) ((recv_buf[0] << 8) | recv_buf[1]); //little-endian
+}
+
+std::vector<uint8_t> Mpu6050::read_bytes(char reg_addr, short length) const
+{
+  char send_buf[1] = {reg_addr};
+  char recv_buf[length];
+  this->bus->write_read(this->slave_addr, 1, send_buf, length, recv_buf);
+  std::vector<uint8_t> vec (length); // new vector of size `length`
+  for (int i = 0; i < length; i++)
+  {
+    vec[i] = (uint8_t) recv_buf[i];
+  }
+  return vec;
+}
+
+
+
+Mpu6050Exception::Mpu6050Exception(std::string msg, uint8_t addr)
+    : i2c_slave_address(addr), message(msg)
+{}
+
+const char* Mpu6050Exception::what() const noexcept
+{
+  return this->message.c_str();
 }

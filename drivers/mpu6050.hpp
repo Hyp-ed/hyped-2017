@@ -1,7 +1,9 @@
-#ifndef HYPED_DRIVERS_MPU6050_H_
-#define HYPED_DRIVERS_MPU6050_H_
+#ifndef HYPED_DRIVERS_MPU6050_HPP_
+#define HYPED_DRIVERS_MPU6050_HPP_
 
 #include <cstdint>
+#include <exception>
+#include <string>
 #include <vector>
 
 #include "i2c.hpp"
@@ -58,38 +60,50 @@ struct SelfTestResult {
 };
 
 class Mpu6050 : public Imu{
- public:
-  Mpu6050 (I2C* bus, uint8_t slave_addr = DEFAULT_SLAVE_ADDR);
+  public:
+    Mpu6050 (I2C* bus, uint8_t slave_addr = DEFAULT_SLAVE_ADDR);
 
-  void set_accl_range(char range);
-  void set_gyro_range(char range);
-  virtual void calibrate_gyro(int num_samples);
-  SelfTestResult test_accl();
-  SelfTestResult test_gyro();
-  RawAcclData get_raw_accl_data();
-  RawGyroData get_raw_gyro_data();
-  RawSensorData get_raw_sensor_data();
-  virtual Vector3D<double> get_acceleration(); //performs accl reading
-  Acceleration get_acceleration(RawAcclData accl_reading); //conversion only, no sensor reading
-  Acceleration get_acceleration(RawSensorData reading); //conversion only, no sensor reading
-  virtual Vector3D<double> get_angular_velocity(); //performs gyro reading
-  AngularVelocity get_angular_velocity(RawGyroData gyro_reading); //conversion only, no sensor reading
-  AngularVelocity get_angular_velocity(RawSensorData reading); //conversion only, no sensor reading
-  SensorData get_sensor_data(); //performs all data reading
-  SensorData get_sensor_data(RawSensorData reading); //conversion only, no sensor reading
-  virtual ImuData get_imu_data(); // calls get_sensor_data()
+    void set_accl_range(char range);
+    void set_gyro_range(char range);
+    virtual void calibrate_gyro(int num_samples);
+    SelfTestResult test_accl();
+    SelfTestResult test_gyro();
+    RawAcclData get_raw_accl_data();
+    RawGyroData get_raw_gyro_data();
+    RawSensorData get_raw_sensor_data();
+    virtual Vector3D<double> get_acceleration(); //performs accl reading
+    Acceleration get_acceleration(RawAcclData accl_reading); //conversion only, no sensor reading
+    Acceleration get_acceleration(RawSensorData reading); //conversion only, no sensor reading
+    virtual Vector3D<double> get_angular_velocity(); //performs gyro reading
+    AngularVelocity get_angular_velocity(RawGyroData gyro_reading); //conversion only, no sensor reading
+    AngularVelocity get_angular_velocity(RawSensorData reading); //conversion only, no sensor reading
+    SensorData get_sensor_data(); //performs all data reading
+    SensorData get_sensor_data(RawSensorData reading); //conversion only, no sensor reading
+    virtual ImuData get_imu_data(); // calls get_sensor_data()
 
- private:
-  void write8(char reg_addr, char data);
-  uint8_t read8(char reg_addr);
-  short read16(char reg_addr);
-  std::vector<uint8_t> read_bytes(char reg_addr, short length);
+  private:
+    void write8(char reg_addr, char data) const;
+    uint8_t read8(char reg_addr) const;
+    short read16(char reg_addr) const;
+    std::vector<uint8_t> read_bytes(char reg_addr, short length) const;
 
-  I2C *bus;
-  uint8_t slave_addr;
-  double accl_scale;
-  double gyro_scale;
-  Vector3D<double> gyro_offset;
+    I2C *bus;
+    uint8_t slave_addr;
+    double accl_scale;
+    double gyro_scale;
+    Vector3D<double> gyro_offset;
 };
 
-#endif // HYPED_DRIVERS_MPU6050_H_
+class Mpu6050Exception : public std::exception
+{
+  public:
+    Mpu6050Exception(std::string message, uint8_t i2c_slave_address);
+    virtual const char* what() const noexcept override;
+
+    const uint8_t i2c_slave_address;
+
+  private:
+    const std::string message;
+};
+
+#endif // HYPED_DRIVERS_MPU6050_HPP_
