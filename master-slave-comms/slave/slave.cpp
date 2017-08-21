@@ -65,9 +65,9 @@ void * loop(void * m)
         retracted = false;
 
         /* here goes the hydraulics code for braking */
-        hydraulics->spin_up();
-        hydraulics->extend("left");
-        hydraulics->extend("right");
+        hydraulics.spin_up();
+        hydraulics.extend("left");
+        hydraulics.extend("right");
         master.Send("OK");
         master.clean();
     }
@@ -77,9 +77,9 @@ void * loop(void * m)
         retracted = true;
 
         /* here goes the hydraulics code for retracting */
-        hydraulics->spin_up();
-        hydraulics->retract("left");
-        hydraulics->retract("right");
+        hydraulics.spin_up();
+        hydraulics.retract("left");
+        hydraulics.retract("right");
         master.Send("OK");
         master.clean();
     }
@@ -95,8 +95,8 @@ int main()
   Vl6180& sensor_ref = factory.make_sensor(SENSOR1_PIN);
   // Store pointer to the driver instance
   sensors.push_back(&sensor_ref);
-  hydraulics->set_up_pins();
-  hydraulics->pressure();
+  hydraulics.set_up_pins();
+  hydraulics.pressure();
 
   // Uncoment the following line and possibly add more to use more sensors
   //sensors.push_back( &(factory.make_sensor(SENSOR2_PIN)) );
