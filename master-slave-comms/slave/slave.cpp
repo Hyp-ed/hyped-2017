@@ -6,7 +6,7 @@
 #include "drivers/i2c.hpp"
 #include "drivers/vl6180.hpp"
 #include "NetworkSlave.hpp"
-#include "Hydraulics.hpp"
+#include "hydraulics.hpp"
 
 #define SENSOR1_PIN PIN23
 #define SENSOR2_PIN PIN24
