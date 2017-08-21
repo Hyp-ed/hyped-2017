@@ -1,4 +1,5 @@
 #include "hydraulics.hpp"
+#include "serialData.h"
 
 #define PUMP_SPINUP 400000 // microseconds = 400 miliseconds 
 #define INRUSH_LIMIT 100
@@ -105,5 +106,36 @@ void Hydraulics::charge_accumulators() {
     this->pump.write(true);
 }
 
+void Hydraulics::pressure(const char frontrear, int pressure)
+{
+    this->pump.write(false);
+    
+    delay(PUMP_SPINUP);
+    
+    this->solenoid_1.write(true);
+    this->solenoid_2.write(true);
+    this->solenoid_3.write(false);
+    this->solenoid_4.write(true);
+    this->solenoid_5.write(true);
+    this->solenoid_6.write(true);
+    this->solenoid_7.write(false);
+    
+    float p = 0;
+       while(p < pressure || p != -1)//ADD WHEN CURRENT SENSOR WORKS!
+    {
+        p = getData("accumulator_pressure");
+        printf("%f", p);
+        delay(50);
+    }
 
+    this->solenoid_1.write(true);
+    this->solenoid_2.write(true);
+    this->solenoid_3.write(true);
+    this->solenoid_4.write(true);
+    this->solenoid_5.write(true);
+    this->solenoid_6.write(true);
+    this->solenoid_7.write(true);
+    this->pump.write(true);
+    
+}
 

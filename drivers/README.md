@@ -47,7 +47,6 @@ Executables: (to be removed)
  - `primeMotor`
  - `retract`
  - `serialTest`
- - `serialTest ; ä ä `
  - `setup`
  - `test`
  - `test_motion_tracker`
