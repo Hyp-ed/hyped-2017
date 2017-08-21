@@ -35,7 +35,7 @@ byte blank[28];
 // select the input pins for the batteries
 
 
-
+#define smallbatteryCurrPin A1
 #define smallbattPinV A8
 #define smallbattPinT A5
 
@@ -181,7 +181,8 @@ void getBattStat() {
   abattValue4 = (analogRead(battPin4) * battWeighting) + (abattValue4 * (1-battWeighting));
   abattValue5 = (analogRead(battPin5) * battWeighting) + (abattValue5 * (1-battWeighting));
   abattValue6 = (analogRead(battPin6) * battWeighting) + (abattValue6 * (1-battWeighting));
-  
+
+  aSmallCurrentValue = (analogRead(smallbatteryCurrPin) * battWeighting) + (acurrValue * (1-battWeighting));
   acurrValue = (analogRead(currPin) * battWeighting) + (acurrValue * (1-battWeighting));
   bigtempValue = (analogRead(battPinT) * battWeighting) + (bigtempValue * (1-battWeighting));
   
@@ -202,6 +203,7 @@ void getBattStat() {
   Cell7 = (adcVolt * abattValue6 * ((470.0+39.0)/39.0))* 1000 - Cell6-Cell5-Cell4-Cell3-Cell2-Cell1;
 
   Current = (adcVolt * acurrValue * ((47.0+39.0)/39.0)  )*CURRENTCOEF- CurrZeropoint;
+smallCurrent = (adcVolt * aSmallCurrentValue * ((47.0+39.0)/39.0)  )*CURRENTCOEF- CurrZeropoint;
 
   bigtemp = ((adcVolt * bigtempValue * ((47.0+39.0)/39.0)) - 0.5) * 100.0;
 
@@ -302,8 +304,10 @@ Serial.print (pump);
 Serial.print (' ');
 //
 //Serial.print ("BAR, AccumulatorPressure=");
-Serial.println(acc);
+Serial.print(acc);
+Serial.print(' ');
 //Serial.println("BAR");
+Serial.print(smallCurrent)
 
 }
 else if (x == 'a')
@@ -360,8 +364,13 @@ Serial.print (pump);
 Serial.print (' ');
 
 Serial.print ("BAR, AccumulatorPressure=");
-Serial.println(acc);
-Serial.println("BAR");
+Serial.print(acc);
+Serial.print("BAR");
+
+
+Serial.print("small battery current");
+Serial.print(smallCurrent);
+Serial.println('A');
 
 }
 }
