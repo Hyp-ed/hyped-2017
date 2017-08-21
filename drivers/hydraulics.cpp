@@ -1,4 +1,5 @@
 #include "hydraulics.hpp"
+#include "serialData.h"
 
 #define PUMP_SPINUP 400000 // microseconds = 400 miliseconds 
 #define INRUSH_LIMIT 100
