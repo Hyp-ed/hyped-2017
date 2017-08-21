@@ -8,7 +8,7 @@
 #define OVER_PRESSURE_ACCUMULATORS 100
 #define OVER_PRESSURE_PUMP 200
 
-void Hydraulics::Hydraulics() {
+Hydraulics::Hydraulics(void) {
 
 }
 
