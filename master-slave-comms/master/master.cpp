@@ -5,29 +5,21 @@ int main(int argc, char *argv[])
 {
 	// Init slaves
 	NetworkMaster slave1;
-        NetworkMaster slave2;
+	slave1.setup("192.168.1.108",11998);
 
-        // Set the IP/Port of each slave
-        slave1.setup("192.168.1.108",11999);
-	slave2.setup("192.168.1.108",11998);
-	
 	// Request string
-        string slave1msg = "Request message";
-	string slave2msg = "Request message";
+  string slave1command = "brake";
 
-        // Send message
-        slave1.Send(slave1msg);
-	slave2.Send(slave2msg);
+  slave1.Send(slave1command);
 
-        // Get response
-        string slave1res = slave1.receive();
-	string slave2res = slave2.receive();
-	
-        // Pring response
-        cout << "Slave1 response:" << slave1res << endl;
-        cout << "Slave2 response:" << slave2res << endl;
+
+  // Get response
+  string slave1res = slave1.receive();
+
+  // Pring response
+  cout << "Slave1 response:" << slave1res << endl;
 
 	exit(0);
 	return 0;
-	
+
 }

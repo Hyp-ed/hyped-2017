@@ -9,7 +9,6 @@ demo-vl6180
 demo-raspberry_pi
 demo-battery
 proxi-hydro
-slave
 # Old executables
 main
 integrator
@@ -20,4 +19,3 @@ test_motion_tracker
 
 # Text editors
 *.swp
-
