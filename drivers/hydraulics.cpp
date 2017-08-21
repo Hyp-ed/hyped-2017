@@ -105,11 +105,11 @@ void Hydraulics::charge_accumulators() {
     this->pump.write(true);
 }
 
-void pressure(const char frontrear, int pressure)
+void Hydraulics::pressure(const char frontrear, int pressure)
 {
     this->pump.write(false);
     
-    delay(pumpSpinup);
+    delay(PUMP_SPINUP);
     
     this->solenoid_1.write(true);
     this->solenoid_2.write(true);
