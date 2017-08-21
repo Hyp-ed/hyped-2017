@@ -105,5 +105,36 @@ void Hydraulics::charge_accumulators() {
     this->pump.write(true);
 }
 
+void pressure(const char frontrear, int pressure)
+{
+    this->pump.write(false);
+    
+    delay(pumpSpinup);
+    
+    this->solenoid_1.write(true);
+    this->solenoid_2.write(true);
+    this->solenoid_3.write(false);
+    this->solenoid_4.write(true);
+    this->solenoid_5.write(true);
+    this->solenoid_6.write(true);
+    this->solenoid_7.write(false);
+    
+    float p = 0;
+       while(p < pressure || p != -1)//ADD WHEN CURRENT SENSOR WORKS!
+    {
+        p = getData("accumulator_pressure");
+        printf("%f", p);
+        delay(50);
+    }
 
+    this->solenoid_1.write(true);
+    this->solenoid_2.write(true);
+    this->solenoid_3.write(true);
+    this->solenoid_4.write(true);
+    this->solenoid_5.write(true);
+    this->solenoid_6.write(true);
+    this->solenoid_7.write(true);
+    this->pump.write(true);
+    
+}
 
