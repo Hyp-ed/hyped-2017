@@ -1,12 +1,16 @@
 #include "hydraulics.hpp"
 #include "serialData.h"
 
-#define PUMP_SPINUP 400000 // microseconds = 400 miliseconds 
+#define PUMP_SPINUP 400000 // microseconds = 400 miliseconds
 #define INRUSH_LIMIT 100
 #define LOW_BATTERY 23
 #define OVER_CURRENT 150
 #define OVER_PRESSURE_ACCUMULATORS 100
 #define OVER_PRESSURE_PUMP 200
+
+void Hydraulics::Hydraulics() {
+
+}
 
 
 void Hydraulics::set_up_pins() {
@@ -85,7 +89,7 @@ void Hydraulics::stand_by() {
 
 void Hydraulics::charge_accumulators() {
     this->pump.write(false);
-    
+
     this->solenoid_1.write(true);
     this->solenoid_2.write(true);
     this->solenoid_3.write(false);
@@ -109,9 +113,9 @@ void Hydraulics::charge_accumulators() {
 void Hydraulics::pressure(const char frontrear, int pressure)
 {
     this->pump.write(false);
-    
+
     delay(PUMP_SPINUP);
-    
+
     this->solenoid_1.write(true);
     this->solenoid_2.write(true);
     this->solenoid_3.write(false);
@@ -119,7 +123,7 @@ void Hydraulics::pressure(const char frontrear, int pressure)
     this->solenoid_5.write(true);
     this->solenoid_6.write(true);
     this->solenoid_7.write(false);
-    
+
     float p = 0;
        while(p < pressure || p != -1)//ADD WHEN CURRENT SENSOR WORKS!
     {
@@ -136,6 +140,5 @@ void Hydraulics::pressure(const char frontrear, int pressure)
     this->solenoid_6.write(true);
     this->solenoid_7.write(true);
     this->pump.write(true);
-    
-}
 
+}

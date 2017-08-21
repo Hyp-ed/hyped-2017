@@ -5,7 +5,7 @@
 #include <string>
 #include <unistd.h>
 
-#define SOL_1 0 // PIN 17 
+#define SOL_1 0 // PIN 17
 #define SOL_2 1 // PIN 18
 #define SOL_3 2 // PIN 21
 #define SOL_4 3 // PIN 22
@@ -28,6 +28,7 @@ class Hydraulics {
         void safety_check(std::string frontrear);
         void pressure(); // not in original .h file but implemented in .c file
         // void charge(std::string frontrear, int pressure); not implemented in .c driver
+        Hydraulics();
     private:
         GpioPin& solenoid_1;
         GpioPin& solenoid_2;
