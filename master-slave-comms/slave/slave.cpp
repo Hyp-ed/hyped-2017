@@ -11,6 +11,9 @@
 #define SENSOR1_PIN PIN23
 #define SENSOR2_PIN PIN24
 
+#define TARGET_RETRACT 120
+#define TARGER_EXTEND 70
+
 NetworkSlave master;
 const int SLAVE_PORT = 11999;
 const std::string NAME = "Slave:1";
@@ -79,11 +82,11 @@ void * loop(void * m)
             proxileft_dist = sensors[1]->get_distance();
         }
       
-        if(proxiright_dist +2 < TARGET)
+        if(proxiright_dist +2 < TARGET_EXTEND)
         {
           hydraulics.extend("right");
         }
-        else if(proxiright_dist - 2> TARGET)
+        else if(proxiright_dist - 2> TARGET_EXTEND)
         {
           hydraulics.retract("right");
         }
@@ -93,11 +96,11 @@ void * loop(void * m)
   	  	  target_ach_1 = TRUE;
         }
         
-        if(proxileft_dist + 2 < TARGET)
+        if(proxileft_dist + 2 < TARGET_EXTEND)
         {
           hydraulics.extend("left");
         }
-        else if(proxileft_dist - 2 > TARGET)
+        else if(proxileft_dist - 2 > TARGET_EXTEND)
         {
           hydraulics.retract("left");
         }
@@ -107,22 +110,75 @@ void * loop(void * m)
   	      target_ach_2 = TRUE;
         }
         
-        
+        if(target_ach_1 == TRUE && target_ach_2 == TRUE)
+        {
+          standby();
+          brakes_engaged = TRUE;  
+        }
       
-        //hydraulics.extend("left");
-        //hydraulics.extend("right");
         master.Send("OK");
         master.clean();
     }
 
     if (str == "retract" && !retracted) {
         brakes_engaged = false;
-        retracted = true;
+        retracted = FALSE;
 
         /* here goes the hydraulics code for retracting */
+      
+        int proxiright_dist = 0;
+        int proxileft_dist = 0;
+        bool target_ach_1 = FALSE;
+        bool target_ach_2 = FALSE;
+        /* here goes the hydraulics code for braking */     
         hydraulics.spin_up();
+    while (retracted == FALSE) {
+        if(target_ach_1 == FALSE)
+        {
+            proxiright_dist = sensors[0]->get_distance();
+        }
+        if(target_ach_2 == FALSE)
+        {
+            proxileft_dist = sensors[1]->get_distance();
+        }
+      
+        if(proxiright_dist +2 < TARGET_RETRACT)
+        {
+          hydraulics.extend("right");
+        }
+        else if(proxiright_dist - 2> TARGET_RETRACT)
+        {
+          hydraulics.retract("right");
+        }
+        else
+        {
+          hold("right");
+  	  	  target_ach_1 = TRUE;
+        }
+        
+        if(proxileft_dist + 2 < TARGET_RETRACT)
+        {
+          hydraulics.extend("left");
+        }
+        else if(proxileft_dist - 2 > TARGET_RETRACT)
+        {
+          hydraulics.retract("left");
+        }
+        else
+        {
+          hydraulics.hold("left");
+  	      target_ach_2 = TRUE;
+        }
+        
+        if(target_ach_1 == TRUE && target_ach_2 == TRUE)
+        {
+          standby();
+          brakes_engaged = TRUE;  
+        }
+      
+       /* hydraulics.spin_up();
         hydraulics.retract("left");
-        hydraulics.retract("right");
+        hydraulics.retract("right"); */
         master.Send("OK");
         master.clean();
     }
@@ -157,5 +213,5 @@ int main()
   {
     master.receive();
   }
-  return 0;
+   return 0;
 }
