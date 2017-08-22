@@ -50,6 +50,9 @@ motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_poi
 quaternion.o : quaternion.hpp quaternion.cpp vector3d.hpp
 	$(CC) $(CFLAGS) quaternion.cpp
 
+keyence.o : keyence.hpp keyence.cpp gpio.hpp
+	$(CC) $(CFLAGS) keyence.cpp
+
 raspberry_pi.o : raspberry_pi.hpp raspberry_pi.cpp
 	$(CC) $(CFLAGS) raspberry_pi.cpp
 

@@ -1,3 +1,6 @@
+#include <atomic>
+#include <thread>
+
 #include "gpio.hpp"
 
 #define CTL_SIG_PIN 29
@@ -6,14 +9,18 @@
 
 class Keyence
 {
-  private: 
-    bool current_state = false;
-    bool prev_state = false;
-    GpioPin& config_pin;
-    GpioPin& output_pin;
-
   public:
     Keyence(GpioPinNumber config_pin_num, GpioPinNumber output_pin_num);
     void calibrate();
-    void countStripes(int &numStripes);			
+    void start();
+    int get_count();
+  
+  private:
+    void count_stripes();
+
+    GpioPin& config_pin;
+    GpioPin& output_pin;
+    std::atomic<int> count;
+    std::atomic_bool stop_flag;
+    std::thread counting_thread;
 };
