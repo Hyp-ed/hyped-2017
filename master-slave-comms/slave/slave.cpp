@@ -95,8 +95,7 @@ int main()
   Vl6180& sensor_ref = factory.make_sensor(SENSOR1_PIN);
   // Store pointer to the driver instance
   sensors.push_back(&sensor_ref);
-  hydraulics.set_up_pins();
-  hydraulics.pressure();
+  hydraulics.pressure(-1);
 
   // Uncoment the following line and possibly add more to use more sensors
   //sensors.push_back( &(factory.make_sensor(SENSOR2_PIN)) );

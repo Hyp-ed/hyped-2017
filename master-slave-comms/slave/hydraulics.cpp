@@ -8,21 +8,16 @@
 #define OVER_PRESSURE_ACCUMULATORS 100
 #define OVER_PRESSURE_PUMP 200
 
-Hydraulics::Hydraulics(void) {
-
-}
-
-
-void Hydraulics::set_up_pins() {
-    this->solenoid_1 = Gpio::get_pin(SOL_1, PinMode::out, PudControl::off);
-    this->solenoid_2 = Gpio::get_pin(SOL_2, PinMode::out, PudControl::off);
-    this->solenoid_3 = Gpio::get_pin(SOL_3, PinMode::out, PudControl::off);
-    this->solenoid_4 = Gpio::get_pin(SOL_4, PinMode::out, PudControl::off);
-    this->solenoid_5 = Gpio::get_pin(SOL_5, PinMode::out, PudControl::off);
-    this->solenoid_6 = Gpio::get_pin(SOL_6, PinMode::out, PudControl::off);
-    this->solenoid_7 = Gpio::get_pin(SOL_7, PinMode::out, PudControl::off);
-    this->pump = Gpio::get_pin(PUMP, PinMode::out, PudControl::off);
-}
+Hydraulics::Hydraulics(void)
+    : solenoid_1 { Gpio::get_pin(SOL_1, PinMode::out, PudControl::off) },
+    solenoid_2 { Gpio::get_pin(SOL_2, PinMode::out, PudControl::off) },
+    solenoid_3 { Gpio::get_pin(SOL_3, PinMode::out, PudControl::off) },
+    solenoid_4 { Gpio::get_pin(SOL_4, PinMode::out, PudControl::off) },
+    solenoid_5 { Gpio::get_pin(SOL_5, PinMode::out, PudControl::off) },
+    solenoid_6 { Gpio::get_pin(SOL_6, PinMode::out, PudControl::off) },
+    solenoid_7 { Gpio::get_pin(SOL_7, PinMode::out, PudControl::off) },
+    pump { Gpio::get_pin(PUMP, PinMode::out, PudControl::off) }
+{}
 
 void Hydraulics::spin_up() {
     this->pump.write(false);
@@ -110,7 +105,7 @@ void Hydraulics::charge_accumulators() {
     this->pump.write(true);
 }
 
-void Hydraulics::pressure(const char frontrear, int pressure)
+void Hydraulics::pressure(int pressure)
 {
     this->pump.write(false);
 

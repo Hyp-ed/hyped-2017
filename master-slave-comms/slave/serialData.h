@@ -11,9 +11,15 @@
 #include <wiringPi.h>
 #include <wiringSerial.h>
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 float getData(char const data[]); //used to be (char *data)
 
-
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

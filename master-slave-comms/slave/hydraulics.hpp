@@ -1,7 +1,7 @@
 #ifndef HYDRAULICS_HPP
 #define HYDRAULICS_HPP
 
-#include "gpio.hpp"
+#include "drivers/gpio.hpp"
 #include <string>
 #include <unistd.h>
 
@@ -16,7 +16,6 @@
 
 class Hydraulics {
     public:
-        void set_up_pins();
         void spin_up();
         void hold(const std::string& side);
         void retract(const std::string& side);
@@ -26,7 +25,7 @@ class Hydraulics {
         void charge_accumulators();
         // void start_up(std::string frontrear); not implemented in .c driver
         void safety_check(std::string frontrear);
-        void pressure(); // not in original .h file but implemented in .c file
+        void pressure(int pressure); // not in original .h file but implemented in .c file
         // void charge(std::string frontrear, int pressure); not implemented in .c driver
         Hydraulics();
     private:
