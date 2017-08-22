@@ -61,13 +61,56 @@ void * loop(void * m)
       master.clean();
     }
     if (str == "brake" && !brakes_engaged) {
-        brakes_engaged = true;
+        brakes_engaged = false;
         retracted = false;
-
-        /* here goes the hydraulics code for braking */
+        int proxiright_dist = 0;
+        int proxileft_dist = 0;
+        bool target_ach_1 = FALSE;
+        bool target_ach_2 = FALSE;
+        /* here goes the hydraulics code for braking */     
         hydraulics.spin_up();
-        hydraulics.extend("left");
-        hydraulics.extend("right");
+    while (brakes_engaged == FALSE) {
+        if(target_ach_1 == FALSE)
+        {
+            proxiright_dist = sensors[0]->get_distance();
+        }
+        if(target_ach_2 == FALSE)
+        {
+            proxileft_dist = sensors[1]->get_distance();
+        }
+      
+        if(proxiright_dist +2 < TARGET)
+        {
+          hydraulics.extend("right");
+        }
+        else if(proxiright_dist - 2> TARGET)
+        {
+          hydraulics.retract("right");
+        }
+        else
+        {
+          hold("right");
+  	  	  target_ach_1 = TRUE;
+        }
+        
+        if(proxileft_dist + 2 < TARGET)
+        {
+          hydraulics.extend("left");
+        }
+        else if(proxileft_dist - 2 > TARGET)
+        {
+          hydraulics.retract("left");
+        }
+        else
+        {
+          hydraulics.hold("left");
+  	      target_ach_2 = TRUE;
+        }
+        
+        
+      
+        //hydraulics.extend("left");
+        //hydraulics.extend("right");
         master.Send("OK");
         master.clean();
     }
