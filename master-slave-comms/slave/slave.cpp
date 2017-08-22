@@ -173,7 +173,7 @@ void * loop(void * m)
         if(target_ach_1 == TRUE && target_ach_2 == TRUE)
         {
           standby();
-          brakes_engaged = TRUE;  
+          retracted = TRUE;  
         }
       
        /* hydraulics.spin_up();
