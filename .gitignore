@@ -9,6 +9,7 @@ demo-vl6180
 demo-raspberry_pi
 demo-battery
 proxi-hydro
+demo-keyence
 # Old executables
 main
 integrator
