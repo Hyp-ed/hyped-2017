@@ -3,21 +3,21 @@
 
 int main()
 {
-  Hydraulics::set_up_pins();
-	Hydraulics::spinup();
+  set_up_pins();
+	hydraulics.spinup();
 	//pressure(ACCUMULATOR_PRESSURE);
-	Hydraulics::charge_accumulators();
-  Hydraulics::retract(left);
-	Hydraulics::retract(right);
-	Hydraulics::standby();
+	hydraulics.charge_accumulators();
+  hydraulics.retract(left);
+	hydraulics.retract(right);
+	hydraulics.standby();
 	usleep(3000000);
-	Hydraulics::extend(left);
-	Hydraulics::extend(right);
+	hydraulics.extend(left);
+	hydraulics.extend(right);
 	usleep(2000000);
-	Hydraulics::spinup();
-	Hydraulics::retract(left);
-	Hydraulics::retract(right);
-	Hydraulics::standby();
-	Hydraulics::shutdown();
+	hydraulics.spinup();
+	hydraulics.retract(left);
+	hydraulics.retract(right);
+	hydraulics.standby();
+	hydraulics.shutdown();
 
 }
