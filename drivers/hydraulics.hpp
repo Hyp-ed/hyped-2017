@@ -4,15 +4,17 @@
 #include "gpio.hpp"
 #include <string>
 #include <unistd.h>
+            
+//      pins for right Pi   pins for left pi
 
-#define SOL_1 0 // PIN 17 
-#define SOL_2 1 // PIN 18
-#define SOL_3 2 // PIN 21
-#define SOL_4 3 // PIN 22
-#define SOL_5 4 // PIN 23
-#define SOL_6 5 // PIN 24
-#define SOL_7 6 // PIN 25
-#define PUMP 7  // PIN  4
+#define SOL_1 3//0 // PIN 17 //6
+#define SOL_2 2//1 // PIN 18 //3
+#define SOL_3 4//2 // PIN 21 //5
+#define SOL_4 7//3 // PIN 22 //1
+#define SOL_5 5//4 // PIN 23 //4
+#define SOL_6 1//5 // PIN 24 //0
+#define SOL_7 6//6 // PIN 25 //2
+#define PUMP 0//7  // PIN  4 //7
 
 class Hydraulics {
     public:
