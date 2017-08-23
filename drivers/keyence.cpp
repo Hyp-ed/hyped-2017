@@ -4,6 +4,16 @@
 #include <cstdio>
 
 
+const int stripe_locations[63] =
+    {0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 
+    1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 
+    2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 
+    3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 
+    4000, 4008, 4016, 4024, 4032, 4040, 4048, 4056, 4064, 4072,
+    4100, 4200, 4300, 4400, 
+    4500, 4508, 4516, 4524, 4532,
+    4600, 4700, 4800, 4900};
+
 Keyence::Keyence(GpioPinNumber config_pin_num, GpioPinNumber output_pin_num)
     : config_pin { Gpio::get_pin(config_pin_num, PinMode::out, PudControl::off) },
     output_pin { Gpio::get_pin(output_pin_num, PinMode::in, PudControl::down) },
