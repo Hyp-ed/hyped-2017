@@ -60,6 +60,8 @@ class MotionTracker
     std::thread tracking_thread;
     Vector3D<double> *accelerometer_offsets = nullptr;
     Vector3D<double> *imu_accl_offsets = nullptr;
+    double initial_ground_dist = 0;
+    double rail_offset = 0;
 
     std::atomic<Vector3D<double>> angular_velocity; 
     std::atomic<Quaternion> rotor;
@@ -68,7 +70,7 @@ class MotionTracker
     std::atomic<Vector3D<double>> displacement;
 
     void track();
-    Quaternion get_proxi_rotor();
+    //Quaternion get_proxi_rotor();
     void get_imu_data_points(DataPoint<Vector3D<double>> &acceleration,
         DataPoint<Vector3D<double>> &angular_velocity);
     void get_gyro_data_point(DataPoint<Vector3D<double>> &angular_velocity);
