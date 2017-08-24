@@ -49,9 +49,9 @@ void MotionTracker::add_ground_proxi(Proxi& sensor, Vector3D<double> position)
 void MotionTracker::add_brake_proxis(Proxi& front, Proxi& rear, RailSide side)
 {
   if (side == RailSide::left)
-    this->brakes.emplace_back(front, rear);
+    this->left_brakes.emplace_back(front, rear);
   else if (side == RailSide::right)
-    this->brakes.emplace_back(rear, front);
+    this->right_brakes.emplace_back(rear, front);
 }
 
 bool MotionTracker::start()
@@ -82,7 +82,8 @@ bool MotionTracker::start()
   for (unsigned int i = 0; i < this->imus.size(); ++i)
     this->imu_accl_offsets[i] /= (double) n;
   // Calibrate proxi offsets
-  int gnd_count = 0, rail_count = 0;
+  int gnd_count = 0, rail_count_left = 0, rail_count_right = 0;
+  double rail_offset_left = 0, rail_offset_right = 0;
   for (int i = 0; i < 1000; ++i)
   {
     for (unsigned int j = 0; j < this->ground_proxis.size(); ++j)
@@ -91,14 +92,21 @@ bool MotionTracker::start()
         ++gnd_count;
         this->initial_ground_dist += p.get_distance();
       }
-    /*for (unsigned int j = 0; j < this->brakes.size(); ++j)
+    for (unsigned int j = 0; j < this->left_brakes.size(); ++j)
     {
-      ++rail_count;
-      this->rail_offset += this->brakes[j].right->get_distance() - this->brakes[j].left->get_distance();
-    }*/
+      rail_count_left += 2;
+      rail_offset_left += this->left_brakes[j].front->get_distance()
+          + this->left_brakes[j].rear->get_distance();
+    }
+    for (unsigned int j = 0; j < this->right_brakes.size(); ++j)
+    {
+      rail_count_right += 2;
+      rail_offset_right += this->right_brakes[j].front->get_distance()
+          + this->right_brakes[j].rear->get_distance();
+    }
   }
   this->initial_ground_dist /= gnd_count;
-  this->rail_offset /= rail_count;
+  this->rail_offset = rail_offset_right / rail_count_right - rail_offset_left / rail_count_left;
         
   this->stop_flag = false;
   this->tracking_thread = std::thread(&MotionTracker::track, this);
@@ -166,11 +174,13 @@ void MotionTracker::track()
   DataPoint<Vector3D<double>> velocity, new_velocity;
   DataPoint<Vector3D<double>> accl0, accl, angv0, angv;
   DataPoint<double> z_proxi_disp0, z_proxi_disp;
+  DataPoint<double> x_proxi_disp0, x_proxi_disp;
   this->get_imu_data_points(accl0, angv0);
   accl0.value -= avg_accl_offset;
   velocity.timestamp = accl0.timestamp;
   double t0 = accl0.timestamp;
   z_proxi_disp0.timestamp = accl0.timestamp;
+  x_proxi_disp0.timestamp = accl0.timestamp;
   while(!this->stop_flag)
   {
     this->get_imu_data_points(accl, angv);
@@ -207,7 +217,8 @@ void MotionTracker::track()
       angv0 = angv;
     }
 
-    if (angv0.timestamp - t0 > 0.01 && this->ground_proxis.size() >= 3 && this->brakes.size() >= 1)
+    if (angv0.timestamp - t0 > 0.01 && this->ground_proxis.size() >= 3
+        && (this->left_brakes.size() + this->right_brakes.size() >= 1))
     {
       // Update from proximity
       z_proxi_disp.value = 0.0;
@@ -243,10 +254,32 @@ void MotionTracker::track()
       Quaternion r1(cos(angle/2.0), sin(angle/2.0) * ((l == 0.0) ? axis : axis / l));
 
       angle = 0.0;
-      for (unsigned int i = 0; i < this->brakes.size(); ++i)
-        angle += atan((double) (this->brakes[i].front->get_distance()
-              - this->brakes[i].rear->get_distance()) / BRAKE_PROXI_SEPARATION);
-      angle /= this->brakes.size();
+      double rail_dist_left = 0, rail_dist_right = 0;
+      for (unsigned int i = 0; i < this->left_brakes.size(); ++i)
+      {
+        int a = this->left_brakes[i].front->get_distance();
+        int b = this->left_brakes[i].rear->get_distance();
+        rail_dist_left += a + b;
+        angle += atan((double) (a - b) / BRAKE_PROXI_SEPARATION);
+      }
+      for (unsigned int i = 0; i < this->right_brakes.size(); ++i)
+      {
+        int a = this->right_brakes[i].front->get_distance();
+        int b = this->right_brakes[i].rear->get_distance();
+        rail_dist_right += a + b;
+        angle += atan((double) (a - b) / BRAKE_PROXI_SEPARATION);
+      }
+      angle /= this->left_brakes.size() + this->right_brakes.size();
+      x_proxi_disp.timestamp = timestamp();
+      x_proxi_disp.value = rail_dist_right / (2 * this->right_brakes.size())
+          - rail_dist_left / (2* this->left_brakes.size())
+          - this->rail_offset;
+      double x_velocity = (x_proxi_disp.value - x_proxi_disp0.value) /
+          (z_proxi_disp.timestamp - z_proxi_disp0.timestamp);
+      velocity.value.x = GYRO_WEIGHT * velocity.value.x + PROXI_WEIGHT * x_velocity;
+      dist.x = GYRO_WEIGHT * dist.x + PROXI_WEIGHT * x_velocity;
+      x_proxi_disp0 = x_proxi_disp;
+
       Quaternion r2(cos(angle/2.0), Vector3D<double>(0, 0, sin(angle/2.0)));
 
       rotor *= Quaternion::pow(Quaternion::inv(rotor) * (r2*r1),

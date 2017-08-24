@@ -55,7 +55,8 @@ class MotionTracker
     std::vector<std::reference_wrapper<Imu>> imus;
     std::vector<Vector3D<double>> ground_proxi_positions;
     std::vector<std::vector< std::reference_wrapper<Proxi>>> ground_proxis;
-    std::vector<BrakingSki> brakes;
+    std::vector<BrakingSki> left_brakes;
+    std::vector<BrakingSki> right_brakes;
     std::atomic_bool stop_flag {true};
     std::thread tracking_thread;
     Vector3D<double> *accelerometer_offsets = nullptr;
