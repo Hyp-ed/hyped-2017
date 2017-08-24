@@ -78,7 +78,8 @@ class GpioPin
 
     GpioPin()                      = delete;
     GpioPin(GpioPin const&)        = delete;
-    void operator=(GpioPin const&) = delete;
+    //TODO
+    //void operator=(GpioPin const&) = delete;
 
   private:
     GpioPin(GpioPinNumber pin, PinMode mode, PudControl pud);

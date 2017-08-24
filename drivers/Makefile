@@ -24,6 +24,9 @@ demo-raspberry_pi : raspberry_pi.o demo-raspberry_pi.o
 demo-battery : demo-battery.o battery.o i2c.o
 	$(CC) i2c.o battery.o $(LFLAGS) demo-battery.o -o demo-battery
 
+demo-keyence : demo-keyence.o keyence.o gpio.o
+	$(CC) gpio.o keyence.o $(LFLAGS) demo-keyence.o -o demo-keyence
+
 
 demo-mpu6050.o : demo-mpu6050.cpp mpu6050.hpp i2c.hpp
 	$(CC) $(CFLAGS) demo-mpu6050.cpp
@@ -43,12 +46,18 @@ demo-raspberry_pi.o : demo-raspberry_pi.cpp raspberry_pi.hpp
 demo-battery.o : demo-battery.cpp battery.hpp i2c.hpp
 	$(CC) $(CFLAGS) demo-battery.cpp
 
+demo-keyence.o : demo-keyence.cpp keyence.hpp gpio.hpp
+	$(CC) $(CFLAGS) demo-keyence.cpp
+
 
 motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_point.hpp quaternion.hpp vector3d.hpp
 	$(CC) $(CFLAGS) -I /usr/local/include/eigen3/ motion_tracker.cpp
 
 quaternion.o : quaternion.hpp quaternion.cpp vector3d.hpp
 	$(CC) $(CFLAGS) quaternion.cpp
+
+keyence.o : keyence.hpp keyence.cpp gpio.hpp
+	$(CC) $(CFLAGS) keyence.cpp
 
 raspberry_pi.o : raspberry_pi.hpp raspberry_pi.cpp
 	$(CC) $(CFLAGS) raspberry_pi.cpp

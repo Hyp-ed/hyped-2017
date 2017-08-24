@@ -6,20 +6,31 @@
 #include "drivers/i2c.hpp"
 #include "drivers/vl6180.hpp"
 #include "NetworkSlave.hpp"
+#include "hydraulics.hpp"
 
 #define SENSOR1_PIN PIN23
 #define SENSOR2_PIN PIN24
+
+#define TARGET_RETRACT 120
+#define TARGER_EXTEND 70
 
 NetworkSlave master;
 const int SLAVE_PORT = 11999;
 const std::string NAME = "Slave:1";
 const bool continuous_mode = true;
 
+// initial state of brakes
+bool brakes_engaged = false;
+bool retracted = true;
+
 std::vector<Vl6180*> sensors;
 //Create an I2C instance to represent the bus
 I2C i2c;
 // Create factory to produce sensor drivers for that bus
 Vl6180Factory& factory = Vl6180Factory::instance(&i2c);
+
+// Create instance of hydraulics;
+Hydraulics hydraulics;
 
 
 inline uint64_t timestamp()
@@ -36,7 +47,7 @@ void * loop(void * m)
   {
 
     std::string str = master.getMessage();
-    if( str != "get" )
+    if( str == "proxi" )
     {
       std::string readings = NAME + "\n"; // populate with readings from proxy
       for (unsigned int i = 0; i < sensors.size(); ++i)
@@ -52,6 +63,126 @@ void * loop(void * m)
       master.Send(readings); // send the readings
       master.clean();
     }
+    if (str == "brake" && !brakes_engaged) {
+        brakes_engaged = false;
+        retracted = false;
+        int proxiright_dist = 0;
+        int proxileft_dist = 0;
+        bool target_ach_1 = FALSE;
+        bool target_ach_2 = FALSE;
+        /* here goes the hydraulics code for braking */     
+        hydraulics.spin_up();
+    while (brakes_engaged == FALSE) {
+        if(target_ach_1 == FALSE)
+        {
+            proxiright_dist = sensors[0]->get_distance();
+        }
+        if(target_ach_2 == FALSE)
+        {
+            proxileft_dist = sensors[1]->get_distance();
+        }
+      
+        if(proxiright_dist +2 < TARGET_EXTEND)
+        {
+          hydraulics.extend("right");
+        }
+        else if(proxiright_dist - 2> TARGET_EXTEND)
+        {
+          hydraulics.retract("right");
+        }
+        else
+        {
+          hold("right");
+  	  	  target_ach_1 = TRUE;
+        }
+        
+        if(proxileft_dist + 2 < TARGET_EXTEND)
+        {
+          hydraulics.extend("left");
+        }
+        else if(proxileft_dist - 2 > TARGET_EXTEND)
+        {
+          hydraulics.retract("left");
+        }
+        else
+        {
+          hydraulics.hold("left");
+  	      target_ach_2 = TRUE;
+        }
+        
+        if(target_ach_1 == TRUE && target_ach_2 == TRUE)
+        {
+          standby();
+          brakes_engaged = TRUE;  
+        }
+      
+        master.Send("OK");
+        master.clean();
+    }
+
+    if (str == "retract" && !retracted) {
+        brakes_engaged = false;
+        retracted = FALSE;
+
+        /* here goes the hydraulics code for retracting */
+      
+        int proxiright_dist = 0;
+        int proxileft_dist = 0;
+        bool target_ach_1 = FALSE;
+        bool target_ach_2 = FALSE;
+        /* here goes the hydraulics code for braking */     
+        hydraulics.spin_up();
+    while (retracted == FALSE) {
+        if(target_ach_1 == FALSE)
+        {
+            proxiright_dist = sensors[0]->get_distance();
+        }
+        if(target_ach_2 == FALSE)
+        {
+            proxileft_dist = sensors[1]->get_distance();
+        }
+      
+        if(proxiright_dist +2 < TARGET_RETRACT)
+        {
+          hydraulics.extend("right");
+        }
+        else if(proxiright_dist - 2> TARGET_RETRACT)
+        {
+          hydraulics.retract("right");
+        }
+        else
+        {
+          hold("right");
+  	  	  target_ach_1 = TRUE;
+        }
+        
+        if(proxileft_dist + 2 < TARGET_RETRACT)
+        {
+          hydraulics.extend("left");
+        }
+        else if(proxileft_dist - 2 > TARGET_RETRACT)
+        {
+          hydraulics.retract("left");
+        }
+        else
+        {
+          hydraulics.hold("left");
+  	      target_ach_2 = TRUE;
+        }
+        
+        if(target_ach_1 == TRUE && target_ach_2 == TRUE)
+        {
+          standby();
+          retracted = TRUE;  
+        }
+      
+       /* hydraulics.spin_up();
+        hydraulics.retract("left");
+        hydraulics.retract("right"); */
+        master.Send("OK");
+        master.clean();
+    }
+
     usleep(1000);
   }
   master.detach();
@@ -63,6 +194,7 @@ int main()
   Vl6180& sensor_ref = factory.make_sensor(SENSOR1_PIN);
   // Store pointer to the driver instance
   sensors.push_back(&sensor_ref);
+  hydraulics.pressure(-1);
 
   // Uncoment the following line and possibly add more to use more sensors
   //sensors.push_back( &(factory.make_sensor(SENSOR2_PIN)) );
@@ -81,6 +213,5 @@ int main()
   {
     master.receive();
   }
-  return 0;
+   return 0;
 }
-
