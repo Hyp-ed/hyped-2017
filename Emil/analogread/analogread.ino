@@ -72,7 +72,7 @@ float bigtempValue = 0;
 
 float smallbattValue = 0;
 float smalltempValue = 0;
-
+float aSmallCurrentValue = 0;
 float pumpvalue =0;
 float accvalue = 0;
 
@@ -95,6 +95,7 @@ float bigtemp = 0;
 
 float smallbatt = 0;
 float smalltemp = 0;
+float smallCurrent = 0;
 
 float pump = 0;
 float acc = 0;
@@ -307,7 +308,7 @@ Serial.print (' ');
 Serial.print(acc);
 Serial.print(' ');
 //Serial.println("BAR");
-Serial.print(smallCurrent)
+Serial.print(smallCurrent);
 
 }
 else if (x == 'a')

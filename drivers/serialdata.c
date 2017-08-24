@@ -88,7 +88,7 @@ else if ((i = lim -1 ))
 
 
 
-char a[256] ;
+char a[512] ;
 int j = 0;
 int b = 1;
 serialPutchar (fd, b);
@@ -161,6 +161,10 @@ else if (strcmp(data, "pump_pressure")== 0)
 else if (strcmp(data, "accumulator_pressure")== 0)
 {
   value = accumulator_pressure;
+}
+else if (strcmp(data, "small_current")== 0)
+{
+  value = small_current;
 }
 else 
 {

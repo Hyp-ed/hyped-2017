@@ -88,7 +88,7 @@ else if ((i = lim -1 ))
 
 
 
-char a[256] ;
+char a[512] ;
 int j = 0;
 int b = 1;
 serialPutchar (fd, b);
@@ -101,9 +101,9 @@ while (serialDataAvail(fd)!= 0)
 }
 //printf(a);
 
-float current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp, small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure = -1;
-sscanf(a, "%f %f %f %f %f %f %f %f %f %f %f %f %f %f",&current,&cell1V,&cell2V,&cell3V,&cell4V,&cell5V,&cell6V,&cell7V,&big_battery_voltage, &big_battery_temp,
-&small_battery_voltage, &small_battery_temp, &pump_pressure, &accumulator_pressure);
+float current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp, small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure, small_current = -1;
+sscanf(a, "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",&current,&cell1V,&cell2V,&cell3V,&cell4V,&cell5V,&cell6V,&cell7V,&big_battery_voltage, &big_battery_temp,
+&small_battery_voltage, &small_battery_temp, &pump_pressure, &accumulator_pressure, &small_current);
 //printf("%f %f %f %f %f %f %f %f %f %f %f %f %f %f", current,cell1V,cell2V,cell3V,cell4V,cell5V,cell6V,cell7V,big_battery_voltage, big_battery_temp, small_battery_voltage, small_battery_temp, pump_pressure, accumulator_pressure);
 float value = -1;
 if (strcmp(data, "current")== 0)
@@ -161,6 +161,10 @@ else if (strcmp(data, "pump_pressure")== 0)
 else if (strcmp(data, "accumulator_pressure")== 0)
 {
   value = accumulator_pressure;
+}
+else if (strcmp(data, "small_current")== 0)
+{
+  value = small_current;
 }
 else 
 {
