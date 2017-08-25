@@ -4,21 +4,18 @@
 #include "gpio.hpp"
 #include <string>
 #include <unistd.h>
-            
-//      pins for right Pi   pins for left pi
 
-#define SOL_1 3//0 // PIN 17 //6
-#define SOL_2 2//1 // PIN 18 //3
-#define SOL_3 4//2 // PIN 21 //5
-#define SOL_4 7//3 // PIN 22 //1
-#define SOL_5 5//4 // PIN 23 //4
-#define SOL_6 1//5 // PIN 24 //0
-#define SOL_7 6//6 // PIN 25 //2
-#define PUMP 0//7  // PIN  4 //7
+#define SOL_1 0 // PIN 17
+#define SOL_2 1 // PIN 18
+#define SOL_3 2 // PIN 21
+#define SOL_4 3 // PIN 22
+#define SOL_5 4 // PIN 23
+#define SOL_6 5 // PIN 24
+#define SOL_7 6 // PIN 25
+#define PUMP 7  // PIN  4
 
 class Hydraulics {
     public:
-        void set_up_pins();
         void spin_up();
         void hold(const std::string& side);
         void retract(const std::string& side);
@@ -26,10 +23,9 @@ class Hydraulics {
         void stand_by();
         void shut_down();
         void charge_accumulators();
-        // void start_up(std::string frontrear); not implemented in .c driver
         void safety_check(std::string frontrear);
-        void pressure(); // not in original .h file but implemented in .c file
-        // void charge(std::string frontrear, int pressure); not implemented in .c driver
+        void pressure(int pressure); // not in original .h file but implemented in .c file
+        Hydraulics();
     private:
         GpioPin& solenoid_1;
         GpioPin& solenoid_2;

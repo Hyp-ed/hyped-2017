@@ -10,6 +10,7 @@ demo-raspberry_pi
 demo-battery
 proxi-hydro
 demo-keyence
+demo-hydraulics
 # Old executables
 main
 integrator

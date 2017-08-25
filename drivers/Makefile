@@ -27,6 +27,9 @@ demo-battery : demo-battery.o battery.o i2c.o
 demo-keyence : demo-keyence.o keyence.o gpio.o
 	$(CC) gpio.o keyence.o $(LFLAGS) demo-keyence.o -o demo-keyence
 
+demo-hydraulics : demo-hydraulics.o hydraulics.o gpio.o
+	$(CC) gpio.o hydraulics.o $(LFLAGS) demo-hydraulics.o -o demo-hydraulics
+
 
 demo-mpu6050.o : demo-mpu6050.cpp mpu6050.hpp i2c.hpp
 	$(CC) $(CFLAGS) demo-mpu6050.cpp
@@ -49,6 +52,12 @@ demo-battery.o : demo-battery.cpp battery.hpp i2c.hpp
 demo-keyence.o : demo-keyence.cpp keyence.hpp gpio.hpp
 	$(CC) $(CFLAGS) demo-keyence.cpp
 
+demo-hydraulics.o : demo-hydraulics.cpp hydraulics.hpp
+	$(CC) $(CFLAGS) demo-hydraulics.cpp
+
+
+hydraulics.o : hydraulics.cpp hydraulics.hpp gpio.hpp
+	$(CC) $(CFLAGS) hydraulics.cpp
 
 motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_point.hpp quaternion.hpp vector3d.hpp
 	$(CC) $(CFLAGS) -I /usr/local/include/eigen3/ motion_tracker.cpp
