@@ -5,8 +5,8 @@
 #include "gpio.hpp"
 #include "keyence.hpp"
 
-#define CONFIG_PIN PIN21
-#define OUTPUT_PIN PIN26
+#define CONFIG_PIN PIN24
+#define OUTPUT_PIN PIN23
 
 
 int main()

@@ -17,8 +17,13 @@ const int stripe_locations[63] =
 Keyence::Keyence(GpioPinNumber config_pin_num, GpioPinNumber output_pin_num)
     : config_pin { Gpio::get_pin(config_pin_num, PinMode::out, PudControl::off) },
     output_pin { Gpio::get_pin(output_pin_num, PinMode::in, PudControl::down) },
-    count(0), stop_flag(true)
+    count(0), new_stripe(false), stop_flag(true)
 {}
+
+Keyence::~Keyence()
+{
+  this->stop();
+}
 
 void Keyence::calibrate()
 {
@@ -28,8 +33,26 @@ void Keyence::calibrate()
   printf("Setup complete\n");	
 }
 
+void Keyence::start()
+{
+  this->stop_flag = false;
+  this->counting_thread = std::thread(&Keyence::count_stripes, this);
+}
+
+void Keyence::stop()
+{
+  this->stop_flag = false;
+  this->counting_thread.join();
+}
+
+bool Keyence::has_new_stripe()
+{
+  return this->new_stripe.load(std::memory_order_relaxed);
+}
+
 int Keyence::get_count()
 {
+  this->new_stripe.store(false, std::memory_order_relaxed);
   return this->count.load(std::memory_order_relaxed);
 }
 
@@ -53,10 +76,11 @@ void Keyence::count_stripes()
     if (!current && previous)
     {
       ++count;
+      this->count.store(count, std::memory_order_relaxed);
+      this->new_stripe.store(true, std::memory_order_relaxed);
       printf("Stripe finished. Stripe Count = %d\n", count);
     }
 
-    this->count.store(count, std::memory_order_relaxed);
     previous = current;
     //Change delay to vary the reading frequency
     std::this_thread::sleep_for(std::chrono::microseconds(10000));
