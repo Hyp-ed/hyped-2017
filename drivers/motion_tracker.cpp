@@ -5,8 +5,19 @@
 #include <Eigen/Dense>
 #include <Eigen/SVD>
 
+
+inline double timestamp()
+{
+  using namespace std::chrono;
+  return duration_cast<nanoseconds>
+    (steady_clock::now().time_since_epoch()).count() / 1.0e+9;
+}
+
+
+
 MotionTracker::MotionTracker()
-    : angular_velocity(Vector3D<double>()),
+    : time(0),
+    angular_velocity(Vector3D<double>()),
     rotor(Quaternion(1, 0, 0, 0)),
     acceleration(Vector3D<double>()),
     velocity(Vector3D<double>()),
@@ -82,6 +93,7 @@ bool MotionTracker::start()
   for (unsigned int i = 0; i < this->imus.size(); ++i)
     this->imu_accl_offsets[i] /= (double) n;
 
+  this->start_time = timestamp();
   this->stop_flag = false;
   this->tracking_thread = std::thread(&MotionTracker::track, this);
 
@@ -96,6 +108,11 @@ void MotionTracker::stop()
   this->accelerometer_offsets = nullptr;
   delete[] this->imu_accl_offsets;
   this->imu_accl_offsets = nullptr;
+}
+
+double MotionTracker::get_time()
+{
+  return this->time.load(std::memory_order_relaxed);
 }
 
 Vector3D<double> MotionTracker::get_angular_velocity()
@@ -122,16 +139,6 @@ Vector3D<double> MotionTracker::get_displacement()
 {
   return this->displacement.load(std::memory_order_relaxed);
 }
-
-
-
-inline double timestamp()
-{
-  using namespace std::chrono;
-  return duration_cast<nanoseconds>
-    (steady_clock::now().time_since_epoch()).count() / 1.0e+9;
-}
-
 
 
 void MotionTracker::track()
@@ -168,6 +175,7 @@ void MotionTracker::track()
     dist +=
         DataPoint<Vector3D<double>>::integrate(velocity, new_velocity).value;
     velocity = new_velocity;
+    this->time.store(accl.timestamp - this->start_time, std::memory_order_relaxed);
     this->angular_velocity.store(angv.value, std::memory_order_relaxed);
     this->rotor.store(rotor, std::memory_order_relaxed);
     this->acceleration.store(accl.value, std::memory_order_relaxed);

@@ -43,6 +43,7 @@ class MotionTracker
     void add_brake_proxis(Proxi& front, Proxi& rear, RailSide side);
     bool start();
     void stop();
+    double get_time(); // Seconds since integration started
     Vector3D<double> get_angular_velocity();
     Quaternion get_rotor();
     Vector3D<double> get_acceleration();
@@ -61,6 +62,8 @@ class MotionTracker
     Vector3D<double> *accelerometer_offsets = nullptr;
     Vector3D<double> *imu_accl_offsets = nullptr;
 
+    double start_time = 0;
+    std::atomic<double> time;
     std::atomic<Vector3D<double>> angular_velocity; 
     std::atomic<Quaternion> rotor;
     std::atomic<Vector3D<double>> acceleration;

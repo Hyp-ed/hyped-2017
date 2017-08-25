@@ -15,8 +15,8 @@
 #include "vector3d.hpp"
 #include "vl6180.hpp"
 
-#define GYRO_POS 5
-#define ACCL_POS 9 
+#define GYRO_POS 7
+#define ACCL_POS 11 
 
 #define SENSOR1_PIN PIN22
 #define SENSOR2_PIN PIN23
@@ -131,6 +131,7 @@ void screen_output()
   int stop = getch();
   while (stop == ERR)
   {
+    mvprintw(GYRO_POS - 2, 0, "Time: %fs", mt.get_time());
     Vector3D<double> v = mt.get_angular_velocity();
     mvprintw(GYRO_POS, 0, "Angular velocity: (%10.6f,  %10.6f,  %10.6f)",
         v.x, v.y, v.z);
