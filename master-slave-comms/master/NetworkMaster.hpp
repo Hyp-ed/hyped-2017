@@ -1,3 +1,6 @@
+#ifndef NETWORKMASTER_HPP_
+#define NETWORKMASTER_HPP_
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,3 +31,5 @@ class NetworkMaster
     string receive(int size = 4096);
     string read();
 };
+
+#endif // NETWORKMASTER_HPP_

@@ -30,6 +30,14 @@ demo-keyence : demo-keyence.o keyence.o gpio.o
 demo-hydraulics : demo-hydraulics.o hydraulics.o gpio.o
 	$(CC) gpio.o hydraulics.o $(LFLAGS) demo-hydraulics.o -o demo-hydraulics
 
+demo-network_proxi : demo-network_proxi.o network_proxi.o master
+	$(CC) ../master-slave-comms/master/NetworkMaster.o network_proxi.o $(LFLAGS) demo-network_proxi.o -o demo-network_proxi
+
+
+.PHONY : master
+master :
+	cd ../master-slave-comms/master/ && make NetworkMaster.o
+
 
 demo-mpu6050.o : demo-mpu6050.cpp mpu6050.hpp i2c.hpp
 	$(CC) $(CFLAGS) demo-mpu6050.cpp
@@ -55,9 +63,15 @@ demo-keyence.o : demo-keyence.cpp keyence.hpp gpio.hpp
 demo-hydraulics.o : demo-hydraulics.cpp hydraulics.hpp
 	$(CC) $(CFLAGS) demo-hydraulics.cpp
 
+demo-network_proxi.o : demo-network_proxi.cpp network_proxi.hpp
+	$(CC) $(CFLAGS) -I ../ demo-network_proxi.cpp
+
 
 hydraulics.o : hydraulics.cpp hydraulics.hpp gpio.hpp
 	$(CC) $(CFLAGS) hydraulics.cpp
+
+network_proxi.o : network_proxi.hpp network_proxi.cpp interfaces.hpp
+	$(CC) $(CFLAGS) -I ../ network_proxi.cpp
 
 motion_tracker.o : motion_tracker.hpp motion_tracker.cpp interfaces.hpp data_point.hpp quaternion.hpp vector3d.hpp
 	$(CC) $(CFLAGS) -I /usr/local/include/eigen3/ motion_tracker.cpp

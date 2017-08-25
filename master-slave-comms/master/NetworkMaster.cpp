@@ -1,4 +1,4 @@
-#include "NetworkMaster.h"
+#include "NetworkMaster.hpp"
 
 NetworkMaster::NetworkMaster()
 {

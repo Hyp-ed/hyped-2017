@@ -1,5 +1,5 @@
 #include <string>
-#include "NetworkMaster.hpp"
+#include "master-slave-comms/master/NetworkMaster.hpp"
 #include "network_proxi.hpp"
 
 int main() {
