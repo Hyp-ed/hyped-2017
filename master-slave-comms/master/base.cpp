@@ -28,8 +28,9 @@ int main()
   RaspberryPi rpi;
 
   // Base Communicator setup
-  BaseCommunicator base("localhost");
+  BaseCommunicator base("192.168.137.153");
   base.setUp();
+  base.setName(1);
 
   //Send data
   while(true)
