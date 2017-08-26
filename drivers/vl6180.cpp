@@ -1,5 +1,8 @@
 #include "vl6180.hpp"
 
+#include <sstream>
+
+
 // Register addresses
 #define IDENTIFICATION__MODEL_ID              0x0000
 #define IDENTIFICATION__MODEL_REV_MAJOR       0x0001
@@ -317,7 +320,18 @@ void Vl6180::write8(uint16_t reg_addr, char data)
   buf[0] = (reg_addr & 0xFF00) >> 8; // MSB
   buf[1] = reg_addr & 0xFF; // LSB
   buf[2] = data;
-  this->bus->write(this->i2c_slave_addr, 3, buf);
+  try
+  {
+    this->bus->write(this->i2c_slave_addr, 3, buf);
+  }
+  catch (I2CException& e)
+  {
+    std::stringstream message;
+    message << "VL6180 (wpi pin " << this->gpio_pin.pin_num
+        << "): Some error: " << e.what();
+    throw Vl6180Exception(message.str(), this->gpio_pin.pin_num);
+  }
+
 }
 
 uint8_t Vl6180::read8(uint16_t reg_addr)
@@ -326,7 +340,27 @@ uint8_t Vl6180::read8(uint16_t reg_addr)
   send_buf[0] = (reg_addr & 0xFF00) >> 8; // MSB
   send_buf[1] = reg_addr & 0xFF; // LSB
   char recv_buf[1];
-  this->bus->write_read(this->i2c_slave_addr, 2, send_buf, 1, recv_buf);
+  try
+  {
+    this->bus->write_read(this->i2c_slave_addr, 2, send_buf, 1, recv_buf);
+  }
+  catch (I2CException& e)
+  {
+    std::stringstream message;
+    message << "VL6180 (wpi pin " << this->gpio_pin.pin_num
+        << "): Some error: " << e.what();
+    throw Vl6180Exception(message.str(), this->gpio_pin.pin_num);
+  }
   return (uint8_t) recv_buf[0];
 }
 
+
+
+Vl6180Exception::Vl6180Exception(std::string msg, int pin_num)
+  : wpi_pin_num(pin_num), message(msg)
+{}
+
+const char* Vl6180Exception::what() const noexcept
+{
+  return this->message.c_str();
+}

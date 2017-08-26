@@ -4,7 +4,9 @@
 #include <atomic>
 #include <chrono>
 #include <cstdio>
+#include <exception>
 #include <map>
+#include <string>
 #include <thread>
 
 #include "gpio.hpp"
@@ -71,6 +73,18 @@ class Vl6180 : public Proxi
     bool cont_mode = false;
     bool on;
     int offset = 0;
+};
+
+class Vl6180Exception : public std::exception
+{
+  public:
+    Vl6180Exception(std::string message, int wpi_pin_num);
+    virtual const char* what() const noexcept override;
+
+    const int wpi_pin_num;
+
+  private:
+    const std::string message;
 };
 
 #endif //HYPED_DRIVERS_VL6180_HPP_
