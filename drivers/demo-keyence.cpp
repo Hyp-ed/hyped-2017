@@ -13,10 +13,14 @@ int main()
 {
   Keyence k(CONFIG_PIN, OUTPUT_PIN);
   k.calibrate();
-  void start();
+  k.start();
   while (1)
   {
-    printf("Count: %d\n", k.get_count());
+    //printf("Count: %d\n", k.get_count());
+    if (k.has_new_stripe())
+    {
+      printf("Count: %d\n", k.get_count());
+    }
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }

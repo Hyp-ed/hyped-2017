@@ -56,6 +56,11 @@ int Keyence::get_count()
   return this->count.load(std::memory_order_relaxed);
 }
 
+double Keyence::get_distance()
+{
+  return this->get_count() * 30.0;
+}
+
 void Keyence::count_stripes()
 {
   int count = 0;
@@ -66,23 +71,23 @@ void Keyence::count_stripes()
     if (current && !previous)
     {
       // Stripe started
-      printf("Stripe started\n");
+      //printf("Stripe started\n");
     }	
     if (current && previous)
     {
       // Stripe in progress
-      printf("Stripe still present\n");
+      //printf("Stripe still present\n");
     }
     if (!current && previous)
     {
       ++count;
       this->count.store(count, std::memory_order_relaxed);
       this->new_stripe.store(true, std::memory_order_relaxed);
-      printf("Stripe finished. Stripe Count = %d\n", count);
+      //printf("Stripe finished. Stripe Count = %d\n", count);
     }
 
     previous = current;
     //Change delay to vary the reading frequency
-    std::this_thread::sleep_for(std::chrono::microseconds(10000));
+    std::this_thread::sleep_for(std::chrono::microseconds(1000));
   }
 }

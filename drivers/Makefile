@@ -9,8 +9,8 @@ all : demo-mpu6050 demo-motion_tracker demo-vl6180 demo-raspberry_pi demo-batter
 demo-mpu6050 : demo-mpu6050.o mpu6050.o i2c.o
 	$(CC) i2c.o mpu6050.o $(LFLAGS) demo-mpu6050.o -o demo-mpu6050
 
-demo-motion_tracker : demo-motion_tracker.o motion_tracker.o quaternion.o mpu6050.o vl6180.o gpio.o i2c.o
-	$(CC) i2c.o gpio.o vl6180.o mpu6050.o quaternion.o motion_tracker.o $(LFLAGS) demo-motion_tracker.o -o demo-motion_tracker
+demo-motion_tracker : demo-motion_tracker.o motion_tracker.o quaternion.o mpu6050.o vl6180.o keyence.o gpio.o i2c.o
+	$(CC) i2c.o gpio.o keyence.o vl6180.o mpu6050.o quaternion.o motion_tracker.o $(LFLAGS) demo-motion_tracker.o -o demo-motion_tracker
 
 demo-vl6180 : demo-vl6180.o vl6180.o gpio.o i2c.o
 	$(CC) i2c.o gpio.o vl6180.o $(LFLAGS) demo-vl6180.o -o demo-vl6180

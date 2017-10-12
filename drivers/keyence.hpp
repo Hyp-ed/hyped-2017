@@ -17,7 +17,7 @@ class Keyence
     void stop();
     bool has_new_stripe();
     int get_count();
-    //double get_distance();
+    double get_distance();
   
   private:
     void count_stripes();

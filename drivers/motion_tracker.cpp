@@ -16,7 +16,8 @@ inline double timestamp()
 
 
 MotionTracker::MotionTracker()
-    : time(0),
+    : keyence(CONFIG_PIN, OUTPUT_PIN),
+    time(0),
     angular_velocity(Vector3D<double>()),
     rotor(Quaternion(1, 0, 0, 0)),
     acceleration(Vector3D<double>()),
@@ -67,6 +68,7 @@ void MotionTracker::add_brake_proxis(Proxi& front, Proxi& rear, RailSide side)
 
 bool MotionTracker::start()
 {
+  this->keyence.calibrate();
   //TODO: check not already started
   //TODO: check enough sensors configured
 
@@ -96,6 +98,8 @@ bool MotionTracker::start()
   this->start_time = timestamp();
   this->stop_flag = false;
   this->tracking_thread = std::thread(&MotionTracker::track, this);
+
+  this->keyence.start();
 
   return true;
 }
@@ -140,6 +144,11 @@ Vector3D<double> MotionTracker::get_displacement()
   return this->displacement.load(std::memory_order_relaxed);
 }
 
+int MotionTracker::get_stripe_count()
+{
+  return this->count.load(std::memory_order_relaxed);
+}
+
 
 void MotionTracker::track()
 {
@@ -154,10 +163,13 @@ void MotionTracker::track()
   Vector3D<double> dist(0.0, 0.0, 0.0);
   DataPoint<Vector3D<double>> velocity, new_velocity;
   DataPoint<Vector3D<double>> accl0, accl, angv0, angv;
+  DataPoint<double> kdist0, kdist;
   this->get_imu_data_points(accl0, angv0);
   accl0.value -= avg_accl_offset;
   velocity.timestamp = accl0.timestamp;
   double t0 = accl0.timestamp;
+  kdist0.value = this->keyence.get_distance();
+  kdist0.timestamp = t0;
   while(!this->stop_flag)
   {
     this->get_imu_data_points(accl, angv);
@@ -195,11 +207,22 @@ void MotionTracker::track()
       angv0 = angv;
     }
 
-    if (angv0.timestamp - t0 > 0.01 && this->ground_proxis.size() >= 3)
+    /*if (angv0.timestamp - t0 > 0.01 && this->ground_proxis.size() >= 3)
     {
       rotor *= Quaternion::pow(Quaternion::inv(rotor) * this->get_proxi_rotor(),
           PROXI_WEIGHT);
       t0 = angv0.timestamp;
+    }//*/
+    if (this->keyence.has_new_stripe())
+    {
+      this->count.store(this->keyence.get_count(), std::memory_order_relaxed);
+      kdist.value = this->keyence.get_distance();
+      kdist.timestamp = timestamp();
+      rotor = Quaternion(1, 0, 0, 0);
+      velocity.value.x = (kdist.value - kdist0.value) /
+          (kdist.timestamp - kdist0.timestamp);
+      dist.x = kdist.value;
+      kdist0 = kdist;
     }
   }
 }
